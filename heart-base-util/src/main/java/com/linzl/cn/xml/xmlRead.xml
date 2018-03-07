@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="GBK"?>
+<!-- dom,sax,jdom,dom4j关于xml的读写操作 ,第一行必须是头信息-->
+<exoa-config>
+	<category additivity="false" name="org.quartz">
+		<priority value="INFO"/>
+		<appender-ref ref="ConsoleAppender"/>
+	</category>
+	 
+	<config name="missive">
+		<!-- 这是注释-->
+		<Opinion.DisableEditableOpinion>禁止修改意见</Opinion.DisableEditableOpinion>
+		<!-- 是否不显示意见填写时间，默认为false -->
+		<Opinion.DisableLeaderEditTime>false</Opinion.DisableLeaderEditTime>
+		<!-- 批示意见填写日期的显示格式，默认为："yyyy年MM月dd日 HH:mm" -->
+		<OpinionListObjectVO.editDt.format>yyyy年MM月dd日 HH:mm:ss</OpinionListObjectVO.editDt.format>
+		<!-- CDATA格式表示xml不对此进行解析 -->
+		<OpinionListObjectVO.format><![CDATA[<content><n><editDt>]]></OpinionListObjectVO.format>
+	</config>
+</exoa-config>

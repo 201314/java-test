@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<!-- 指定当前pom的版本 -->
+	<modelVersion>4.0.0</modelVersion>
+	<!-- 反写公司网址+项目名 -->
+	<groupId>com.linzl</groupId>
+	<!-- 项目名+模块名 -->
+	<artifactId>heart-base-util</artifactId>
+	<!-- 版本号 第一个0表示大版本号，第二个0分支版本号，第三个0表示小版本号 -->
+	<!-- snapshot快照，alpha内测，beta公测，Release稳定，GA正式发布 -->
+	<version>0.0.1-SNAPSHOT</version>
+	<!-- 默认是jar,可以是war,zip,pom -->
+	<packaging>jar</packaging>
+	<!-- 项目描述名 -->
+	<name>baseUtil</name>
+	<!-- 项目地址 -->
+	<url>http://repo2.maven.org/maven2</url>
+
+	<dependencies>
+		<dependency>
+			<!-- 读取各种文件中的纯文本工具 -->
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-app</artifactId>
+			<version>1.16</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.11</version>
+		</dependency>
+
+		<!-- 二维码操作 -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+
+		<!-- xml操作 -->
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
+		<!-- 压缩工具 -->
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.10.1</version>
+		</dependency>
+
+		<!-- 邮件 -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
+		<!-- FTP文件服务 -->
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.6</version>
+		</dependency>
+	</dependencies>
+</project>

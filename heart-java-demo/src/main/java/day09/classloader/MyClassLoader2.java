@@ -6,18 +6,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * 如果通过重写loadClass来实现类加载器，这样会破坏查找加载的规则被修改，所以直接导致ClassCastException,
- * 
- * 因为一个是通过MyClassLoader加载，一个是通过AppClassLoader加载
- * 
- * @description
- * @author linzl
- * @email 2225010489@qq.com
- * @date 2018年3月12日
- */
-public class MyClassLoader extends ClassLoader {
+public class MyClassLoader2 extends ClassLoader {
 
+	/**
+	 * 
+	 */
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		byte[] classData = getClassData(name); // 根据类的二进制名称,获得该class文件的字节码数组

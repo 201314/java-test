@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author linzl 最后修改时间：2014年9月20日
  */
-public class ComparatorDemo implements Comparator {
+public class ComparatorDemo implements Comparator<Object> {// 外比较器，策略模式
 
 	// JavaBean 按照金额从大到小排序，同金额的按时间从大到小排序
 	// 比较器是按-1 ,0 ,1 自然升序排序的
@@ -32,35 +32,6 @@ public class ComparatorDemo implements Comparator {
 		}
 		return 0;
 	}
-
-	public static void main(String[] args) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2014);
-		cal.set(Calendar.MONTH, 9);
-
-		List<JavaBean> list = new ArrayList<JavaBean>();
-		cal.set(Calendar.DAY_OF_MONTH, 12);
-		list.add(new JavaBean("来源A", 100, cal.getTime()));
-
-		cal.set(Calendar.DAY_OF_MONTH, 11);
-		list.add(new JavaBean("来源B", 200, cal.getTime()));
-
-		cal.set(Calendar.DAY_OF_MONTH, 13);
-		list.add(new JavaBean("来源C", 300, cal.getTime()));
-
-		cal.set(Calendar.DAY_OF_MONTH, 10);
-		list.add(new JavaBean("来源D", 100, cal.getTime()));
-
-		cal.set(Calendar.DAY_OF_MONTH, 9);
-		list.add(new JavaBean("来源E", 300, cal.getTime()));
-
-		Collections.sort(list, new ComparatorDemo());
-		for (int i = 0; i < list.size(); i++) {
-			JavaBean demo = list.get(i);
-			System.out.println(demo.getGroup());
-		}
-	}
-
 }
 
 class JavaBean {

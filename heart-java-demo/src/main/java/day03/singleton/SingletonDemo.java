@@ -1,17 +1,20 @@
 package day03.singleton;
 
 public class SingletonDemo {
-	private SingletonDemo(){
-		
+	private SingletonDemo() {
+
 	}
-	public static SingletonDemo createInstance(){
+
+	public static SingletonDemo getInstance() {
 		return new SingletonDemo();
 	}
-	public void test(){
-		System.out.println("这是一个单例模式，即只能实例化一次");
+
+	public void test() {
+		System.out.println("鍗曚緥妯″紡");
 	}
-	public static void main(String args[]){
-		SingletonDemo single=SingletonDemo.createInstance();
+
+	public static void main(String args[]) {
+		SingletonDemo single = SingletonDemo.getInstance();
 		single.test();
 	}
 }

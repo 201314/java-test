@@ -57,7 +57,7 @@ public class HelloScriptingWorld {
 	 * @throws ScriptException
 	 */
 	private static void defineScript(ScriptEngine engine) throws ScriptException {
-		engine.eval("function sayHello(name) { console('defineScript-->' + name)}");
+		engine.eval("function sayHello(name) { console.log('defineScript-->' + name)}");
 		engine.eval("sayHello('Hellow World!')");
 	}
 
@@ -84,7 +84,7 @@ public class HelloScriptingWorld {
 	private static void invokeJavaFromScript(ScriptEngine engine) throws ScriptException {
 		engine.put("helloScriptingWorld", new HelloScriptingWorld());
 		engine.eval("var msg = helloScriptingWorld.getHelloReply('JavaScript');");
-		engine.eval("console('Java returned:' + msg);");
+		engine.eval("console.log('Java returned:' + msg);");
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class HelloScriptingWorld {
 
 		engine.eval("var helloScriptingWorld2=new HelloScriptingWorld();");
 		engine.eval("var msg2 = helloScriptingWorld2.getHelloReply('invokeJavaFromScript2-->JavaScript');");
-		engine.eval("console('invokeJavaFromScript2--Java returned:' + msg2);");
+		engine.eval("console.log('invokeJavaFromScript2--Java returned:' + msg2);");
 	}
 
 	/**

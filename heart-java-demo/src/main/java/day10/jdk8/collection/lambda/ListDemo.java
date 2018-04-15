@@ -1,49 +1,75 @@
 package day10.jdk8.collection.lambda;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * 1.stream不存储数据
+ * 
+ * 2.stream不改变源数据
+ * 
+ * 3.stream的延迟执行特性
+ */
 public class ListDemo {
-	List<String> list = null;
+	List<Student> stuList = null;
 
 	@Before
 	public void init() {
-		list = new ArrayList<>();
-		list.add("1");
-		list.add("1");
-		list.add("2");
-		list.add("3");
+		Random random = new Random();
+		stuList = new ArrayList<Student>() {
+			{
+				for (int i = 0; i < 100; i++) {
+					add(new Student("student" + i, random.nextInt(50) + 50));
+				}
+			}
+		};
+	}
+
+	@Test
+	/**
+	 * 对于stream的聚合、消费或收集操作只能进行一次，再次操作会报错
+	 */
+	public void listTest() {
+		Stream<String> stream = Stream.generate(() -> "user").limit(20);
+		stream.forEach(System.out::println);
+		// stream.forEach(System.out::println);
 	}
 
 	@Test
 	public void listFilter() {
-		Objects.requireNonNull(list);
-		List<String> list2 = list.stream().filter(s -> s != "1").collect(Collectors.toList());
-		System.out.println(list2.toString());
+		Objects.requireNonNull(stuList);
+		List<String> studentList = stuList.stream().filter(stu -> stu.getScore() > 85)
+				.sorted(Comparator.comparing(Student::getScore).reversed())
+
+				.map(Student::getName).collect(Collectors.toList());
+		System.out.println(studentList);
 	}
 
 	@Test
 	public void listMap() {
-		List<String> list2 = list.stream().map(string -> {
-			// 修改数据
-			return "stream().map()处理之后：" + string;
-		}).collect(Collectors.toList());
-
-		list2.stream().forEach(string -> {
-			System.out.println(string);
-		});
+		// List<String> list2 = list.stream().map(string -> {
+		// // 修改数据
+		// return "stream().map()处理之后：" + string;
+		// }).collect(Collectors.toList());
+		//
+		// list2.stream().forEach(string -> {
+		// System.out.println(string);
+		// });
 	}
 
 	@Test
 	public void listMapToInt() {
-		IntStream intStream = list.stream().mapToInt(string -> Integer.parseInt(string));
-		System.out.println(intStream.sum());
+		// IntStream intStream = list.stream().mapToInt(string ->
+		// Integer.parseInt(string));
+		// System.out.println(intStream.sum());
 	}
 
 	@Test
@@ -89,14 +115,14 @@ public class ListDemo {
 	@Test
 	public void listForEach() {
 		// 两种写法有何不同
-		list.stream().forEach(string -> {
-			System.out.println(string);
-		});
+		// list.stream().forEach(string -> {
+		// System.out.println(string);
+		// });
 
 		// 这是以前的写法
-		list.forEach(string -> {
-			System.out.println(string);
-		});
+		// list.forEach(string -> {
+		// System.out.println(string);
+		// });
 	}
 
 	@Test

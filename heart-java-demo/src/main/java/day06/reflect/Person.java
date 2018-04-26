@@ -1,36 +1,37 @@
 package day06.reflect;
 
 public class Person {
-	public String password="123466";
-	protected String sex="ÄÐ";
+	public String password = "123466";
+	protected String sex = "ç”·";
 	private String name;
 	private int age;
-	
-	public Person(){};
-	
-	private void say(String name){
-		System.out.println("ÎÒ½Ð£º"+name);
+
+	public Person() {
+	};
+
+	private void say(String name) {
+		System.out.println("æˆ‘å«ï¼š" + name);
 	}
-	
-	private Person(String name,int age,String sex){
-		System.out.println("Ãû³Æ£º"+name+"ÄêÁä:"+age+"ÐÔ±ð:"+sex);
+
+	private Person(String name, int age, String sex) {
+		System.out.println("åç§°ï¼š" + name + "å¹´é¾„:" + age + "æ€§åˆ«:" + sex);
 	}
-		
-	public Person(String name,int age){
-		this.name=name;
-		this.age=age;
+
+	public Person(String name, int age) {
+		this.name = name;
+		this.age = age;
 	}
-	
-	public String print(){
-		return "ÎÒµÄÃÜÂëÊÇ:"+this.password;
+
+	public String print() {
+		return "æˆ‘çš„å¯†ç æ˜¯:" + this.password;
 	}
-	
-	public void updatePassword(String password){
-		this.password=password;
+
+	public void updatePassword(String password) {
+		this.password = password;
 	}
-	
-	public String toString(){
-		return "ÐÕÃû:"+this.name+"-->ÄêÁä:"+this.age;		
+
+	public String toString() {
+		return "å§“å:" + this.name + "-->å¹´é¾„:" + this.age;
 	}
-	
+
 }

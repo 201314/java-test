@@ -2,6 +2,8 @@ package day09.proxy;
 
 import org.junit.Test;
 
+import day09.proxy.dynamic.CglibProxy;
+import day09.proxy.dynamic.JDKDynamicProxy;
 import day09.proxy.subject.RealSubject;
 import day09.proxy.subject.StaticSubjectProxy;
 import day09.proxy.subject.Subject;

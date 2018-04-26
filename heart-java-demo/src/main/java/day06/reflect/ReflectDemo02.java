@@ -6,23 +6,23 @@ import java.lang.reflect.Modifier;
 
 public class ReflectDemo02 {
 	public static void main(String[] args) throws Exception {
-		Class cl=Class.forName("day06.reflect.Person");
-		Object obj=cl.newInstance();
-		Person per2=(Person)obj;
-		Method method1=cl.getMethod("updatePassword", String.class);
-	    method1.invoke(per2, "asdf");
-	    System.out.println(per2.print());
-	    //System.out.println(obj.getClass());
-	  	     
-	    Constructor[] cont1=cl.getDeclaredConstructors();//·µ»ØËùÓĞ¹¹Ôì·½·¨
-	    for (Constructor constructor : cont1) {
-			System.out.println("¹¹Ôì·½·¨µÄ·ÃÎÊÈ¨ÏŞ£º"+Modifier.toString(constructor.getModifiers())+"·½·¨Ãû³Æ:"+constructor.getName());
+		Class cl = Class.forName("day06.reflect.Person");
+		Object obj = cl.newInstance();
+		Person per2 = (Person) obj;
+		Method method1 = cl.getMethod("updatePassword", String.class);
+		method1.invoke(per2, "asdf");
+		System.out.println(per2.print());
+		// System.out.println(obj.getClass());
+
+		Constructor[] cont1 = cl.getDeclaredConstructors();// è¿”å›æ‰€æœ‰æ„é€ æ–¹æ³•
+		for (Constructor constructor : cont1) {
+			System.out.println(
+					"æ„é€ æ–¹æ³•çš„è®¿é—®æƒé™ï¼š" + Modifier.toString(constructor.getModifiers()) + "æ–¹æ³•åç§°:" + constructor.getName());
 		}
-	    
-	    Constructor cont2=cl.getDeclaredConstructor(String.class,int.class,String.class);
-	    cont2.setAccessible(true);
-	    Person per=(Person)cont2.newInstance("ÁÖÎ°Ç¿",22,"ÄĞ");
-	    
+
+		Constructor cont2 = cl.getDeclaredConstructor(String.class, int.class, String.class);
+		cont2.setAccessible(true);
+		Person per = (Person) cont2.newInstance("æ—ä¼Ÿå¼º", 22, "ç”·");
 	}
 
 }

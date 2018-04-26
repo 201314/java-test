@@ -2,6 +2,11 @@ package day09.classloader;
 
 import org.junit.Test;
 
+/*
+ * 对于任意一个类，由加载它的ClassLoader和它本身决定了在jvm虚拟机中的唯一性。
+ * 也就是说比较2个类，只有它们都是由同一个ClassLoader加载，那么比较才有意义。
+ * 否则，即使是同一个类文件，只要加载它们的ClassLoader不同，那么这2个类必定不相等。
+ */
 public class ClassLoaderTest {
 	@Test
 	public void printClassLoder() {

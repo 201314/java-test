@@ -31,12 +31,12 @@ public class SpiTest2 {
 	 */
 	public static void main(String[] args)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		ServiceLoader<SPIService> loader = ServiceLoader.load(SPIService.class);
+		ServiceLoader<SpiService> loader = ServiceLoader.load(SpiService.class);
 		if (loader == null) {
 			return;
 		}
 
-		for (SPIService service : loader) {
+		for (SpiService service : loader) {
 			System.out.println("哪个类--》" + service.getClass().getSimpleName());
 			service.test();
 		}

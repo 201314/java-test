@@ -122,37 +122,33 @@ public class FileUtilss {
 	public static void unZipFiles(File zipFile, File destDir) throws IOException {
 		FileUtils.forceMkdir(destDir);
 
-		ZipFile zip = new ZipFile(zipFile);
-		Enumeration entries = zip.getEntries();
+		try (ZipFile zip = new ZipFile(zipFile);) {
+			Enumeration entries = zip.getEntries();
+			while (entries.hasMoreElements()) {
+				int len = 0;
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				String outPath = (destDir.getPath() + "/" + entry.getName()).replaceAll("\\\\", "/").replaceAll("//*",
+						"/");
 
-		ZipEntry entry = null;
-		InputStream in = null;
-		OutputStream out = null;
+				// 判断路径是否存在,不存在则创建文件路径
+				File parentDir = new File(outPath.substring(0, outPath.lastIndexOf('/')));
+				FileUtils.forceMkdir(parentDir);
 
-		int len = 0;
-		while (entries.hasMoreElements()) {
-			entry = (ZipEntry) entries.nextElement();
-			String outPath = (destDir.getPath() + "/" + entry.getName()).replaceAll("\\\\", "/").replaceAll("//*", "/");
+				// 判断文件全路径是否为文件夹,如果是上面已经创建,不需要解压
+				if (new File(outPath).isDirectory()) {
+					continue;
+				}
 
-			// 判断路径是否存在,不存在则创建文件路径
-			File parentDir = new File(outPath.substring(0, outPath.lastIndexOf('/')));
-			FileUtils.forceMkdir(parentDir);
-
-			// 判断文件全路径是否为文件夹,如果是上面已经创建,不需要解压
-			if (new File(outPath).isDirectory()) {
-				continue;
+				try (InputStream in = zip.getInputStream(entry);
+						OutputStream out = FileUtils.openOutputStream(new File(outPath));) {
+					while ((len = in.read(buf)) > 0) {
+						out.write(buf, 0, len);
+					}
+					IOUtils.closeQuietly(out);
+					IOUtils.closeQuietly(in);
+				}
 			}
-
-			in = zip.getInputStream(entry);
-			out = FileUtils.openOutputStream(new File(outPath));
-
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-
-			IOUtils.closeQuietly(out);
-			IOUtils.closeQuietly(in);
+			ZipFile.closeQuietly(zip);
 		}
-		ZipFile.closeQuietly(zip);
 	}
 }

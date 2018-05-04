@@ -7,6 +7,14 @@ import java.util.regex.Pattern;
 
 import org.bouncycastle.util.encoders.Hex;
 
+/**
+ * TODO TODO TODO TODO java.util.zip.CRC32的使用
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年4月24日
+ */
 public class HexUtil {
 	/**
 	 * 

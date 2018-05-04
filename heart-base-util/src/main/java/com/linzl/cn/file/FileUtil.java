@@ -1,16 +1,37 @@
 package com.linzl.cn.file;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * 文件处理辅助类
  * 
- * @author yjmyzz@126.com
- * @version 0.2
- * @since 2014-11-17
- *
+ * @description
+ * 
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年5月4日
  */
 public class FileUtil {
 
@@ -47,13 +68,10 @@ public class FileUtil {
 	 * @return
 	 */
 	public static boolean delete(String fileName) {
-		boolean result = false;
+		boolean result = true;
 		File f = new File(fileName);
 		if (f.exists()) {
 			result = f.delete();
-
-		} else {
-			result = true;
 		}
 		return result;
 	}
@@ -144,12 +162,12 @@ public class FileUtil {
 	 */
 	public static String read(String fileName) throws IOException {
 		File f = new File(fileName);
-		FileInputStream fs = new FileInputStream(f);
 		String result = null;
-		byte[] b = new byte[fs.available()];
-		fs.read(b);
-		fs.close();
-		result = new String(b);
+		try (FileInputStream fs = new FileInputStream(f)) {
+			byte[] b = new byte[fs.available()];
+			fs.read(b);
+			result = new String(b);
+		}
 		return result;
 	}
 
@@ -166,12 +184,11 @@ public class FileUtil {
 	public static boolean write(String fileName, String fileContent) throws IOException {
 		boolean result = false;
 		File f = new File(fileName);
-		FileOutputStream fs = new FileOutputStream(f);
-		byte[] b = fileContent.getBytes();
-		fs.write(b);
-		fs.flush();
-		fs.close();
-		result = true;
+		try (FileOutputStream fs = new FileOutputStream(f)) {
+			byte[] b = fileContent.getBytes();
+			fs.write(b);
+			result = true;
+		}
 		return result;
 	}
 
@@ -187,15 +204,15 @@ public class FileUtil {
 		boolean result = false;
 		File f = new File(fileName);
 		if (f.exists()) {
-			RandomAccessFile rFile = new RandomAccessFile(f, "rw");
-			byte[] b = fileContent.getBytes();
-			long originLen = f.length();
-			rFile.setLength(originLen + b.length);
-			rFile.seek(originLen);
-			rFile.write(b);
-			rFile.close();
+			try (RandomAccessFile rFile = new RandomAccessFile(f, "rw");) {
+				byte[] b = fileContent.getBytes();
+				long originLen = f.length();
+				rFile.setLength(originLen + b.length);
+				rFile.seek(originLen);
+				rFile.write(b);
+				result = true;
+			}
 		}
-		result = true;
 		return result;
 	}
 
@@ -209,25 +226,25 @@ public class FileUtil {
 	 * @return 拆分后的文件名列表
 	 * @throws IOException
 	 */
-	public List<String> splitBySize(String fileName, int byteSize) throws IOException {
-		List<String> parts = new ArrayList<String>();
-		File file = new File(fileName);
+	public List<String> splitBySize(File file, int byteSize) throws IOException {
+
 		int count = (int) Math.ceil(file.length() / (double) byteSize);
-		int countLen = (count + "").length();
+		int countLen = String.valueOf(count).length();
 
-		ThreadPoolExecutor threadPool = new ThreadPoolExecutor(count, count * 3, 1, TimeUnit.SECONDS,
-				new ArrayBlockingQueue<Runnable>(count * 2));
+		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 
+		List<String> parts = new ArrayList<String>();
 		for (int i = 0; i < count; i++) {
-			String partFileName = file.getName() + "." + leftPad((i + 1) + "", countLen, '0') + ".part";
-			threadPool.execute(new SplitRunnable(byteSize, i * byteSize, partFileName, file));
+			String partFileName = String.format("%s.%s.part", file.getName(),
+					leftPad(String.valueOf(i + 1), countLen, '0'));
+			executor.submit(new SplitRunnable(byteSize, i * byteSize, partFileName, file));
 			parts.add(partFileName);
 		}
 		return parts;
 	}
 
 	/**
-	 * 合并文件
+	 * 异步合并文件,合并完成会删除分片文件
 	 * 
 	 * @param dirPath
 	 *            拆分文件所在目录名
@@ -239,17 +256,86 @@ public class FileUtil {
 	 *            合并后的文件名
 	 * @throws IOException
 	 */
-	public void mergePartFiles(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
+	public void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
 			throws IOException {
 		ArrayList<File> partFiles = FileUtil.getDirFiles(dirPath, partFileSuffix);
 		Collections.sort(partFiles, new FileComparator());
 
-		ThreadPoolExecutor threadPool = new ThreadPoolExecutor(partFiles.size(), partFiles.size() * 3, 1,
-				TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(partFiles.size() * 2));
+		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 
-		for (int i = 0; i < partFiles.size(); i++) {
-			threadPool.execute(new MergeRunnable(i * partFileSize, mergeFileName, partFiles.get(i)));
+		for (int i = 0, length = partFiles.size(); i < length; i++) {
+			Future<Boolean> future = executor
+					.submit(new MergeRunnable(i * partFileSize, mergeFileName, partFiles.get(i)));
+			try {
+				if (future.get()) {// 表示已经合并成功，即可删除
+					partFiles.get(i).deleteOnExit();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+
+	/**
+	 * 同步合并文件,合并完成会删除分片文件
+	 * 
+	 * @param dirPath
+	 *            拆分文件所在目录名
+	 * @param partFileSuffix
+	 *            拆分文件后缀名
+	 * @param partFileSize
+	 *            拆分文件的字节数大小
+	 * @param mergeFileName
+	 *            合并后的文件名
+	 * @throws IOException
+	 */
+	public void synMergeFiles(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
+			throws IOException {
+		ArrayList<File> partFiles = FileUtil.getDirFiles(dirPath, partFileSuffix);
+		Collections.sort(partFiles, new FileComparator());
+
+		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
+
+		List<MergeRunnable> runList = new ArrayList<>();
+		for (int i = 0, length = partFiles.size(); i < length; i++) {
+			runList.add(new MergeRunnable(i * partFileSize, mergeFileName, partFiles.get(i)));
+		}
+		try {
+			executor.invokeAll(runList);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		executor.shutdown();
+		for (int i = 0, length = partFiles.size(); i < length; i++) {
+			partFiles.get(i).deleteOnExit();
+		}
+	}
+
+	public void synMergeFiles2(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
+			throws IOException {
+		ArrayList<File> partFiles = FileUtil.getDirFiles(dirPath, partFileSuffix);
+		Collections.sort(partFiles, new FileComparator());
+
+		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
+
+		List<MergeRunnable> runList = new ArrayList<>();
+		for (int i = 1; i < 7; i = i + 2) {
+			runList.add(new MergeRunnable(i * partFileSize, mergeFileName,
+					FileUtils.readFileToByteArray(partFiles.get(i))));
+		}
+
+		for (int i = 0; i < 7; i = i + 2) {
+			runList.add(new MergeRunnable(i * partFileSize, mergeFileName,
+					FileUtils.readFileToByteArray(partFiles.get(i))));
+		}
+		try {
+			executor.invokeAll(runList);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		executor.shutdown();
 	}
 
 	/**
@@ -284,17 +370,12 @@ public class FileUtil {
 		}
 
 		public void run() {
-			RandomAccessFile rFile;
-			OutputStream os;
-			try {
-				rFile = new RandomAccessFile(originFile, "r");
+			try (RandomAccessFile rFile = new RandomAccessFile(originFile, "r");
+					OutputStream os = new FileOutputStream(new File(originFile.getParentFile(), partFileName));) {
 				byte[] b = new byte[byteSize];
 				rFile.seek(startPos);// 移动指针到每“段”开头
 				int s = rFile.read(b);
-				os = new FileOutputStream(partFileName);
 				os.write(b, 0, s);
-				os.flush();
-				os.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -302,36 +383,40 @@ public class FileUtil {
 	}
 
 	/**
-	 * 合并处理Runnable
-	 * 
-	 * @author yjmyzz@126.com
-	 *
+	 * @description 合并文件
+	 * @author linzl
+	 * @email 2225010489@qq.com
+	 * @date 2018年4月24日
 	 */
-	private class MergeRunnable implements Runnable {
+	private class MergeRunnable implements Callable<Boolean> {
 		long startPos;
 		String mergeFileName;
-		File partFile;
+		byte[] partFileByte;
 
-		public MergeRunnable(long startPos, String mergeFileName, File partFile) {
+		public MergeRunnable(long startPos, String fullMergeFileName, File partFile) {
 			this.startPos = startPos;
-			this.mergeFileName = mergeFileName;
-			this.partFile = partFile;
-		}
-
-		public void run() {
-			RandomAccessFile rFile;
+			this.mergeFileName = fullMergeFileName;
 			try {
-				rFile = new RandomAccessFile(mergeFileName, "rw");
-				rFile.seek(startPos);
-				FileInputStream fs = new FileInputStream(partFile);
-				byte[] b = new byte[fs.available()];
-				fs.read(b);
-				fs.close();
-				rFile.write(b);
-				rFile.close();
+				this.partFileByte = FileUtils.readFileToByteArray(partFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		public MergeRunnable(long startPos, String fullMergeFileName, byte[] partFileByte) {
+			this.startPos = startPos;
+			this.mergeFileName = fullMergeFileName;
+			this.partFileByte = partFileByte;
+		}
+
+		public Boolean call() {
+			try (RandomAccessFile rFile = new RandomAccessFile(mergeFileName, "rw");) {
+				rFile.seek(startPos);
+				rFile.write(partFileByte);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return true;
 		}
 	}
 
@@ -344,13 +429,9 @@ public class FileUtil {
 	 */
 	public static Object byteToObj(byte[] bytes) {
 		Object obj = null;
-		try {
-			ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
-			ObjectInputStream oi = new ObjectInputStream(bi);
-
+		try (ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
+				ObjectInputStream oi = new ObjectInputStream(bi);) {
 			obj = oi.readObject();
-			bi.close();
-			oi.close();
 		} catch (Exception e) {
 			System.out.println("translation" + e.getMessage());
 			e.printStackTrace();
@@ -367,15 +448,10 @@ public class FileUtil {
 	 */
 	public static byte[] objToByte(Object obj) {
 		byte[] bytes = null;
-		try {
-			// object to bytearray
-			ByteArrayOutputStream bo = new ByteArrayOutputStream();
-			ObjectOutputStream oo = new ObjectOutputStream(bo);
+		try (ByteArrayOutputStream bo = new ByteArrayOutputStream();
+				ObjectOutputStream oo = new ObjectOutputStream(bo);) {
 			oo.writeObject(obj);
-
 			bytes = bo.toByteArray();
-			bo.close();
-			oo.close();
 		} catch (Exception e) {
 			System.out.println("translation" + e.getMessage());
 			e.printStackTrace();

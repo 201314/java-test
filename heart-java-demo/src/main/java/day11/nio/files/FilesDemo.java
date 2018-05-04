@@ -11,26 +11,32 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class FilesDemo {
 
-	public static void main(String[] args) {
+	public void createDir() {
 		Path dir = Paths.get("D:/data1/logging.properties");
-
 		try {
-			// 目录不存在，会先创建
-			Files.createDirectories(dir);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		boolean pathExists = Files.exists(dir);
-		// 判断是否存在
-		if (!pathExists) {
-			try {// 创建目录,父目录必须存在,否则报错
+			if (Files.exists(dir.getParent())) {
+				// 要特别注意这种创建方式，父目录必须存在,否则报错
 				Files.createDirectory(dir);
-			} catch (IOException e) {
-				e.printStackTrace();
+			} else {
+				// 目录不存在，会先创建
+				Files.createDirectories(dir);
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
 
+	public void creatTempDir() {
+		try {
+			// 生成临时目录，add为最后一个目录的前缀
+			Path path = Files.createTempDirectory("add");
+			System.out.println(path.toFile().getPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void copy() {
 		Path first = Paths.get("D:/data/IMG_20170910_144224_HDR.jpg");
 		Path second = Paths.get("D:/data1/", "hello1.jpg");
 		Path third = Paths.get("D:/data1");
@@ -45,15 +51,9 @@ public class FilesDemo {
 				e.printStackTrace();
 			}
 		}
+	}
 
-		try {
-			// 生成临时目录，add为最后一个目录的前缀
-			Path path = Files.createTempDirectory("add");
-			System.out.println(path.toFile().getPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public void move() {
 		Path moveSource = Paths.get("D:/data1/", "hello1.jpg");
 		Path targetSource = Paths.get("D:/data1/", "hello2.jpg");
 		try {
@@ -61,7 +61,9 @@ public class FilesDemo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 
+	public void listFile() {
 		Path tempPath = Paths.get("C:\\Users\\Administrator\\AppData\\Local\\Temp");
 		try {
 			Files.walkFileTree(tempPath, new SimpleFileVisitor<Path>() {
@@ -79,5 +81,9 @@ public class FilesDemo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+
 	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.gitee.linzl.nio.file.FilesDemo;
+
 public class FilesDemoTest {
 
 	@Test

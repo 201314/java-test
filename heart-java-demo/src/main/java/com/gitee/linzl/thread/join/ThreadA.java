@@ -6,9 +6,9 @@ public class ThreadA extends Thread {
 		for (int i = 0; i < 10; i++) {
 			count = (count + 1) * 2;
 		}
-		System.out.println(count);
+		System.out.println("ThreadA:" + count);
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

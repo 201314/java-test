@@ -23,8 +23,9 @@ public class RegisterSingleton {
 			System.out.println("抛出异常");
 			return null;
 		} else {
-			if (map.get(name) == null)
+			if (map.get(name) == null) {
 				map.put(name, (RegisterSingleton) Class.forName(name).newInstance());
+			}
 		}
 		return map.get(name);
 	}

@@ -7,7 +7,15 @@ import java.util.Arrays;
  * 
  * 对于两个整数进行交换，可以使用以下算法：
  * 
- * int a=10; int b=5; a=a+b; b=a-b; a=a-b;
+ * int a=10;
+ * 
+ * int b=5;
+ * 
+ * a=a+b;
+ * 
+ * b=a-b;
+ * 
+ * a=a-b;
  * 
  * @author Administrator
  */
@@ -23,7 +31,7 @@ public class OrderDataReverse {
 	}
 
 	public static void main(String[] args) {
-		int[] array = { 2, 9, 1, 8, 7, 3 };//{ 1, 2, 5, 9, 14, 15, 36, 54, 99 };
+		int[] array = { 2, 9, 1, 8, 7, 3 };// { 1, 2, 5, 9, 14, 15, 36, 54, 99 };
 		System.out.println("程序运行前：" + Arrays.toString(array));
 		System.out.println("程序运行后：" + Arrays.toString(reverse(array)));
 	}

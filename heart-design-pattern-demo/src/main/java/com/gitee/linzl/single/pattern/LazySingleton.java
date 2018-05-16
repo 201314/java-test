@@ -11,16 +11,10 @@ public class LazySingleton {
 	private static LazySingleton single;
 
 	private LazySingleton() {
-	};
-
-	public static synchronized LazySingleton getInstance() {
-		if (single == null)
-			single = new LazySingleton();
-		return single;
 	}
 
 	// 双重检查标准声明对象,多线程 考虑加锁
-	public static LazySingleton MultiThreadGetInstance() {
+	public static LazySingleton getInstance() {
 		if (single == null) {
 			synchronized (LazySingleton.class) {
 				if (single == null) {

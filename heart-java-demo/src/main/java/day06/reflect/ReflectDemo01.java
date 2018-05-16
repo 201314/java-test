@@ -16,18 +16,18 @@ public class ReflectDemo01 {
 		Class cl = Class.forName("day06.reflect.Person");
 		System.out.println(cl.getName());
 		System.out.println(cl.getModifiers());
-		System.out.println("¹¹Ôì·½·¨µÄ·ÃÎÊÈ¨ÏŞ£º" + Modifier.toString(cl.getModifiers()));
+		System.out.println("æ„é€ æ–¹æ³•çš„è®¿é—®æƒé™ï¼š" + Modifier.toString(cl.getModifiers()));
 		System.out.println(cl.getClass());
 
-		Field field[] = cl.getDeclaredFields();// ·µ»ØµÄÊÇË½ÓĞµÄÊôĞÔDeclared
-		// Field field[]=cl.getFields(); //·µ»ØµÄÊÇ¹«¿ªµÄÊôĞÔ
+		Field field[] = cl.getDeclaredFields();// è¿”å›çš„æ˜¯ç§æœ‰çš„å±æ€§Declared
+		// Field field[]=cl.getFields(); //è¿”å›çš„æ˜¯å…¬å¼€çš„å±æ€§
 		for (Field field2 : field) {
-			System.out.println("ÉùÃ÷ÀàĞÍ:" + field2.getType() + "-->Ãû³Æ" + field2.getName());
+			System.out.println("å£°æ˜ç±»å‹:" + field2.getType() + "-->åç§°" + field2.getName());
 		}
 
-		Method method[] = cl.getDeclaredMethods();// ·µ»ØµÄÊÇËùÓĞ·½·¨
+		Method method[] = cl.getDeclaredMethods();// è¿”å›çš„æ˜¯æ‰€æœ‰æ–¹æ³•
 		for (Method method1 : method) {
-			System.out.println("·ÃÎÊÈ¨ÏŞ£º" + Modifier.toString(method1.getModifiers()) + "·½·¨Ãû:" + method1.getName());
+			System.out.println("è®¿é—®æƒé™ï¼š" + Modifier.toString(method1.getModifiers()) + "æ–¹æ³•å:" + method1.getName());
 		}
 	}
 

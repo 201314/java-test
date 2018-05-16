@@ -9,6 +9,10 @@ package day04.inner;
  * @date 2018年1月10日
  */
 public class AnonymityInnerClass {
+	public interface Person {
+		public void test();
+	}
+
 	public void anonymity(Person per) {
 		per.test();
 		System.out.println("向匿名内部类打个招呼吧");

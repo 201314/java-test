@@ -5,7 +5,7 @@ package day05.comparator;
  * 
  * @author linzl 最后修改时间：2014年9月21日
  */
-public class ComparableDemo implements Comparable<Object> {// 相当于内比较器，自己和自己比
+public class ComparableDemo implements Comparable<ComparableDemo> {// 相当于内比较器，自己和自己比
 	private String name;
 	private int age;
 
@@ -15,8 +15,7 @@ public class ComparableDemo implements Comparable<Object> {// 相当于内比较
 	}
 
 	@Override
-	public int compareTo(Object obj) {
-		ComparableDemo second = (ComparableDemo) obj;
+	public int compareTo(ComparableDemo second) {
 		if (this.age > second.getAge()) {
 			return -1;
 		} else if (this.age < second.getAge()) {

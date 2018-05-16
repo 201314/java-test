@@ -11,7 +11,7 @@ public class HungrySingleton {
 	private static HungrySingleton single = new HungrySingleton();
 
 	private HungrySingleton() {
-	};
+	}
 
 	public static HungrySingleton getInstance() {
 		return single;

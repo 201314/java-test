@@ -25,7 +25,7 @@ public class DeleteAssignData {
 	}
 
 	public static void main(String[] args) {
-		int[] array = { 1, 2, 3, 4, 5, 6 };
+		int[] array = { 1, 2, 3, 4, 5, 6, 2, 5, 2, 9, 5, 4 };
 		System.out.println("程序运行前：" + Arrays.toString(array));
 		System.out.println("程序运行后：" + Arrays.toString(delete(array, 2)));
 	}

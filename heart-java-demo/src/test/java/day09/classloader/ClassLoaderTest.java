@@ -2,6 +2,8 @@ package day09.classloader;
 
 import org.junit.Test;
 
+import com.gitee.linzl.classloader.MyClassLoader;
+
 /*
  * 对于任意一个类，由加载它的ClassLoader和它本身决定了在jvm虚拟机中的唯一性。
  * 也就是说比较2个类，只有它们都是由同一个ClassLoader加载，那么比较才有意义。

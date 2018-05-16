@@ -4,11 +4,4 @@
 	<groupId>com.linzl</groupId>
 	<artifactId>heart-java-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<dependencies>
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>3.2.5</version>
-		</dependency>
-	</dependencies>
 </project>

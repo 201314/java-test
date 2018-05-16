@@ -3,7 +3,6 @@ package day05.comparator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
@@ -22,32 +21,32 @@ public class ListGroup {
 		list.add(new Group("来源A", 99800));
 
 		List<Group> groupList = getListByGroup(list);
-		for (Group bean : groupList) {
+		groupList.stream().forEach((bean) -> {
 			System.out.print(bean.getGroup() + "		");
 			System.out.println(bean.getMoney());
-		}
+		});
 	}
 
 	private static List<Group> getListByGroup(List<Group> list) {
 		List<Group> result = new ArrayList<Group>();
 		Map<String, Integer> map = new TreeMap<String, Integer>();
 
-		for (Group bean : list) {
+		list.stream().forEach((bean) -> {
 			if (map.containsKey(bean.getGroup())) {
 				map.put(bean.getGroup(), map.get(bean.getGroup()) + bean.getMoney());
 			} else {
 				map.put(bean.getGroup(), bean.getMoney());
 			}
-		}
-		for (Entry<String, Integer> entry : map.entrySet()) {
+		});
+
+		map.entrySet().forEach((entry) -> {
 			result.add(new Group(entry.getKey(), entry.getValue()));
-		}
+		});
 		return result;
 	}
 }
 
 class Group {
-
 	private String group;
 	private int money;
 

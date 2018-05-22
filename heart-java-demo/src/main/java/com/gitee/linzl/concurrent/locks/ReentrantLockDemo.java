@@ -3,13 +3,13 @@ package com.gitee.linzl.concurrent.locks;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 可重入：防止自己锁死自己
+ * 可重入：防止自己锁死自己,ReentrantLock\synchronized都是可重入锁
  * 
- * 可中断
+ * 可中断：ReentrantLock可中断，synchronized不可中断
  * 
- * 可限时
+ * 可限时：ReentrantLock可限时释放锁，synchronized不可
  * 
- * 公平锁
+ * 公平锁：ReentrantLock可设置公平锁，synchronized非公平锁
  * 
  * @description
  * @author linzl

@@ -8,9 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ProduceAndConsumer {
 	private int Max = 10;
-	Lock lock = new ReentrantLock();
-	
-	Queue<String> buffer = new LinkedList<>();
+	private Lock lock = new ReentrantLock();
+	private Queue<String> buffer = new LinkedList<>();
 
 	class Producer implements Runnable {
 		public void run() {
@@ -41,7 +40,6 @@ public class ProduceAndConsumer {
 							System.out.println("等待生产");
 							lock.wait();// 没有可以消费的，要等待
 						}
-
 						System.out.println("消费者" + Thread.currentThread().getName() + "开始:大小" + buffer.size() + ",取出"
 								+ buffer.poll());
 						lock.notify();

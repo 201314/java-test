@@ -1,4 +1,4 @@
-package day06.file;
+package com.gitee.linzl.io.file;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

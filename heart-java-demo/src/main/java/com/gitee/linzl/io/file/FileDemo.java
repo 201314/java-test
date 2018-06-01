@@ -1,4 +1,4 @@
-package day06.file;
+package com.gitee.linzl.io.file;
 
 import java.io.File;
 import java.io.IOException;

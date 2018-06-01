@@ -39,6 +39,7 @@ public class SellTickets {
 
 	public static void main(String[] args) {
 		SellTickets st = new SellTickets();
+		System.out.println(Runtime.getRuntime().availableProcessors());
 		new Thread(st.new Seller(), "SellerA").start();
 		new Thread(st.new Seller(), "SellerB").start();
 	}

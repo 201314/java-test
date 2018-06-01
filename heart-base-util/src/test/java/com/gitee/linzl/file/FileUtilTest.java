@@ -3,7 +3,7 @@ package com.gitee.linzl.file;
 import java.io.File;
 import java.io.IOException;
 
-import com.gitee.linzl.file.FileUtilss;
+import org.junit.Test;
 
 /**
  * 文件压缩、解压功能
@@ -13,13 +13,13 @@ import com.gitee.linzl.file.FileUtilss;
  * @author linzl
  */
 public class FileUtilTest {
-	// @Test
+	@Test
 	public void zipFiles() throws IOException {
 		/**
 		 * 压缩文件
 		 */
 		File[] files = new File[] { new File("d:/testDir/22"), new File("d:/testDir/中文.png") };
-		File zip = new File("d:/testDir/测试中文2.zip");
+		File zip = new File("d:/testDir/测试中文2.jar");
 		FileUtilss.zipFiles(files, zip);
 		String str = "11/adsf////we\\\\asd";
 		str = str.replaceAll("\\\\", "/");

@@ -1,8 +1,8 @@
-package com.gitee.linzl.thread.demo;
+package com.gitee.linzl.concurrent.atomic;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SpinLock1 {
+public class AtomicReferenceDemo {
 	private AtomicReference<Thread> owner = new AtomicReference<>();
 	private int count = 0;
 
@@ -29,7 +29,7 @@ public class SpinLock1 {
 	}
 
 	public static void main(String[] args) {
-		SpinLock1 ss = new SpinLock1();
+		AtomicReferenceDemo ss = new AtomicReferenceDemo();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

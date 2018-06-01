@@ -14,9 +14,6 @@ import java.util.List;
  * 
  */
 public class IteratorDemo extends ArrayList<String> {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public IteratorDemo(Collection<String> col) {
@@ -37,7 +34,7 @@ public class IteratorDemo extends ArrayList<String> {
 
 					@Override
 					public String next() {
-						return (String) get(current--);
+						return get(current--);
 					}
 
 					@Override
@@ -59,7 +56,7 @@ public class IteratorDemo extends ArrayList<String> {
 		}
 
 		Integer[] ia = { 1, 2, 3, 4, 5, 6 };
-		List list = Arrays.asList(ia);
+		List<Integer> list = Arrays.asList(ia);
 		System.out.println("修改前--》" + list.toString());
 		list.set(0, 100);// 修改第0个
 		System.out.println("修改后--》" + list.toString());

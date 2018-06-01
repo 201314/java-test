@@ -25,8 +25,6 @@ interface myInterface1 {
 	default void getName() {
 		System.out.println("myInterface1 getName");
 	}
-
-	;
 }
 
 interface myInterface2 {

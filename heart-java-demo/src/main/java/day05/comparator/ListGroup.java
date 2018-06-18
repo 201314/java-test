@@ -13,7 +13,7 @@ import java.util.TreeMap;
 public class ListGroup {
 
 	public static void main(String[] args) {
-		List<Group> list = new ArrayList<Group>();
+		List<Group> list = new ArrayList<>();
 		list.add(new Group("来源A", 100));
 		list.add(new Group("来源B", 200));
 		list.add(new Group("来源C", 300));
@@ -22,14 +22,13 @@ public class ListGroup {
 
 		List<Group> groupList = getListByGroup(list);
 		groupList.stream().forEach((bean) -> {
-			System.out.print(bean.getGroup() + "		");
-			System.out.println(bean.getMoney());
+			System.out.println(bean.getGroup() + "		" + bean.getMoney());
 		});
 	}
 
 	private static List<Group> getListByGroup(List<Group> list) {
-		List<Group> result = new ArrayList<Group>();
-		Map<String, Integer> map = new TreeMap<String, Integer>();
+		List<Group> result = new ArrayList<>();
+		Map<String, Integer> map = new TreeMap<>();
 
 		list.stream().forEach((bean) -> {
 			if (map.containsKey(bean.getGroup())) {

@@ -22,13 +22,11 @@ public class LuckDrawThread {
 
 	public void print() {
 		synchronized (this) {
-
 			int index = (int) (Math.random() * arr.length);
 			int get = arr[index];
 
 			// 代表这张抽奖券抽过了
 			if (flag[index] != true) {
-
 				flag[index] = true;
 				System.out.println(Thread.currentThread().getName() + " 又产生了一个" + get + "元大奖");
 				num--;
@@ -39,23 +37,19 @@ public class LuckDrawThread {
 	public static void main(String[] args) {
 		LuckDrawThread luck = new LuckDrawThread();
 
-		Thread thread = new Thread(luck.new Luck());
-		thread.setName("抽奖箱1");
+		Thread thread = new Thread(() -> {
+			while (true) {
+				luck.print();
+			}
+		}, "抽奖箱1");
 
-		Thread thread2 = new Thread(luck.new Luck());
-		thread2.setName("抽奖箱2");
+		Thread thread2 = new Thread(() -> {
+			while (true) {
+				luck.print();
+			}
+		}, "抽奖箱2");
 
 		thread.start();
 		thread2.start();
 	}
-
-	class Luck implements Runnable {
-
-		public void run() {
-			while (true) {
-				print();
-			}
-		}
-	}
-
 }

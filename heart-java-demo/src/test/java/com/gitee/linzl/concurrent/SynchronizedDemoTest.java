@@ -2,13 +2,13 @@ package com.gitee.linzl.concurrent;
 
 import org.junit.Test;
 
-public class SynchronizdeDemoTest {
+public class SynchronizedDemoTest {
 	/**
 	 * 同一资源，产生竞争，锁同步，必须按顺序
 	 */
 	@Test
 	public void test1() {
-		SynchronizdeDemo demo = new SynchronizdeDemo();
+		SynchronizedDemo demo = new SynchronizedDemo();
 
 		Thread thread1 = new Thread(() -> {
 			demo.print();
@@ -27,14 +27,14 @@ public class SynchronizdeDemoTest {
 	 */
 	@Test
 	public void test2() {
-		SynchronizdeDemo demo = new SynchronizdeDemo();
+		SynchronizedDemo demo = new SynchronizedDemo();
 
 		Thread thread1 = new Thread(() -> {
 			demo.print();
 		}, "thread1");
 
 		Thread thread2 = new Thread(() -> {
-			SynchronizdeDemo.print2();
+			SynchronizedDemo.print2();
 		}, "thread2");
 
 		thread1.start();
@@ -46,7 +46,7 @@ public class SynchronizdeDemoTest {
 	 */
 	@Test
 	public void test3() {
-		SynchronizdeDemo demo = new SynchronizdeDemo();
+		SynchronizedDemo demo = new SynchronizedDemo();
 
 		Thread thread1 = new Thread(() -> {
 			demo.print();
@@ -65,7 +65,7 @@ public class SynchronizdeDemoTest {
 	 */
 	@Test
 	public void test4() {
-		SynchronizdeDemo demo = new SynchronizdeDemo();
+		SynchronizedDemo demo = new SynchronizedDemo();
 
 		Thread thread1 = new Thread(() -> {
 			demo.print();
@@ -77,6 +77,13 @@ public class SynchronizdeDemoTest {
 
 		thread1.start();
 		thread2.start();
+
+		try {
+			thread1.join();
+			thread2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -84,7 +91,7 @@ public class SynchronizdeDemoTest {
 	 */
 	@Test
 	public void test5() {
-		SynchronizdeDemo demo = new SynchronizdeDemo();
+		SynchronizedDemo demo = new SynchronizedDemo();
 
 		final Integer param = 11;
 

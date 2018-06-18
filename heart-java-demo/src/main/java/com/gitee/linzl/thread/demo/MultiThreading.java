@@ -21,30 +21,25 @@ public class MultiThreading {
 		System.out.println(Thread.currentThread().getName() + "-sub:" + x);
 	}
 
-	class Inc implements Runnable {
-		public void run() {
-			for (int i = 0; i < 5; i++) {
-				add();
-			}
-		}
-	}
-
-	class Sub implements Runnable {
-		public void run() {
-			for (int i = 0; i < 5; i++) {
-				sub();
-			}
-		}
-	}
-
 	public static void main(String[] args) throws InterruptedException {
 		MultiThreading multi = new MultiThreading();
+		Runnable inc = () -> {
+			for (int i = 0; i < 5; i++) {
+				multi.add();
+			}
+		};
 
-		Thread thread1 = new Thread(multi.new Inc());
-		Thread thread2 = new Thread(multi.new Inc());
+		Runnable sub = () -> {
+			for (int i = 0; i < 5; i++) {
+				multi.sub();
+			}
+		};
 
-		Thread thread3 = new Thread(multi.new Sub());
-		Thread thread4 = new Thread(multi.new Sub());
+		Thread thread1 = new Thread(inc);
+		Thread thread2 = new Thread(inc);
+
+		Thread thread3 = new Thread(sub);
+		Thread thread4 = new Thread(sub);
 
 		thread1.start();
 		thread2.start();

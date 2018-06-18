@@ -1,4 +1,4 @@
-package com.gitee.linzl.thread.demo;
+package com.gitee.linzl.concurrent.threadPoolExecutor;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -10,21 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPoolTest {
 
-	private ThreadPoolExecutor pool = null;
-
-	public ThreadPoolTest() {
-		init();
-	}
-
-	public void init() {
-		pool = new ThreadPoolExecutor(1, // 非频繁执行，核心线程数就1个。
-				17, // 最大线程数，一般为服务器核心数*2+1
-				60, // 线程池中超过核心线程数的线程存活时间
-				TimeUnit.MINUTES, // 存活时间单位，秒
-				new ArrayBlockingQueue<Runnable>(10), // 10容量的阻塞队列，视具体情况而定
-				new MatCapitalApplyTransferThreadFactory(), // 线程工厂
-				new MatCapitalApplyTransferExecutionHandler());// 超过最大线程数时，线程池将会把线程交给RejectedExecutionHandler处理
-	}
+	private ThreadPoolExecutor pool = new ThreadPoolExecutor(1, // 非频繁执行，核心线程数就1个。
+			17, // 最大线程数，一般为服务器核心数*2+1
+			60, // 线程池中超过核心线程数的线程存活时间
+			TimeUnit.MINUTES, // 存活时间单位，秒
+			new ArrayBlockingQueue<Runnable>(10), // 10容量的阻塞队列，视具体情况而定
+			new MatCapitalApplyTransferThreadFactory(), // 线程工厂
+			new MatCapitalApplyTransferExecutionHandler());// 超过最大线程数时，线程池将会把线程交给RejectedExecutionHandler处理
 
 	public void destory() {
 		if (pool != null) {
@@ -32,12 +24,11 @@ public class ThreadPoolTest {
 		}
 	}
 
-	public ExecutorService getCustomThreadPoolExecutor() {
+	public ExecutorService getPool() {
 		return this.pool;
 	}
 
 	private class MatCapitalApplyTransferThreadFactory implements ThreadFactory {
-
 		private AtomicInteger count = new AtomicInteger(0);
 
 		@Override
@@ -51,7 +42,6 @@ public class ThreadPoolTest {
 	}
 
 	private class MatCapitalApplyTransferExecutionHandler implements RejectedExecutionHandler {
-
 		@Override
 		public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 			try {
@@ -70,7 +60,7 @@ public class ThreadPoolTest {
 	public static void main(String[] args) {
 		ThreadPoolTest exec = new ThreadPoolTest();
 
-		ExecutorService pool = exec.getCustomThreadPoolExecutor();
+		ExecutorService pool = exec.getPool();
 		for (int i = 1; i < 100; i++) {
 			System.out.println("提交第" + i + "个任务!");
 			pool.execute(new Runnable() {

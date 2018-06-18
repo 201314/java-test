@@ -29,28 +29,21 @@ public class MultiThreading2 {
 		}
 	}
 
-	class Add implements Runnable {
-		public void run() {
-			while (true) {
-				add();
-			}
-		}
-	}
-
-	class Sub implements Runnable {
-		public void run() {
-			while (true) {
-				sub();
-			}
-		}
-	}
-
 	public static void main(String[] args) {
 		MultiThreading2 test = new MultiThreading2();
 
-		Thread thread1 = new Thread(test.new Add());
+		Thread thread1 = new Thread(() -> {
+			while (true) {
+				test.add();
+			}
+		});
+		Thread thread2 = new Thread(() -> {
+			while (true) {
+				test.sub();
+			}
+		});
+
 		thread1.start();
-		Thread thread2 = new Thread(test.new Sub());
 		thread2.start();
 	}
 }

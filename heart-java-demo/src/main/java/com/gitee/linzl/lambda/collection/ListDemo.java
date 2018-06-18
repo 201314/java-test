@@ -3,8 +3,10 @@ package com.gitee.linzl.lambda.collection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +36,18 @@ public class ListDemo {
 	}
 
 	@Test
+	public void listForEach() {
+		// 两种写法有何不同
+		stuList.stream().forEach(stu -> {
+			System.out.println(stu);
+		});
+
+		stuList.stream().forEach(stu -> {
+			System.out.println(stu);
+		});
+	}
+
+	@Test
 	/**
 	 * 对于stream的聚合、消费或收集操作只能进行一次，再次操作会报错
 	 */
@@ -55,120 +69,89 @@ public class ListDemo {
 
 	@Test
 	public void listMap() {
-		// List<String> list2 = list.stream().map(string -> {
-		// // 修改数据
-		// return "stream().map()处理之后：" + string;
-		// }).collect(Collectors.toList());
-		//
-		// list2.stream().forEach(string -> {
-		// System.out.println(string);
-		// });
+		List<String> list2 = stuList.stream().map(string -> {
+			// 修改数据
+			return "stream().map()处理之后：" + string;
+		}).collect(Collectors.toList());
+		System.out.println(list2);
+		Map<String, Student> map = stuList.stream().collect(Collectors.toMap(Student::getName, Function.identity()));
+		System.out.println(map);
 	}
 
 	@Test
 	public void listMapToInt() {
-		// IntStream intStream = list.stream().mapToInt(string ->
-		// Integer.parseInt(string));
-		// System.out.println(intStream.sum());
+//		IntStream intStream = list.stream().mapToInt(string -> Integer.parseInt(string));
+//		System.out.println(intStream.sum());
 	}
 
 	@Test
-	// TODO
 	public void listFlatMap() {
 	}
 
 	@Test
-	// TODO
 	public void listFlatMapToInt() {
 	}
 
 	@Test
-	// TODO
 	public void listDistinct() {
 	}
 
 	@Test
-	// TODO
 	public void listSorted() {
 	}
 
 	@Test
-	// TODO
 	public void listSortedComparator() {
 	}
 
 	@Test
-	// TODO
 	public void listPeek() {
 	}
 
 	@Test
-	// TODO
 	public void listLimit() {
 	}
 
 	@Test
-	// TODO
 	public void listSkip() {
 	}
 
 	@Test
-	public void listForEach() {
-		// 两种写法有何不同
-		// list.stream().forEach(string -> {
-		// System.out.println(string);
-		// });
-
-		// 这是以前的写法
-		// list.forEach(string -> {
-		// System.out.println(string);
-		// });
-	}
-
-	@Test
-	// TODO
 	public void listForEachOrdered() {
 
 	}
 
 	@Test
-	// TODO
 	public void listToArray() {
 
 	}
 
 	@Test
-	// TODO
 	public void listToArrayFunction() {
 
 	}
 
 	@Test
-	// TODO
 	public void listReduce() {
 
 	}
 
 	@Test
-	// TODO
 	public void listReduceOptional() {
 
 	}
 
 	@Test
-	// TODO
 	public void listReduceU() {
 
 	}
 
 	@Test
-	// TODO
 	public void listCollect() {
 
 	}
 
 	@Test
-	// TODO
 	public void listMinAndMax() {
 
 	}

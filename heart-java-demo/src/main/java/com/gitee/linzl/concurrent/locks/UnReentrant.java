@@ -1,4 +1,4 @@
-package com.gitee.linzl.thread.demo;
+package com.gitee.linzl.concurrent.locks;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,7 +9,7 @@ public class UnReentrant {
 	public void outer() {
 		lock.lock();
 		System.out.println("锁一次");
-		inner();
+		inner();// 可重入锁，不然锁死自己吗
 		lock.unlock();
 	}
 

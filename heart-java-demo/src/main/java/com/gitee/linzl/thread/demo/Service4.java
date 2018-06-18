@@ -12,20 +12,17 @@ public class Service4 {
 		}
 	}
 
-	class Inner implements Runnable {
-		public void run() {
-			service();
-		}
-	}
-
 	public static void main(String[] args) {
 		Service4 service = new Service4();
-		Service4.Inner inner = service.new Inner();
 
-		Thread thread = new Thread(inner);
+		Thread thread = new Thread(() -> {
+			service.service();
+		});
+		Thread thread2 = new Thread(() -> {
+			service.service();
+		});
+
 		thread.start();
-
-		Thread thread2 = new Thread(inner);
 		thread2.start();
 	}
 

@@ -1,14 +1,9 @@
 package com.gitee.linzl.file;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.junit.Test;
-
-import com.gitee.linzl.file.FileUtil;
 
 public class FileTest {
 
@@ -69,6 +64,16 @@ public class FileTest {
 
 		// 合并成新文件
 		fileUtil.synMergeFiles2("D:\\trawe_store", ".part", 1024 * 10, "D:\\trawe_store\\new.myfile.zip");
-		
 	}
+
+	@Test
+	public void splitBySize2() {
+		FileUtil fileUtil = new FileUtil();
+		try {
+			fileUtil.splitBySize2(new File("D:\\trawe_store\\trawe_store1.zip"), 40 * 1024);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

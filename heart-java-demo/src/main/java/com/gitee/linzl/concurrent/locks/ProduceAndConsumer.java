@@ -3,12 +3,10 @@ package com.gitee.linzl.concurrent.locks;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ProduceAndConsumer {
 	private int Max = 10;
-	private Lock lock = new ReentrantLock();
+	private Object lock = new Object();
 	private Queue<String> buffer = new LinkedList<>();
 
 	class Producer implements Runnable {

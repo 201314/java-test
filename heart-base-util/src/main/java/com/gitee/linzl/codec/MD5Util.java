@@ -82,6 +82,7 @@ public class MD5Util {
 	public static String MD5(String target) {
 		return DigestUtils.md5Hex(target);
 	}
+	
 
 	public static void main(String[] args) throws IOException {
 		File fileZIP = new File("D:\\S0001_全国版.cfg");

@@ -15,14 +15,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+
+import com.adobe.xmp.impl.Base64;
 
 /**
  * 文件处理辅助类
@@ -34,7 +40,6 @@ import org.apache.commons.io.FileUtils;
  * @date 2018年5月4日
  */
 public class FileUtil {
-
 	/**
 	 * 当前目录路径
 	 */
@@ -276,6 +281,77 @@ public class FileUtil {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * TODO，考虑加一个接口传入，让外部实现如何保存分片信息
+	 * 
+	 * @param file
+	 *            要分片的文件
+	 * @param byteSize
+	 *            分片大小
+	 * @return 返回分片后，每片序号对应的MD5
+	 * @throws IOException
+	 */
+	public Map<Integer, String> splitBySize2(File file, int byteSize) throws IOException {
+		Map<Integer, String> map = new ConcurrentHashMap<>();
+		System.out.println("文件MD5＝＝" + DigestUtils.md5Hex(new FileInputStream(file)));
+		long fileSize = file.length();
+		System.out.println("文件大小＝＝" + fileSize);
+		int number = (int) (fileSize / byteSize);
+		number = fileSize % byteSize == 0 ? number : number + 1;// 分割后文件的数目
+
+		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
+		List<Boolean> completeList = new ArrayList<>();
+		for (int i = 0; i < number; i++) {
+			final int index = i;
+			Future<Boolean> future = executor.submit(() -> {
+				boolean flag = false;
+				try (RandomAccessFile rFile = new RandomAccessFile(file, "r")) {
+					int offset = index * byteSize;
+					byte[] bytes = null;
+					if (fileSize - offset >= byteSize) {
+						bytes = new byte[byteSize];
+					} else {// 最后一片可能小于byteSize
+						bytes = new byte[(int) (fileSize - offset)];
+					}
+
+					rFile.seek(index * byteSize);// 移动指针到每“段”开头
+					int s = rFile.read(bytes);
+
+					System.out.println("大小:count=>" + index + "==s==》" + s + "==size==>" + bytes.length + "==md5==>"
+							+ DigestUtils.md5Hex(Base64.encode(bytes)));
+					map.put(index, DigestUtils.md5Hex(bytes));
+					flag = true;
+					FileUtils.writeByteArrayToFile(new File("D:\\trawe_store\\app", String.valueOf(index) + ".txt"),
+							Base64.encode(bytes));
+					// 要把base64\MD5\分片大小\offset\index分片序号\File 传递给外部接口，允许其实现如何保存分片数据信息
+				} catch (IOException e) {
+					flag = false;
+				}
+				return flag;
+			});
+
+			try {
+				completeList.add(future.get());
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
+		int totalCompleteNumber = 0;
+		Iterator<Boolean> iter = completeList.iterator();
+		while (iter.hasNext()) {
+			boolean flag = iter.next();
+			if (flag) {
+				++totalCompleteNumber;
+			}
+		}
+
+		if (totalCompleteNumber == number) {
+			// 发布分片结束事件
+		}
+		return map;
 	}
 
 	/**

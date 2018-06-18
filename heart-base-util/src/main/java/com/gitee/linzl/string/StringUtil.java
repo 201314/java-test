@@ -5,6 +5,74 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class StringUtil {
+	// 开始字符，比如字符0
+	private static char startChar = '0';
+	// 结束字符，比如字符Z
+	private static char endChar = 'z';
+
+	private static char[] exclusionFirList = null;
+	private static char[] exclusionSecList = null;
+	static {
+		// 除外列表，比如字符9和字符A之间的[:;<=>?]
+		exclusionFirList = new char['A' - '9' - 1];
+		exclusionSecList = new char['a' - 'Z' - 1];
+		for (char cc = '9' + 1; cc < 'A'; cc++) {
+			exclusionFirList[cc - '9' - 1] = cc;
+		}
+		for (char cc = 'Z' + 1; cc < 'a'; cc++) {
+			exclusionSecList[cc - 'Z' - 1] = cc;
+		}
+	}
+
+	public static boolean exclusionArray(char index) {
+		// 刚好在特殊字符范围内
+		if ((exclusionFirList[0] <= index && index <= exclusionFirList[exclusionFirList.length - 1])
+				|| (exclusionSecList[0] <= index && index <= exclusionSecList[exclusionSecList.length - 1])) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 递增字符串，特殊字符除外
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static String increase(String source) {
+		char[] inputCharArray = source.toCharArray();
+		boolean carryFlag = false;
+		int length = inputCharArray.length - 1;
+		for (int ii = length; ii >= 0; ii--) {
+			char tempChar = inputCharArray[ii];
+			// 处理第一位
+			if (ii == length) {
+				if (tempChar == endChar) {// 刚好+1要进一位
+					inputCharArray[ii] = startChar;
+					carryFlag = true;
+				} else {
+					do {
+						inputCharArray[ii]++;
+					} while (exclusionArray(inputCharArray[ii]));
+				}
+			} else {
+				if (carryFlag) {
+					do {
+						inputCharArray[ii]++;
+					} while (exclusionArray(inputCharArray[ii]));
+
+					tempChar = inputCharArray[ii];
+					if (tempChar > endChar) {
+						inputCharArray[ii] = startChar;
+						carryFlag = true;
+					} else {
+						carryFlag = false;
+					}
+				}
+			}
+		}
+		return String.valueOf(inputCharArray);
+	}
 
 	/**
 	 * 判断是否为空
@@ -246,5 +314,22 @@ public class StringUtil {
 		System.out.println(str);
 		System.out.println(str.replaceAll("\t|\r|\n", " "));
 		System.out.println("".isEmpty());
+
+		String a1 = "0009";
+		String a2 = "000Z";
+		String a3 = "000z";
+		String a4 = "0099";
+		String a5 = "009Z";
+		String a6 = "009z";
+		String a7 = "00Zz";
+		String a8 = "00zz";
+		System.out.println(a1 + "==" + increase(a1));
+		System.out.println(increase(a2));
+		System.out.println(increase(a3));
+		System.out.println(increase(a4));
+		System.out.println(increase(a5));
+		System.out.println(increase(a6));
+		System.out.println(increase(a7));
+		System.out.println(increase(a8));
 	}
 }

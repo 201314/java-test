@@ -1,17 +1,30 @@
 package com.gitee.linzl.concurrent;
 
-public class SynchronizdeDemo {
+public class SynchronizedDemo {
 	private Object obj = new Object();
 
 	/**
 	 * 直接锁普通方法，就是this对象锁
 	 */
 	public synchronized void print() {
+		print4();
 		for (int i = 0; i < 100; i++) {
 			System.out.println(Thread.currentThread().getName() + "=print打印当前：" + i);
 		}
+		
 	}
 
+	/**
+	 * 
+	 */
+	public synchronized void print1() {
+		print4();
+		for (int i = 0; i < 100; i++) {
+			System.out.println(Thread.currentThread().getName() + "=print打印当前：" + i);
+		}
+		
+	}
+	
 	public synchronized static void print2() {
 		for (int i = 0; i < 100; i++) {
 			System.out.println(Thread.currentThread().getName() + "=print222222打印当前：" + i);

@@ -12,7 +12,7 @@ import org.junit.Test;
  * 
  * @author linzl
  */
-public class FileUtilTest {
+public class FileUtilsTest {
 	@Test
 	public void zipFiles() throws IOException {
 		/**
@@ -20,7 +20,7 @@ public class FileUtilTest {
 		 */
 		File[] files = new File[] { new File("d:/testDir/22"), new File("d:/testDir/中文.png") };
 		File zip = new File("d:/testDir/测试中文2.jar");
-		FileUtilss.zipFiles(files, zip);
+		DecompressionUtil.zipFiles(files, zip);
 		String str = "11/adsf////we\\\\asd";
 		str = str.replaceAll("\\\\", "/");
 		str = str.replaceAll("//*", "/");
@@ -34,6 +34,6 @@ public class FileUtilTest {
 		 */
 		File zipFile = new File("d:/testDir/测试中文2.zip");
 		File destFile = new File("d:/testDir/测试中文中文");
-		FileUtilss.unZipFiles(zipFile, destFile);
+		DecompressionUtil.unZipFiles(zipFile, destFile);
 	}
 }

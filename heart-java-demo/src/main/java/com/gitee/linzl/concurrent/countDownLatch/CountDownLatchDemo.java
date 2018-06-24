@@ -3,12 +3,14 @@ package com.gitee.linzl.concurrent.countDownLatch;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * CountDownLatch计数器，不允许在执行过程中变更线程数量
+ * 
  * @description
  * @author linzl
  * @email 2225010489@qq.com
  * @date 2018年3月3日
  */
-public class CountDownLatch2 {
+public class CountDownLatchDemo {
 	private static int N = 10;
 
 	public static void main(String[] args) throws InterruptedException {

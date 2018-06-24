@@ -21,14 +21,11 @@ public class CyclicBarrierDemo {
 	public CyclicBarrierDemo(float[][] matrix) {
 		data = matrix;
 		N = matrix.length;
-		Runnable barrierAction = new Runnable() {
-			public void run() {
-				System.out.println("Runnable running");
-			}
-		};
-		barrier = new CyclicBarrier(N, barrierAction);
+		barrier = new CyclicBarrier(N);
+	}
 
-		List<Thread> threads = new ArrayList<Thread>(N);
+	public void testRun() {
+		List<Thread> threads = new ArrayList<>(N);
 		for (int i = 0; i < N; i++) {
 			Thread thread = new Thread(new Worker(i));
 			thread.setName("Thread-Name-" + i);
@@ -46,10 +43,6 @@ public class CyclicBarrierDemo {
 		}
 	}
 
-	public static void main(String[] args) {
-		new CyclicBarrierDemo(new float[2][3]);
-	}
-
 	class Worker implements Runnable {
 		int myRow;
 
@@ -63,11 +56,14 @@ public class CyclicBarrierDemo {
 				try {
 					barrier.await();
 				} catch (InterruptedException ex) {
-					return;
 				} catch (BrokenBarrierException ex) {
-					return;
 				}
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		CyclicBarrierDemo demo = new CyclicBarrierDemo(new float[2][3]);
+		demo.testRun();
 	}
 }

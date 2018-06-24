@@ -309,6 +309,28 @@ public class StringUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * 在source前补zeroNum个0
+	 * 
+	 * @param zeroNum
+	 * @param source
+	 * @return
+	 */
+	public static String appendZeroBefore(int zeroNum, String source) {
+		return String.format("%0" + zeroNum + "d", 0) + source;
+	}
+
+	/**
+	 * 在source后补zeroNum个0
+	 * 
+	 * @param zeroNum
+	 * @param source
+	 * @return
+	 */
+	public static String appendZeroAfter(int zeroNum, String source) {
+		return source + String.format("%0" + zeroNum + "d", 0);
+	}
+
 	public static void main(String[] args) {
 		String str = "这是标题 ------------           标题\nhello	12";
 		System.out.println(str);

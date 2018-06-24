@@ -47,7 +47,7 @@ public class FileTest {
 
 	@Test
 	public void testSplitFile() throws IOException {
-		FileUtil fileUtil = new FileUtil();
+		FileUtils fileUtil = new FileUtils();
 
 		// String fileName = "D:\\trawe_store\\trawe_store.zip";
 		// try {
@@ -68,7 +68,7 @@ public class FileTest {
 
 	@Test
 	public void splitBySize2() {
-		FileUtil fileUtil = new FileUtil();
+		FileUtils fileUtil = new FileUtils();
 		try {
 			fileUtil.splitBySize2(new File("D:\\trawe_store\\trawe_store1.zip"), 40 * 1024);
 		} catch (IOException e) {

@@ -1,4 +1,4 @@
-package com.gitee.linzl.file;
+package com.gitee.linzl.file.progress;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.util.encoders.Base64;
 
 /**
  * @description 合并文件
@@ -15,27 +16,28 @@ import org.apache.commons.io.FileUtils;
  */
 public class MergeRunnable implements Callable<Boolean> {
 	long startPos;
-	String mergeFileName;
+	File mergeFile;
 	byte[] partFileByte;
 
-	public MergeRunnable(long startPos, String fullMergeFileName, File partFile) {
+	public MergeRunnable(long startPos, File mergeFile, File partFile) {
 		this.startPos = startPos;
-		this.mergeFileName = fullMergeFileName;
+		this.mergeFile = mergeFile;
 		try {
-			this.partFileByte = FileUtils.readFileToByteArray(partFile);
+			// this.partFileByte = FileUtils.readFileToByteArray(partFile);
+			this.partFileByte = Base64.decode(FileUtils.readFileToByteArray(partFile));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public MergeRunnable(long startPos, String fullMergeFileName, byte[] partFileByte) {
+	public MergeRunnable(long startPos, File mergeFile, byte[] partFileByte) {
 		this.startPos = startPos;
-		this.mergeFileName = fullMergeFileName;
+		this.mergeFile = mergeFile;
 		this.partFileByte = partFileByte;
 	}
 
 	public Boolean call() {
-		try (RandomAccessFile rFile = new RandomAccessFile(mergeFileName, "rw")) {
+		try (RandomAccessFile rFile = new RandomAccessFile(mergeFile, "rw")) {
 			rFile.seek(startPos);
 			rFile.write(partFileByte);
 		} catch (IOException e) {

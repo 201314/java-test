@@ -1,5 +1,13 @@
 package com.gitee.linzl.thread.demo;
 
+/**
+ * 互相持有锁，导致死锁
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年6月26日
+ */
 public class ThreadDeadlock {
 	public static void main(String[] args) throws InterruptedException {
 		Object obj1 = new Object();

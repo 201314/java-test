@@ -20,7 +20,7 @@ public class FileUtilsTest {
 		 */
 		File[] files = new File[] { new File("d:/testDir/22"), new File("d:/testDir/中文.png") };
 		File zip = new File("d:/testDir/测试中文2.jar");
-		DecompressionUtil.zipFiles(files, zip);
+		CompressUtil.zipFiles(files, zip);
 		String str = "11/adsf////we\\\\asd";
 		str = str.replaceAll("\\\\", "/");
 		str = str.replaceAll("//*", "/");

@@ -2,6 +2,8 @@ package com.gitee.linzl.concurrent;
 
 import org.junit.Test;
 
+import com.gitee.linzl.thread.demo.SynchronizedDemo;
+
 public class SynchronizedDemoTest {
 	/**
 	 * 同一资源，产生竞争，锁同步，必须按顺序

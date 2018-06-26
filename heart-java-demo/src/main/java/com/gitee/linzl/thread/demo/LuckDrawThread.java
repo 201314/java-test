@@ -17,8 +17,7 @@ package com.gitee.linzl.thread.demo;
 public class LuckDrawThread {
 	int[] arr = { 10, 5, 20, 50, 100, 200, 500, 800, 2, 80, 300 };
 	int num = arr.length;
-	Object obj = new Object();
-	boolean[] flag = new boolean[arr.length];
+	boolean[] flag = new boolean[num];
 
 	public void print() {
 		synchronized (this) {

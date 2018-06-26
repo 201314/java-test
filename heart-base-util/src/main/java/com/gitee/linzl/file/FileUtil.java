@@ -17,9 +17,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.io.FileUtils;
-
-import com.adobe.xmp.impl.Base64;
+import com.gitee.linzl.file.event.ProgressListener;
+import com.gitee.linzl.file.model.SplitFileRequest;
+import com.gitee.linzl.file.progress.MergeRunnable;
+import com.gitee.linzl.file.progress.SplitRunnable;
 
 /**
  * 文件处理辅助类
@@ -176,74 +177,27 @@ public class FileUtil {
 	}
 
 	/**
-	 * 拆分文件
-	 * 
-	 * @param fileName
-	 *            待拆分的完整文件名
-	 * @param byteSize
-	 *            按多少字节大小拆分
-	 * @return 拆分后的文件名列表
-	 * @throws IOException
-	 */
-	public List<String> splitBySize(File file, int byteSize) throws IOException {
-		int count = (int) Math.ceil(file.length() / (double) byteSize);
-		int totalLength = String.valueOf(count).length();
-
-		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
-
-		List<String> parts = new ArrayList<String>();
-		for (int i = 0; i < count; i++) {
-			int currentLength = String.valueOf(i + 1).length();
-			String indexOfFile = String.format("%0" + (totalLength - currentLength) + "d", 0);
-			String partFileName = String.format("%s.%s.part", file.getName(), indexOfFile);
-			executor.submit(new SplitRunnable(byteSize, i * byteSize, partFileName, file));
-			parts.add(partFileName);
-		}
-		return parts;
-	}
-
-	/**
-	 * TODO，考虑加一个接口传入，让外部实现如何保存分片信息
 	 * 
 	 * @param file
 	 *            要分片的文件
 	 * @param byteSize
 	 *            分片大小
-	 * @return 返回分片后，每片序号对应的MD5
 	 * @throws IOException
 	 */
-	public void splitBySize2(File file, int byteSize) throws IOException {
+	public void asynSplitFile(File file, int byteSize, ProgressListener listener) throws IOException {
 		long fileSize = file.length();
 		int number = (int) (fileSize / byteSize);
 		number = fileSize % byteSize == 0 ? number : number + 1;// 分割后文件的数目
 
 		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 		List<Boolean> completeList = new ArrayList<>();
-		for (int i = 0; i < number; i++) {
-			final int index = i;
-			Future<Boolean> future = executor.submit(() -> {
-				boolean flag = false;
-				try (RandomAccessFile rFile = new RandomAccessFile(file, "r")) {
-					int offset = index * byteSize;
-					byte[] bytes = null;
-					if (fileSize - offset >= byteSize) {
-						bytes = new byte[byteSize];
-					} else {// 最后一片可能小于byteSize
-						bytes = new byte[(int) (fileSize - offset)];
-					}
-
-					rFile.seek(index * byteSize);// 移动指针到每“段”开头
-					int s = rFile.read(bytes);
-
-					flag = true;
-					FileUtils.writeByteArrayToFile(new File("D:\\trawe_store\\app", String.valueOf(index) + ".txt"),
-							Base64.encode(bytes));
-					// 要把base64\MD5\分片大小\offset\index分片序号\File 传递给外部接口，允许其实现如何保存分片数据信息
-				} catch (IOException e) {
-					flag = false;
-				}
-				return flag;
-			});
+		for (int index = 0; index < number; index++) {
+			SplitFileRequest request = new SplitFileRequest();
+			request.setFile(file);
+			request.setPartNum(index);
+			request.setPartSize(byteSize);
+			request.setListener(listener);
+			Future<Boolean> future = executor.submit(new SplitRunnable(request));
 
 			try {
 				completeList.add(future.get());
@@ -279,19 +233,18 @@ public class FileUtil {
 	 *            合并后的文件名
 	 * @throws IOException
 	 */
-	public void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
+	public void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, File mergeFile)
 			throws IOException {
 		ArrayList<File> partFiles = getDirFiles(dirPath, partFileSuffix);
 		Collections.sort(partFiles, new FileComparator());
-
 		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 
-		for (int i = 0, length = partFiles.size(); i < length; i++) {
+		for (int index = 0, length = partFiles.size(); index < length; index++) {
 			Future<Boolean> future = executor
-					.submit(new MergeRunnable(i * partFileSize, mergeFileName, partFiles.get(i)));
+					.submit(new MergeRunnable(index * partFileSize, mergeFile, partFiles.get(index)));
 			try {
 				if (future.get()) {// 表示已经合并成功，即可删除
-					partFiles.get(i).deleteOnExit();
+					partFiles.get(index).deleteOnExit();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -302,45 +255,12 @@ public class FileUtil {
 	}
 
 	/**
-	 * 同步合并文件,合并完成会删除分片文件
-	 * 
-	 * @param dirPath
-	 *            拆分文件所在目录名
-	 * @param partFileSuffix
-	 *            拆分文件后缀名
-	 * @param partFileSize
-	 *            拆分文件的字节数大小
-	 * @param mergeFileName
-	 *            合并后的文件名
-	 * @throws IOException
-	 */
-	public void synMergeFiles(String dirPath, String partFileSuffix, int partFileSize, String mergeFileName)
-			throws IOException {
-		ArrayList<File> partFiles = getDirFiles(dirPath, partFileSuffix);
-		Collections.sort(partFiles, new FileComparator());
-
-		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
-
-		List<MergeRunnable> runList = new ArrayList<>();
-		for (int i = 0, length = partFiles.size(); i < length; i++) {
-			runList.add(new MergeRunnable(i * partFileSize, mergeFileName, partFiles.get(i)));
-		}
-		try {
-			executor.invokeAll(runList);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		executor.shutdown();
-		for (int i = 0, length = partFiles.size(); i < length; i++) {
-			partFiles.get(i).deleteOnExit();
-		}
-	}
-
-	/**
 	 * 根据文件名，比较文件
 	 * 
-	 * @author yjmyzz@126.com
-	 *
+	 * @description
+	 * @author linzl
+	 * @email 2225010489@qq.com
+	 * @date 2018年6月26日
 	 */
 	private class FileComparator implements Comparator<File> {
 		public int compare(File o1, File o2) {

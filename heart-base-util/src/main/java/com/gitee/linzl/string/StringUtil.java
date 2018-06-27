@@ -3,6 +3,9 @@ package com.gitee.linzl.string;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class StringUtil {
 	// 开始字符，比如字符0
@@ -331,6 +334,22 @@ public class StringUtil {
 		return source + String.format("%0" + zeroNum + "d", 0);
 	}
 
+	/**
+	 * 过滤特殊字符
+	 * 
+	 * @param str
+	 * @return
+	 * @throws PatternSyntaxException
+	 */
+	public static String filterSpecial(String str) throws PatternSyntaxException {
+		// 只允许字母和数字 // String regEx ="[^a-zA-Z0-9]";
+		// 清除掉所有特殊字符
+		String regEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+		Pattern p = Pattern.compile(regEx);
+		Matcher m = p.matcher(str);
+		return m.replaceAll("").trim();
+	}
+
 	public static void main(String[] args) {
 		String str = "这是标题 ------------           标题\nhello	12";
 		System.out.println(str);
@@ -353,5 +372,10 @@ public class StringUtil {
 		System.out.println(increase(a6));
 		System.out.println(increase(a7));
 		System.out.println(increase(a8));
+
+		String str1 = "*adCVs*34_a _09_b5*[/435^*&城池()^$$&*).{}+.|.)%%*(*.中国}34{45[]12.fd'*&999下面是中文的字符￥……{}【】。，；’“‘”？";
+		str1 = "?多来米";
+		System.out.println(str1);
+		System.out.println(filterSpecial(str1));
 	}
 }

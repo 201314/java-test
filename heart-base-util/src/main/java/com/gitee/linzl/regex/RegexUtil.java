@@ -366,10 +366,11 @@ public class RegexUtil {
 		java.util.regex.Matcher m_ba;
 
 		try {
-			String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>"; // 定义script的正则表达式{或<script[^>]*?>[\\s\\S]*?<\\/script>
-			// }
-			String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>"; // 定义style的正则表达式{或<style[^>]*?>[\\s\\S]*?<\\/style>
-			// }
+			// 定义script的正则表达式{或<script[^>]*?>[\\s\\S]*?<\\/script>}
+			String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>";
+
+			// 定义style的正则表达式{或<style[^>]*?>[\\s\\S]*?<\\/style>}
+			String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>";
 			String regEx_html = "<[^>]+>"; // 定义HTML标签的正则表达式
 			String patternStr = "\\s+";
 

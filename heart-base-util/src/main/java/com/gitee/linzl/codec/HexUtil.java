@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -24,10 +25,10 @@ public class HexUtil {
 	 *            字节数组
 	 * @return 校验码
 	 */
-	public static Integer byteToIntCrc(byte[] data) {
-		int CRC = 0xFFFF;
+	public static long crc16(byte[] data) {
+		long CRC = 0xFFFF;
 		for (int i = 0; i < data.length; i++) {
-			CRC ^= ((int) data[i] & 0x00FF);// 遇到负数，转为正数
+			CRC ^= (data[i] & 0x00FF);// 遇到负数，转为正数
 			for (int j = 0; j < 8; j++) {
 				if ((CRC & 0x0001) != 0) {
 					CRC >>= 1;
@@ -42,14 +43,24 @@ public class HexUtil {
 
 	/**
 	 * 
-	 * 计算CRC16校验码
+	 * 计算CRC16校验码 (Modbus)
 	 *
 	 * @param data
 	 *            字节数组
 	 * @return 校验码
 	 */
-	public String byteToHexCrc(byte[] data) {
-		return Integer.toHexString(byteToIntCrc(data));
+	public static String hexCrc16(byte[] data) {
+		return Long.toHexString(crc16(data));
+	}
+
+	public static long crc32(byte[] data) {
+		CRC32 crc = new CRC32();
+		crc.update(data);
+		return crc.getValue();
+	}
+
+	public static String hexCrc32(byte[] data) {
+		return Long.toHexString(crc32(data));
 	}
 
 	/**
@@ -190,7 +201,6 @@ public class HexUtil {
 				buffer.append(hex);
 			}
 		}
-
 		return buffer.toString();
 	}
 
@@ -293,9 +303,8 @@ public class HexUtil {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// int x = 58165;
-		// byte[] data = toByte(x);
-		// FileUtils.writeByteArrayToFile(new File("D://11.txt"), data);
+		System.out.println("crc-32:" + hexCrc32("0CB2B7A8DCB4".getBytes()));
+		System.out.println("crc-16:" + hexCrc16("0CB2B7A8DCB4".getBytes()));
 		System.out.println(string2Unicode("我是logback输出\\u的消息，快消费掉吧"));
 		System.out.println(unicodeStr2String(
 				"\\u6211\\u662f\\u6c\\u6f\\u67\\u62\\u61\\u63\\u6b\\u8f93\\u51fa\\u5c\\u75\\u7684\\u6d88\\u606f\\uff0c\\u5feb\\u6d88\\u8d39\\u6389\\u5427"));

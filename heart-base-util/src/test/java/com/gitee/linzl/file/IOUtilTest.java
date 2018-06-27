@@ -22,7 +22,7 @@ public class IOUtilTest {
 
 	@Test
 	public void unZip() throws IOException {
-		File zipFile = new File("d:/trawe_store/测试中文2.zip");
+		File zipFile = new File("d:/testDir/jd-gui-1.4.0.jar");
 		File destFile = new File("d:/testDir/测试中文中文");
 		IOUtil.unZipFiles(zipFile, destFile);
 	}

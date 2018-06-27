@@ -69,7 +69,6 @@ public class TokenUtil {
 				.compressWith(CompressionCodecs.DEFLATE)
 				// 签名算法，及key
 				.signWith(SignatureAlgorithm.HS512, key);
-
 		return builder.compact();
 	}
 
@@ -82,7 +81,7 @@ public class TokenUtil {
 	public static String parseToken(String compactJws) {
 		try {
 			// require表示必须包含该属性
-			Jws<Claims> claims = Jwts.parser().requireSubject("users/1300819380")//.require("user_id", "11-用户ID")
+			Jws<Claims> claims = Jwts.parser().requireSubject("users/1300819380")// .require("user_id", "11-用户ID")
 					.setSigningKey(key).parseClaimsJws(compactJws);
 
 			String head = claims.getHeader().toString();

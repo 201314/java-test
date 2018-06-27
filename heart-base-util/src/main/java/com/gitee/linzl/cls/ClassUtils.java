@@ -10,8 +10,7 @@ import java.util.List;
 public class ClassUtils {
 
 	public static List<Class> getAllClassByInterface(Class c) {
-		// 返回结果
-		List<Class> returnClassList = new ArrayList<Class>();
+		List<Class> returnClassList = new ArrayList<>();
 		// 如果不是一个接口，则不做处理
 		if (c.isInterface()) {
 			// 获得当前的包名
@@ -39,7 +38,14 @@ public class ClassUtils {
 		return returnClassList;
 	}
 
-	// 从一个包中查找出所有的类，在jar包中不能查找
+	/**
+	 * 从一个包中查找出所有的类，在jar包中不能查找
+	 * 
+	 * @param packageName
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	private static List<Class> getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		// 用'/'代替'.'路径
@@ -50,7 +56,7 @@ public class ClassUtils {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		ArrayList<Class> classes = new ArrayList<Class>();
+		ArrayList<Class> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
@@ -58,7 +64,7 @@ public class ClassUtils {
 	}
 
 	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<Class>();
+		List<Class> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
@@ -71,7 +77,6 @@ public class ClassUtils {
 				// 去掉'.class'
 				classes.add(
 						Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-
 			}
 		}
 		return classes;

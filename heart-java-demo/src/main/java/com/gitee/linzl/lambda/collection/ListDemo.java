@@ -74,14 +74,16 @@ public class ListDemo {
 			return "stream().map()处理之后：" + string;
 		}).collect(Collectors.toList());
 		System.out.println(list2);
+
 		Map<String, Student> map = stuList.stream().collect(Collectors.toMap(Student::getName, Function.identity()));
 		System.out.println(map);
 	}
 
 	@Test
 	public void listMapToInt() {
-//		IntStream intStream = list.stream().mapToInt(string -> Integer.parseInt(string));
-//		System.out.println(intStream.sum());
+		// IntStream intStream = list.stream().mapToInt(string ->
+		// Integer.parseInt(string));
+		// System.out.println(intStream.sum());
 	}
 
 	@Test

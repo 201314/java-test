@@ -12,7 +12,6 @@ import org.apache.commons.io.FileUtils;
  * @author linzl 最后修改时间：2014年8月11日
  */
 public class Base64Util {
-
 	/**
 	 * base64 编码文件
 	 * 

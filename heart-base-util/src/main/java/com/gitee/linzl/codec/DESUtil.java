@@ -20,7 +20,6 @@ import javax.crypto.spec.SecretKeySpec;
  * 
  */
 public class DESUtil {
-
 	private final static String DES = "DES";
 
 	private final static String THREEDES = "desede";

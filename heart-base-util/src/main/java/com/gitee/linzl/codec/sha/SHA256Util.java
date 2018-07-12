@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 其他加密方式，可以使用commons-codec-1.3-dev.jar的DigestUtils
+ * 
  * 密码加密方式入库
  * 
  * 后面可考虑使用 apache shiro

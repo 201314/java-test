@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import com.gitee.linzl.codec.MD5Util;
 import com.gitee.linzl.file.event.ProgressListener;
 import com.gitee.linzl.file.model.FileProgressPart;
 
@@ -19,6 +20,7 @@ public class FileTest {
 		ProgressListener listener = (progressEvent) -> {
 			FileProgressPart part = progressEvent.getPart();
 			try {
+				System.out.println(part.getIndex() + "=" + MD5Util.MD5(part.getBase64()));
 				FileUtils.writeStringToFile(new File("D://trawe_store//split//" + part.getIndex() + ".txt"),
 						part.getBase64(), Charset.forName("UTF-8"));
 			} catch (IOException e) {
@@ -26,7 +28,9 @@ public class FileTest {
 			}
 		};
 		try {
-			fileUtil.asynSplitFile(new File("D:\\trawe_store\\trawe_store1.zip"), 40 * 1024, listener);
+			File file = new File("D:\\trawe_store\\trawe_store1.zip");
+			fileUtil.asynSplitFile(file, 40 * 1024, listener);
+			System.out.println("文件MD5：" + MD5Util.MD5File(file));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

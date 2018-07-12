@@ -8,12 +8,15 @@ public class HexUtilTest {
 
 	@Test
 	public void testGetCRC() {
-
+		System.out.println("crc-32:" + HexUtil.hexCrc32("0CB2B7A8DCB4".getBytes()));
+		System.out.println("crc-16:" + HexUtil.hexCrc16("0CB2B7A8DCB4".getBytes()));
 	}
 
 	@Test
-	public void testGetHexCRC() {
-
+	public void testUnicode2String() {
+		System.out.println(HexUtil.string2Unicode("我是logback输出\\u的消息，快消费掉吧"));
+		System.out.println(HexUtil.unicodeStr2String(
+				"\\u6211\\u662f\\u6c\\u6f\\u67\\u62\\u61\\u63\\u6b\\u8f93\\u51fa\\u5c\\u75\\u7684\\u6d88\\u606f\\uff0c\\u5feb\\u6d88\\u8d39\\u6389\\u5427"));
 	}
 
 	@Test
@@ -27,11 +30,6 @@ public class HexUtilTest {
 		int data = 99;
 		String dataHex = "0063";
 		System.out.println(dataHex.equalsIgnoreCase(HexUtil.fullFormatHex(data)));
-	}
-
-	@Test
-	public void testparseInt() {
-
 	}
 
 	@Test

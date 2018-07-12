@@ -159,8 +159,10 @@ public class EncryptUtil {
 	public static void main(String[] args) {
 		String data = "中华人民共和国政府";
 		EncryptUtil util = getSHA1withECDSAInstance();
+		System.out.println("私钥：" + Hex.encodeHexString(util.privateKey.getEncoded()));
+		System.out.println("公钥：" + Hex.encodeHexString(util.publicKey.getEncoded()));
 		byte[] signResult = util.sign(data);
-		System.out.println(Hex.encodeHexString(signResult));
+		// System.out.println(Hex.encodeHexString(signResult));
 		boolean flag = util.verify(data, signResult);
 		System.out.println(flag);
 	}

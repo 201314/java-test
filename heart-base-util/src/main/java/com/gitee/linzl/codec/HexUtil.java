@@ -1,6 +1,5 @@
 package com.gitee.linzl.codec;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,8 +8,6 @@ import java.util.zip.CRC32;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
- * TODO TODO TODO TODO java.util.zip.CRC32的使用
- * 
  * @description
  * @author linzl
  * @email 2225010489@qq.com
@@ -50,17 +47,31 @@ public class HexUtil {
 	 * @return 校验码
 	 */
 	public static String hexCrc16(byte[] data) {
-		return Long.toHexString(crc16(data));
+		return Long.toHexString(crc16(data)).toUpperCase();
 	}
 
+	/**
+	 * 计算CRC32校验码
+	 * 
+	 * @param data
+	 * @return
+	 */
 	public static long crc32(byte[] data) {
 		CRC32 crc = new CRC32();
 		crc.update(data);
 		return crc.getValue();
 	}
 
+	/**
+	 * 
+	 * 计算CRC32校验码 (Modbus)
+	 *
+	 * @param data
+	 *            字节数组
+	 * @return 校验码
+	 */
 	public static String hexCrc32(byte[] data) {
-		return Long.toHexString(crc32(data));
+		return Long.toHexString(crc32(data)).toUpperCase();
 	}
 
 	/**
@@ -145,6 +156,44 @@ public class HexUtil {
 	 * 移位运算
 	 */
 	/**
+	 * 将二进制转换成16进制
+	 * 
+	 * @param buf
+	 * @return
+	 */
+	public static String parseByte2Hex(byte buf[]) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < buf.length; i++) {
+			String hex = Integer.toHexString(buf[i] & 0xFF);
+			if (hex.length() == 1) {
+				hex = '0' + hex;
+			}
+			sb.append(hex.toUpperCase());
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 将16进制转换为二进制
+	 * 
+	 * @param hex
+	 * @return
+	 */
+	public static byte[] parseHex2Byte(String hex) {
+		if (hex.length() < 1) {
+			return null;
+		}
+
+		byte[] result = new byte[hex.length() / 2];
+		for (int i = 0; i < hex.length() / 2; i++) {
+			int high = Integer.parseInt(hex.substring(i * 2, i * 2 + 1), 16);
+			int low = Integer.parseInt(hex.substring(i * 2 + 1, i * 2 + 2), 16);
+			result[i] = (byte) (high * 16 + low);
+		}
+		return result;
+	}
+
+	/**
 	 * 16进制字符串转10进制
 	 */
 	public int parseInt(String str) {
@@ -213,8 +262,8 @@ public class HexUtil {
 	public static String hex2String(String hex) {
 		if (hex.length() % 4 != 0) {
 			return null;
-
 		}
+
 		StringBuilder sb = new StringBuilder();
 
 		// 49204c6f7665204a617661 split into two characters 49, 20, 4c...
@@ -261,8 +310,8 @@ public class HexUtil {
 	 * @return
 	 */
 	public static String unicodeStr2String(String unicodeStr) {
-		int length = unicodeStr.length();
-		int count = 0;
+		// int length = unicodeStr.length();
+		// int count = 0;
 		// 正则匹配条件，可匹配“\\u”1到4位，一般是4位可直接使用 String regex = "\\\\u[a-f0-9A-F]{4}";
 		String regex = "\\\\u[a-f0-9A-F]{1,4}";
 		Pattern pattern = Pattern.compile(regex);
@@ -277,7 +326,7 @@ public class HexUtil {
 			sb.append(newChar);// 添加转换后的字符
 			// count = index + oldChar.length();// 统计下标移动的位置
 		}
-		sb.append(unicodeStr.substring(count, length));// 添加末尾不是Unicode的字符
+		// sb.append(unicodeStr.substring(count, length));// 添加末尾不是Unicode的字符
 		return sb.toString();
 	}
 
@@ -302,11 +351,4 @@ public class HexUtil {
 		return string.toString();
 	}
 
-	public static void main(String[] args) throws IOException {
-		System.out.println("crc-32:" + hexCrc32("0CB2B7A8DCB4".getBytes()));
-		System.out.println("crc-16:" + hexCrc16("0CB2B7A8DCB4".getBytes()));
-		System.out.println(string2Unicode("我是logback输出\\u的消息，快消费掉吧"));
-		System.out.println(unicodeStr2String(
-				"\\u6211\\u662f\\u6c\\u6f\\u67\\u62\\u61\\u63\\u6b\\u8f93\\u51fa\\u5c\\u75\\u7684\\u6d88\\u606f\\uff0c\\u5feb\\u6d88\\u8d39\\u6389\\u5427"));
-	}
 }

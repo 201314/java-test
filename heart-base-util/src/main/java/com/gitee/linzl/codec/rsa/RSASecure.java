@@ -311,7 +311,7 @@ public class RSASecure {
 		if (null == real_public_key || real_public_key.length <= 0) {
 			InputStream publicKey = null;
 			try {
-				publicKey = ReadResourceUtil.getInputStream("com/gzzq/secure/rsa_public_key.pem");
+				publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/rsa_public_key.pem");
 
 				if (logger.isDebugEnabled()) {
 					logger.debug("加载公钥路径成功");
@@ -333,7 +333,7 @@ public class RSASecure {
 		if (null == real_private_key || real_private_key.length <= 0) {
 			InputStream privateKey = null;
 			try {
-				privateKey = ReadResourceUtil.getInputStream("com/gzzq/secure/pkcs8_rsa_private_key.pem");
+				privateKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/pkcs8_rsa_private_key.pem");
 				if (logger.isDebugEnabled()) {
 					logger.debug("加载私钥路径成功");
 				}

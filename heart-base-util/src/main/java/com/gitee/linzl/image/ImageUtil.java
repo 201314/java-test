@@ -22,7 +22,7 @@ public class ImageUtil {
 	/**
 	 * 读取照片里面的信息
 	 * 
-	 * 使用metadata-extractor
+	 * 使用metadata-extractor,支持获取tif,photoshop等多种com.drew.imaging.FileType
 	 * 
 	 * ExifDirectoryBase 包含图片基础参数
 	 */

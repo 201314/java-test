@@ -47,7 +47,7 @@ public class DESUtil {
 	}
 
 	/**
-	 * 默认采用密钥长度112加密
+	 * 采用密钥长度112加密
 	 * 
 	 * @return
 	 * @throws NoSuchAlgorithmException
@@ -56,6 +56,12 @@ public class DESUtil {
 		return generateKey(THREEDES, 112);
 	}
 
+	/**
+	 * 采用密钥长度168加密
+	 * 
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 */
 	public static byte[] generate3DES168Key() throws NoSuchAlgorithmException {
 		return generateKey(THREEDES, 168);
 	}
@@ -190,9 +196,11 @@ public class DESUtil {
 
 	/**
 	 * @param data
-	 *            需要加密的数据
+	 *            明文
 	 * @param key
 	 *            加密密钥
+	 * @param keyiv
+	 *            IV密钥
 	 * @return
 	 * @throws Exception
 	 */
@@ -212,6 +220,16 @@ public class DESUtil {
 		return cipher.doFinal(data);
 	}
 
+	/**
+	 * @param data
+	 *            密文
+	 * @param key
+	 *            加密密钥
+	 * @param keyiv
+	 *            IV密钥
+	 * @return
+	 * @throws Exception
+	 */
 	public static byte[] decrypt3DESForCBC(byte[] data, byte[] key, byte[] keyiv) throws Exception {
 		// 从原始密钥数据创建DESedeKeySpec对象
 		DESedeKeySpec spec = new DESedeKeySpec(key);
@@ -248,70 +266,5 @@ public class DESUtil {
 		// 用密钥初始化Cipher对象
 		cipher.init(Cipher.DECRYPT_MODE, deskey);
 		return cipher.doFinal(data);
-	}
-
-	/**
-	 * 将二进制转换成16进制
-	 * 
-	 * @param buf
-	 * @return
-	 */
-	public static String parseByte2HexStr(byte buf[]) {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < buf.length; i++) {
-			String hex = Integer.toHexString(buf[i] & 0xFF);
-			if (hex.length() == 1) {
-				hex = '0' + hex;
-			}
-			sb.append(hex.toUpperCase());
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * 将16进制转换为二进制
-	 * 
-	 * @param hexStr
-	 * @return
-	 */
-	public static byte[] parseHexStr2Byte(String hexStr) {
-		if (hexStr.length() < 1)
-			return null;
-		byte[] result = new byte[hexStr.length() / 2];
-		for (int i = 0; i < hexStr.length() / 2; i++) {
-			int high = Integer.parseInt(hexStr.substring(i * 2, i * 2 + 1), 16);
-			int low = Integer.parseInt(hexStr.substring(i * 2 + 1, i * 2 + 2), 16);
-			result[i] = (byte) (high * 16 + low);
-		}
-		return result;
-	}
-
-	public static void main(String[] args) throws Exception {
-		String data = "我是个中国人";
-
-		// byte[] randomkey = generateDESKey();
-		// byte[] encryptData = encryptDES(data.getBytes(), randomkey);
-		// byte[] descryptData = decryptDES(encryptData, randomkey);
-		// System.out.println("DESData==>" + new String(descryptData));
-
-		byte[] randomkey = generateAESKey();
-		byte[] encode = encryptAES(data.getBytes("utf-8"), randomkey);
-		// 传输过程,不转成16进制的字符串，就等着程序崩溃掉吧
-		String code = parseByte2HexStr(encode);
-		byte[] decode = parseHexStr2Byte(code);
-		// 解密
-		byte[] descryptData = decryptAES(decode, randomkey);
-		System.out.println("AESData==>" + new String(descryptData, "utf-8"));
-
-		// randomkey = generate3DES168Key();// "abcdefghijklmnopqrstuvwx".getBytes();//
-		// encryptData = encrypt3DESForECB(data.getBytes(), randomkey);
-		// descryptData = decrypt3DESForECB(encryptData, randomkey);
-		// System.out.println("ECB===3DESForECBData==>" + new String(descryptData));
-		//
-		// byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8 };// 长度必须是8
-		// encryptData = encrypt3DESForCBC(data.getBytes(), randomkey, keyiv);
-		// descryptData = decrypt3DESForCBC(encryptData, randomkey, keyiv);
-		// System.out.println("CBC===3DESForCBCData==>" + new String(descryptData));
-
 	}
 }

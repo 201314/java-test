@@ -14,6 +14,16 @@ import org.apache.tools.zip.ZipOutputStream;
 
 /**
  * 文件压缩、解压功能
+ * 
+ * TODO 用commons-compress要支持各种jar,war,tar.gz等压缩、解压功能，且需要支持zip密码压缩、解压
+ * 
+ * <dependency> 
+ * <groupId>net.lingala.zip4j</groupId>
+ * <artifactId>zip4j</artifactId> 
+ * <version>1.3.2</version> 
+ * </dependency>
+ * 
+ * 
  * <p>
  * 使用了ant.jar包
  * 

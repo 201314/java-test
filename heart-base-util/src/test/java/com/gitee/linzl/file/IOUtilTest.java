@@ -16,7 +16,7 @@ public class IOUtilTest {
 	@Test
 	public void zipFiles() throws IOException {
 		File[] files = new File[] { new File("D:\\trawe_store\\play"), new File("D:\\trawe_store\\trawe_store.zip") };
-		File zip = new File("d:/trawe_store/测试中文2.zip");
+		File zip = new File("d:/trawe_store/测试中文2.tar.gz");
 		IOUtil.zipFiles(files, zip);
 	}
 

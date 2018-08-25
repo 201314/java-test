@@ -1,4 +1,4 @@
-package com.gitee.linzl.regex;
+package com.gitee.linzl.rules;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Java表单验证工具类
  * 
- * @author huanghp
+ * @author linzl
  * @date 2017/01/09
  */
 public class RegexUtil {
@@ -51,9 +51,9 @@ public class RegexUtil {
 	 */
 	public static final String DIGITS = "^[0-9]*$";
 	/**
-	 * 身份证号码验证
+	 * 18身份证号码验证
 	 */
-	public static final String ID_NUMBER = "^(\\d{6})()?(\\d{4})(\\d{2})(\\d{2})(\\d{3})(\\w)$";
+	public static final String ID_NUMBER = "^[1-9]\\\\d{5}(18|19|(2\\\\d))\\\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|[1-2]0|3[0-1])\\\\d{3}[0-9Xx]$";
 	/**
 	 * 邮政编码验证
 	 */

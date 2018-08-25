@@ -161,7 +161,7 @@ public class HexUtil {
 	 * @param buf
 	 * @return
 	 */
-	public static String parseByte2Hex(byte buf[]) {
+	public static String byte2Hex(byte buf[]) {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < buf.length; i++) {
 			String hex = Integer.toHexString(buf[i] & 0xFF);
@@ -179,16 +179,18 @@ public class HexUtil {
 	 * @param hex
 	 * @return
 	 */
-	public static byte[] parseHex2Byte(String hex) {
+	public static byte[] hex2Byte(String hex) {
 		if (hex.length() < 1) {
 			return null;
 		}
-
+		if (hex.length() % 2 != 0) {
+			// 字节数组长度不是偶数直接抛出异常不予处理
+			throw new IllegalArgumentException("The byte Array's length is not even!");
+		}
 		byte[] result = new byte[hex.length() / 2];
-		for (int i = 0; i < hex.length() / 2; i++) {
-			int high = Integer.parseInt(hex.substring(i * 2, i * 2 + 1), 16);
-			int low = Integer.parseInt(hex.substring(i * 2 + 1, i * 2 + 2), 16);
-			result[i] = (byte) (high * 16 + low);
+		for (int n = 0; n < hex.length(); n += 2) {
+			String item = new String(hex.getBytes(), n, 2);
+			result[n / 2] = (byte) Integer.parseInt(item, 16);
 		}
 		return result;
 	}
@@ -351,4 +353,26 @@ public class HexUtil {
 		return string.toString();
 	}
 
+	/**
+	 * 将字符数组转为整型数组
+	 * 
+	 * @param c
+	 * @return
+	 * @throws NumberFormatException
+	 */
+	public static int[] charToInt(char[] c) throws NumberFormatException {
+		int[] a = new int[c.length];
+		int k = 0;
+		for (char temp : c) {
+			a[k++] = Integer.parseInt(String.valueOf(temp));
+		}
+		return a;
+	}
+
+	public static void main(String[] args) {
+		String str = "中国人1`1@#?><$%^&*().?/,;':\"`~";
+		String b = byte2Hex(str.getBytes());
+		String result = new String(hex2Byte(b));
+		System.out.println(result);
+	}
 }

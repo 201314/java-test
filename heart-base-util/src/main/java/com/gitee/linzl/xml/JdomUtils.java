@@ -42,6 +42,7 @@ import org.xml.sax.InputSource;
  * 
  * @author linzl 最后修改时间：2014年10月10日
  */
+@Deprecated
 public class JdomUtils {
 	private static final String DEFAULT_CHARSET = "UTF-8";
 

@@ -44,6 +44,7 @@ import org.xml.sax.SAXException;
  * 
  * @author linzl 最后修改时间：2014年10月10日
  */
+@Deprecated
 public class DomUtils {
 	private static String getEncoding(String encoding) {
 		return encoding != null ? encoding : "UTF-8";

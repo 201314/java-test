@@ -1,5 +1,7 @@
 package com.gitee.linzl.xml;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -20,7 +22,11 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * 特别支持Root对象是List的情形.
  * 
- * @author
+ * @description
+ * 
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年9月5日
  */
 public class JaxbUtil {
 	// 多线程安全的Context
@@ -39,14 +45,39 @@ public class JaxbUtil {
 	}
 
 	/**
-	 * Java Object->Xml.
+	 * Java Object->Xml
+	 * 
+	 * @param root
+	 * @return
 	 */
 	public String toXml(Object root) {
 		return toXml(root, null);
 	}
 
+	public void writeToFile(Object root, File file) {
+		try {
+			createMarshaller(null).marshal(root, file);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeToFile(Collection<?> root, String rootName, File file) {
+		CollectionWrapper wrapper = new CollectionWrapper();
+		wrapper.collection = root;
+
+		rootName = rootName == null ? "root" : rootName;
+		JAXBElement<CollectionWrapper> wrapperElement = new JAXBElement<CollectionWrapper>(new QName(rootName),
+				CollectionWrapper.class, wrapper);
+		writeToFile(wrapperElement, file);
+	}
+
 	/**
-	 * Java Object->Xml.
+	 * Java Object->Xml
+	 * 
+	 * @param root
+	 * @param encoding
+	 * @return
 	 */
 	public String toXml(Object root, String encoding) {
 		try {
@@ -59,9 +90,14 @@ public class JaxbUtil {
 	}
 
 	/**
-	 * Java Object->Xml, 特别支持对Root Element是Collection的情形.
+	 * Java Object->Xml, 特别支持对Root Element是Collection的情形
+	 * 
+	 * @param root
+	 * @param rootName
+	 * @param encoding
+	 * @return
 	 */
-	public String toXml(Collection root, String rootName, String encoding) {
+	public String toXml(Collection<?> root, String rootName, String encoding) {
 		CollectionWrapper wrapper = new CollectionWrapper();
 		wrapper.collection = root;
 
@@ -74,19 +110,28 @@ public class JaxbUtil {
 	/**
 	 * Xml->Java Object,默认大小写敏感
 	 */
-	public <T> T fromXml(String xml) {
-		return fromXml(xml, true);
-	}
-
-	/**
-	 * Xml->Java Object, 支持大小写敏感或不敏感.
-	 */
-	public <T> T fromXml(String xml, boolean caseSensitive) {
-		if (!caseSensitive) {
-			xml = xml.toLowerCase();
-		}
+	@SuppressWarnings("unchecked")
+	public <T> T toBean(String xml) {
 		try {
 			return (T) createUnmarshaller().unmarshal(new StringReader(xml));
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T toBean(File xml) {
+		try {
+			return (T) createUnmarshaller().unmarshal(xml);
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T toBean(InputStream input) {
+		try {
+			return (T) createUnmarshaller().unmarshal(input);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
@@ -95,14 +140,7 @@ public class JaxbUtil {
 	/**
 	 * 创建Marshaller
 	 */
-	public Marshaller createMarshaller() {
-		return createMarshaller(null);
-	}
-
-	/**
-	 * 创建Marshaller
-	 */
-	public Marshaller createMarshaller(String encoding) {
+	private Marshaller createMarshaller(String encoding) {
 		try {
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -122,7 +160,7 @@ public class JaxbUtil {
 	/**
 	 * 创建UnMarshaller.
 	 */
-	public Unmarshaller createUnmarshaller() {
+	private Unmarshaller createUnmarshaller() {
 		try {
 			return jaxbContext.createUnmarshaller();
 		} catch (JAXBException e) {
@@ -134,8 +172,7 @@ public class JaxbUtil {
 	 * 封装Root Element 是 Collection的情况.
 	 */
 	public static class CollectionWrapper {
-		@SuppressWarnings("unchecked")
 		@XmlAnyElement
-		protected Collection collection;
+		protected Collection<?> collection;
 	}
 }

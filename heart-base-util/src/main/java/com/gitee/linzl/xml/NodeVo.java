@@ -20,7 +20,7 @@ public class NodeVo {
 	private Map<String, String> attributeMap;
 
 	/**
-	 * 节点文本内容
+	 * 节点文本内容 
 	 */
 	private String text;
 

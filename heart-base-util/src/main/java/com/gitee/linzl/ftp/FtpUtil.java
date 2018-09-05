@@ -13,6 +13,14 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
+/**
+ * FTP上传下载文件,不做加解密处理
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年8月27日
+ */
 public class FtpUtil {
 	// ftp服务器地址
 	public String hostname = "192.168.1.249";
@@ -28,7 +36,7 @@ public class FtpUtil {
 	/**
 	 * 初始化ftp服务器
 	 */
-	public void initFtpClient() {
+	public FtpUtil() {
 		ftpClient = new FTPClient();
 		ftpClient.setControlEncoding("UTF-8");
 		try {
@@ -79,7 +87,6 @@ public class FtpUtil {
 	public boolean uploadFile(String pathname, String fileName, InputStream inputStream) {
 		boolean flag = false;
 		try {
-			initFtpClient();
 			ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
 			mkdir(pathname);
 			ftpClient.makeDirectory(pathname);
@@ -212,7 +219,6 @@ public class FtpUtil {
 		boolean flag = false;
 		OutputStream os = null;
 		try {
-			initFtpClient();
 			// 切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
 			FTPFile[] ftpFiles = ftpClient.listFiles();
@@ -259,7 +265,6 @@ public class FtpUtil {
 	public boolean deleteFile(String pathname, String filename) {
 		boolean flag = false;
 		try {
-			initFtpClient();
 			// 切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
 			ftpClient.dele(filename);

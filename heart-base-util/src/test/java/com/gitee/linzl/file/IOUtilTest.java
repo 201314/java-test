@@ -16,14 +16,14 @@ public class IOUtilTest {
 	@Test
 	public void zipFiles() throws IOException {
 		File[] files = new File[] { new File("D:\\trawe_store\\play"), new File("D:\\trawe_store\\trawe_store.zip") };
-		File zip = new File("d:/trawe_store/测试中文2.tar.gz");
-		IOUtil.zipFiles(files, zip);
+		File zip = new File("d:/trawe_store/play.7z");
+		IOUtil.compressionFiles(files, zip);
 	}
 
 	@Test
 	public void unZip() throws IOException {
-		File zipFile = new File("d:/testDir/jd-gui-1.4.0.jar");
-		File destFile = new File("d:/testDir/测试中文中文");
-		IOUtil.unZipFiles(zipFile, destFile);
+		File zipFile = new File("d:/trawe_store/play.7z");
+		File destFile = new File("d:/testDir/测试中文中文1");
+		IOUtil.decompressionFiles(zipFile, destFile);
 	}
 }

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -13,18 +15,8 @@ import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
 
 /**
- * 文件压缩、解压功能
+ * 单文件/多文件 压缩、解压功能
  * 
- * TODO 用commons-compress要支持各种jar,war,tar.gz等压缩、解压功能，且需要支持zip密码压缩、解压
- * 
- * <dependency> 
- * <groupId>net.lingala.zip4j</groupId>
- * <artifactId>zip4j</artifactId> 
- * <version>1.3.2</version> 
- * </dependency>
- * 
- * 
- * <p>
  * 使用了ant.jar包
  * 
  * @author linzl
@@ -33,16 +25,20 @@ public class IOUtil {
 	private static byte[] buf = new byte[1024];
 
 	/**
-	 * 压缩文件
+	 * 压缩单个文件
 	 * 
 	 * @param srcFiles
-	 *            需要压缩的文件
-	 * @param targetZip
-	 *            压缩后目标位置,如 D:/测试中文.zip
+	 *            需要压缩的文件,默认压缩到同目录下,后缀为zip
 	 * @throws IOException
 	 */
-	public static void zipFiles(File[] srcFiles, File targetZip) throws IOException {
-		zipFiles(srcFiles, targetZip, null);
+	public static void compressionFiles(File srcFile) throws IOException {
+		String compressionFilesName = null;
+		if (srcFile.isDirectory()) {
+			compressionFilesName = srcFile.getName() + ".zip";
+		} else {
+			compressionFilesName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf(".")) + ".zip";
+		}
+		compressionFiles(srcFile, new File(srcFile.getParentFile(), compressionFilesName));
 	}
 
 	/**
@@ -50,14 +46,41 @@ public class IOUtil {
 	 * 
 	 * @param srcFiles
 	 *            需要压缩的文件
-	 * @param targetZip
+	 * @param targetFile
+	 *            压缩后目标位置,如 D:/测试中文.zip
+	 * @throws IOException
+	 */
+	public static void compressionFiles(File srcFile, File targetFile) throws IOException {
+		File[] srcFiles = new File[] { srcFile };
+		compressionFiles(srcFiles, targetFile);
+	}
+
+	/**
+	 * 压缩文件
+	 * 
+	 * @param srcFiles
+	 *            需要压缩的文件
+	 * @param targetFile
+	 *            压缩后目标位置,如 D:/测试中文.zip
+	 * @throws IOException
+	 */
+	public static void compressionFiles(File[] srcFiles, File targetFile) throws IOException {
+		compressionFiles(srcFiles, targetFile, null);
+	}
+
+	/**
+	 * 压缩文件
+	 * 
+	 * @param srcFiles
+	 *            需要压缩的文件
+	 * @param targetFile
 	 *            压缩后目标位置,如 D:/测试中文.zip
 	 * @param rootName
 	 *            压缩成功后，根文件夹的全路径,如windows环境下 D:/test,linux环境下 /var/local
 	 * @throws IOException
 	 */
-	public static void zipFiles(File[] srcFiles, File targetZip, String rootName) throws IOException {
-		zipFiles(srcFiles, targetZip, rootName, null);
+	public static void compressionFiles(File[] srcFiles, File targetFile, String rootName) throws IOException {
+		compressionFiles(srcFiles, targetFile, rootName, null);
 	}
 
 	/**
@@ -65,7 +88,7 @@ public class IOUtil {
 	 * 
 	 * @param srcFiles
 	 *            需要压缩的文件
-	 * @param targetZip
+	 * @param targetFile
 	 *            压缩后目标位置,如 D:/测试中文.zip
 	 * @param rootName
 	 *            压缩成功后，根文件夹的全路径,如windows环境下 D:/test,linux环境下 /var/local
@@ -73,10 +96,11 @@ public class IOUtil {
 	 *            压缩包说明
 	 * @throws IOException
 	 */
-	public static void zipFiles(File[] srcFiles, File targetZip, String rootName, String comment) throws IOException {
+	public static void compressionFiles(File[] srcFiles, File targetFile, String rootName, String comment)
+			throws IOException {
 		rootName = (rootName == null ? "/" : rootName.trim().replaceAll("\\\\", "/").replaceAll("//*", "/"));
-		ZipOutputStream out = new ZipOutputStream(targetZip);
-		zipFiles(out, srcFiles, rootName);
+		ZipOutputStream out = new ZipOutputStream(targetFile);
+		compressionFiles(out, srcFiles, rootName);
 		comment = (comment == null ? "" : comment);
 		out.setComment(comment);
 		out.close();
@@ -90,7 +114,7 @@ public class IOUtil {
 	 * @param rootName
 	 *            压缩成功后，根文件夹的全路径,如windows环境下 D:/test,linux环境下 /var/local
 	 */
-	private static void zipFiles(ZipOutputStream out, File[] srcFiles, String rootName) {
+	private static void compressionFiles(ZipOutputStream out, File[] srcFiles, String rootName) {
 		if (!"".equalsIgnoreCase(rootName) && !rootName.endsWith("/")) {
 			rootName += "/";
 		}
@@ -102,7 +126,7 @@ public class IOUtil {
 				if (srcFiles[i].isDirectory()) {
 					fileName += "/"; // 标记为目录
 					out.putNextEntry(new ZipEntry(fileName));
-					zipFiles(out, srcFiles[i].listFiles(), fileName);
+					compressionFiles(out, srcFiles[i].listFiles(), fileName);
 				} else {
 					out.putNextEntry(new ZipEntry(fileName));
 					InputStream in = FileUtils.openInputStream(srcFiles[i]);
@@ -123,38 +147,57 @@ public class IOUtil {
 	/**
 	 * 解压文件到指定目录
 	 * 
-	 * @param zipFile
+	 * @param srcFile
+	 *            需要解压的压缩文件,默认解压到srcFile父目录下
+	 * @return 得到解压后的文件
+	 * @throws IOException
+	 */
+	public static List<File> decompressionFiles(File srcFile) throws IOException {
+		return decompressionFiles(srcFile, srcFile.getParentFile());
+	}
+
+	/**
+	 * 解压文件到指定目录
+	 * 
+	 * @param srcFile
 	 *            需要解压的压缩文件
-	 * @param descDir
+	 * @param destFile
 	 *            解压到指定目录
+	 * @return 得到解压后的文件
+	 * @throws IOException
 	 */
 	@SuppressWarnings("rawtypes")
-	public static void unZipFiles(File zipFile, File destDir) throws IOException {
-		FileUtils.forceMkdir(destDir);
+	public static List<File> decompressionFiles(File srcFile, File destFile) throws IOException {
+		FileUtils.forceMkdir(destFile);
 
-		try (ZipFile zip = new ZipFile(zipFile);) {
+		List<File> fileList = Collections.emptyList();
+
+		try (ZipFile zip = new ZipFile(srcFile);) {
 			Enumeration entries = zip.getEntries();
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
 
 				// 如果是文件夹，则创建完提前结束
-				File file = new File(destDir.getPath(), entry.getName());
+				File file = new File(destFile.getPath(), entry.getName());
 				if (entry.isDirectory()) {
 					FileUtils.forceMkdir(file);
 					continue;
 				}
 
-				try (InputStream in = zip.getInputStream(entry); OutputStream out = FileUtils.openOutputStream(file)) {
+				try (InputStream in = zip.getInputStream(entry);
+
+						OutputStream out = FileUtils.openOutputStream(file)) {
 					int len = 0;
 					while ((len = in.read(buf)) > 0) {
 						out.write(buf, 0, len);
 					}
 					IOUtils.closeQuietly(out);
 					IOUtils.closeQuietly(in);
+					fileList.add(file);
 				}
 			}
 			ZipFile.closeQuietly(zip);
 		}
+		return fileList;
 	}
-
 }

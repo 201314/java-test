@@ -7,6 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class StringUtil {
 	// 开始字符，比如字符0
 	private static char startChar = '0';
@@ -34,6 +36,16 @@ public class StringUtil {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * 判空
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static boolean isNotEmpty(String source) {
+		return !"null".equals(source) && StringUtils.isNotEmpty(source);
 	}
 
 	/**

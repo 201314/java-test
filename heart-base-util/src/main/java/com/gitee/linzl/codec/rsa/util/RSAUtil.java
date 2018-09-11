@@ -18,7 +18,7 @@ import com.gitee.linzl.codec.rsa.RSASecure;
  * 
  * openssl默认使用的是PEM格式，经过base64编码
  * 
- * java加载密钥文件，不能带有注解
+ * java加载密钥文件，不能带有注释
  * 
  * @author linzl
  *

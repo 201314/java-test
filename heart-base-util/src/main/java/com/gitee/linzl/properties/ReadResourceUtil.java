@@ -81,6 +81,7 @@ public class ReadResourceUtil {
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
+		classLoader.getResource(path);
 		InputStream input = classLoader.getResourceAsStream(path);
 		if (input == null) {
 			throw new FileNotFoundException(

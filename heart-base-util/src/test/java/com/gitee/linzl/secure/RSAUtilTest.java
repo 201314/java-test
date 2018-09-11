@@ -16,7 +16,7 @@ import com.gitee.linzl.codec.rsa.util.RSAUtil;
 public class RSAUtilTest {
 	private static final Logger logger = LoggerFactory.getLogger(RSAUtilTest.class);
 	// 测试字符串
-	String encryptStr = "中国人林振烈";
+	String encryptStr = "中国人linzl";
 	byte[] encryptByte = null;
 
 	@Before

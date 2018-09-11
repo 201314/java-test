@@ -53,6 +53,8 @@ import com.gitee.linzl.properties.ReadResourceUtil;
  * 
  * 将rsa_public_key.pem内容复制给客户端加密用
  * 
+ * PS:只能公钥加密，私钥解密，不能颠倒顺序
+ * 
  * @author linzl
  * 
  *         非对称加密

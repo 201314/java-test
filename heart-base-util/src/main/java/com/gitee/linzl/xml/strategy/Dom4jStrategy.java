@@ -28,6 +28,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLResult;
 import org.dom4j.io.XMLWriter;
 
+import com.gitee.linzl.cls.ClassUtil;
 import com.gitee.linzl.xml.NodeVo;
 
 /**
@@ -50,7 +51,7 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 		this.doc = DocumentHelper.createDocument(DocumentHelper.createElement("root"));
 	}
 
-	public Dom4jStrategy(File file) {
+	public Dom4jStrategy read(File file) {
 		SAXReader reader = new SAXReader();
 		Document doc = null;
 		try {
@@ -60,9 +61,10 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 		}
 		doc.normalize();
 		this.doc = doc;
+		return this;
 	}
 
-	public Dom4jStrategy(URL url) {
+	public Dom4jStrategy read(URL url) {
 		SAXReader reader = new SAXReader();
 		Document doc = null;
 		try {
@@ -72,21 +74,23 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 		}
 		doc.normalize();
 		this.doc = doc;
+		return this;
 	}
 
-	public Dom4jStrategy(InputStream in) {
+	public Dom4jStrategy read(InputStream is) {
 		SAXReader reader = new SAXReader();
 		Document doc = null;
 		try {
-			doc = reader.read(in);
+			doc = reader.read(is);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
 		doc.normalize();
 		this.doc = doc;
+		return this;
 	}
 
-	public Dom4jStrategy(Reader reader) {
+	public Dom4jStrategy read(Reader reader) {
 		SAXReader saxReader = new SAXReader();
 		Document doc = null;
 		try {
@@ -96,9 +100,10 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 		}
 		doc.normalize();
 		this.doc = doc;
+		return this;
 	}
 
-	public Dom4jStrategy(String xmlContent) {
+	public Dom4jStrategy read(String xmlContent) {
 		Document doc = null;
 		try {
 			doc = DocumentHelper.parseText(xmlContent);
@@ -107,6 +112,12 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 		}
 		doc.normalize();
 		this.doc = doc;
+		return this;
+	}
+
+	public boolean supports(String xmlParseType) {
+		return "dom4j".equalsIgnoreCase(xmlParseType)
+				&& ClassUtil.isPresent("org.dom4j.Document", Dom4jStrategy.class.getClassLoader());
 	}
 
 	public String readAsText() {

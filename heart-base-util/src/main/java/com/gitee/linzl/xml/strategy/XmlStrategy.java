@@ -1,11 +1,29 @@
 package com.gitee.linzl.xml.strategy;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URL;
 import java.util.List;
 
 import com.gitee.linzl.xml.NodeVo;
 
 public interface XmlStrategy {
+	/**
+	 * 是否支持该xml策略
+	 * 
+	 * @return
+	 */
+	public boolean supports(String xmlParseType);
+
+	public XmlStrategy read(File file);
+
+	public XmlStrategy read(URL url);
+
+	public XmlStrategy read(InputStream is);
+
+	public XmlStrategy read(Reader reader);
+
 	/**
 	 * xml内容转字符串
 	 * 

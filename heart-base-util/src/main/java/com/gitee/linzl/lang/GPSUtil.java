@@ -1,4 +1,4 @@
-package com.gitee.linzl.string;
+package com.gitee.linzl.lang;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

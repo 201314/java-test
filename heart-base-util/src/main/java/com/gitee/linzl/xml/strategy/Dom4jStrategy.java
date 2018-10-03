@@ -386,11 +386,13 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 			return Collections.emptyList();
 		}
 
-		Branch branch = null;
-		if (node.getNodeType() == Node.ELEMENT_NODE || node.getNodeType() == Node.DOCUMENT_NODE) {
-			branch = (Branch) node;
+		if (node.getNodeType() != Node.ELEMENT_NODE
+
+				&& node.getNodeType() != Node.DOCUMENT_NODE) {
+			return Collections.emptyList();
 		}
 
+		Branch branch = (Branch) node;
 		List<NodeVo> childList = new LinkedList<>();
 		NodeVo nodeVo = new NodeVo();
 
@@ -404,11 +406,12 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 			}
 
 			// xml规范，先写注释，再写节点，所以遇到元素节点，信息就已经完整了
-			if (currNode.getNodeType() == Node.COMMENT_NODE) {
-				if (StringUtils.isNotEmpty(currNode.getText())) {
-					nodeVo.setComment(currNode.getText());
-				}
-			} else if (currNode.getNodeType() == Node.ELEMENT_NODE) {
+			if (currNode.getNodeType() == Node.COMMENT_NODE && StringUtils.isNotEmpty(currNode.getText())) {
+				nodeVo.setComment(currNode.getText());
+				continue;
+			}
+
+			if (currNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element child = (Element) currNode;
 				nodeVo.setName(child.getName());
 				if (StringUtils.isNotEmpty(child.getTextTrim())) {

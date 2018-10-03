@@ -19,7 +19,7 @@ import org.krysalis.barcode4j.tools.MimeTypes;
  *
  * @creatDate 2016年8月31日
  */
-public class OneDimensionUtil {
+public class LinearBarcodeUtil {
 	private static BarcodeClassResolver resolver = new DefaultBarcodeClassResolver();
 
 	public enum CodeType {
@@ -76,30 +76,6 @@ public class OneDimensionUtil {
 		}
 	}
 
-	public static void toBarcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.UPCA, msg, target);
-	}
-
-	public static void toCodabarBarcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.CODABAR, msg, target);
-	}
-
-	public static void toCode39Barcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.CODE39, msg, target);
-	}
-
-	public static void toCode128Barcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.CODE128, msg, target);
-	}
-
-	public static void toEan_128Barcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.EAN_128, msg, target);
-	}
-
-	public static void toEan128Barcode(String msg, File target) {
-		toBarcode(OneDimensionUtil.CodeType.EAN128, msg, target);
-	}
-
 	/**
 	 * 生成到流
 	 *
@@ -110,6 +86,7 @@ public class OneDimensionUtil {
 		if (StringUtils.isEmpty(msg) || target == null) {
 			return;
 		}
+
 		BarcodeGenerator bean = null;
 		try {
 			bean = (BarcodeGenerator) resolver.resolveBean(codeType.getName()).newInstance();

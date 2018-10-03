@@ -4,8 +4,6 @@ import java.io.File;
 
 import org.junit.Test;
 
-import com.gitee.linzl.dimension.OneDimensionUtil;
-
 /**
  * 条形码工具类
  *
@@ -13,12 +11,13 @@ import com.gitee.linzl.dimension.OneDimensionUtil;
  * @createDate 2016年8月31日
  *
  */
-public class BarcodeTest {
+public class LinearBarcodeTest {
 	@Test
-	public void generateBarcode() {
+	public void generateBarcode() { 
 		String msg = "00000000068";
 		String basePath = this.getClass().getResource("/").getFile();
 		String path = basePath + "/com/utea/dimension/barcode.gif";
-		OneDimensionUtil.toBarcode(OneDimensionUtil.CodeType.UPCA, msg, new File(path));
+		System.out.println(path);
+		LinearBarcodeUtil.toBarcode(LinearBarcodeUtil.CodeType.UPCA, msg, new File(path));
 	}
 }

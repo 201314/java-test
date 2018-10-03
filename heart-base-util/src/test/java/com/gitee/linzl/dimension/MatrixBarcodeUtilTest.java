@@ -3,9 +3,9 @@ package com.gitee.linzl.dimension;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import com.gitee.linzl.dimension.ZxingUtil;
 import com.google.zxing.WriterException;
 
 /**
@@ -41,7 +41,7 @@ import com.google.zxing.WriterException;
  * 
  * @author linzl
  */
-public class ZxingUtilTest {
+public class MatrixBarcodeUtilTest {
 
 	@Test
 	public void createBarcode() throws WriterException, IOException {
@@ -51,20 +51,20 @@ public class ZxingUtilTest {
 		// File("D://barcode.png"));
 		// util.createBarcode();
 		// // 读取商品条形码、二维码
-		System.out.println(ZxingUtil.read(new File("D://testDir//barcode.gif")));
+		System.out.println(MatrixBarcodeUtil.read(new File("D://testDir//barcode.gif"), null));
 	}
 
 	@Test
 	public void createTwo() throws WriterException, IOException {
 		// 二维码生成
 		File targetPath = new File("D://testDir//zxing.png");
-		String content = "网址https://baidu.com";
-		ZxingUtil util = new ZxingUtil(content, targetPath, 0, 0);
-		util.createQRcode();
+		FileUtils.forceMkdirParent(targetPath);
+		String content = "网址q中国人民https://baidu.com";
 		File logo = new File("D://testDir//taobao.png");
-		util.addQRLogo(targetPath, logo);
+		MatrixBarcodeUtil util = new MatrixBarcodeUtil.WriteBuilder(content, targetPath).logo(logo).build();
+		util.create();
 
 		// 读取商品条形码、二维码
-		System.out.println(ZxingUtil.read(new File("D://testDir//zxing.png")));
+		System.out.println(MatrixBarcodeUtil.read(new File("D://testDir//zxing.png"), null));
 	}
 }

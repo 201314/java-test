@@ -4,4 +4,9 @@
 	<groupId>com.linzl</groupId>
 	<artifactId>heart-java-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	
+	<dependency>
+		<groupId>net.java.dev.jna</groupId>
+		<artifactId>jna</artifactId>
+	</dependency>
 </project>

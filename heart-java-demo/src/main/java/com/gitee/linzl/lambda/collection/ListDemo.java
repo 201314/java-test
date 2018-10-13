@@ -155,6 +155,27 @@ public class ListDemo {
 
 	@Test
 	public void listMinAndMax() {
+		List<String> list = new ArrayList<>();
+		list.add("11");
+		list.add("22");
+		list.add("33");
+		list.add("44");
+		list.add("55");
 
+		// for (String str : list) {
+		// if (str.equals("33")) {
+		// System.out.println("结束");
+		// continue;
+		// }
+		// System.out.println("有没有搞错" + str);
+		// }
+
+		list.stream().forEach((str) -> {
+			if (str.equals("33")) {
+				System.out.println("结束11");
+				return;
+			}
+			System.out.println("有没有搞错" + str);
+		});
 	}
 }

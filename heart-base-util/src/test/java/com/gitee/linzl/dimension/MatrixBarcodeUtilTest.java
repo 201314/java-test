@@ -2,6 +2,7 @@ package com.gitee.linzl.dimension;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -61,7 +62,8 @@ public class MatrixBarcodeUtilTest {
 		FileUtils.forceMkdirParent(targetPath);
 		String content = "网址q中国人民https://baidu.com";
 		File logo = new File("D://testDir//taobao.png");
-		MatrixBarcodeUtil util = new MatrixBarcodeUtil.WriteBuilder(content, targetPath).logo(logo).build();
+		MatrixBarcodeUtil util = new MatrixBarcodeUtil.WriteBuilder(content, targetPath)
+				.charset(Charset.forName("UTF-8")).logo(logo).build();
 		util.create();
 
 		// 读取商品条形码、二维码

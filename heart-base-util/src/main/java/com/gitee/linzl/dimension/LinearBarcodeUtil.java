@@ -14,6 +14,7 @@ import org.krysalis.barcode4j.tools.MimeTypes;
 
 /**
  * 条形码工具类
+ * https://www.cnblogs.com/zhaoyhBlog/p/6236949.html?utm_source=itdadao&utm_medium=referral
  * 
  * @author linzl
  *

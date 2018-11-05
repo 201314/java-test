@@ -1,4 +1,4 @@
-package com.gitee.linzl.codec.sha;
+package com.gitee.linzl.crypto.message;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +48,6 @@ public class SHA256Util {
 		byte[] publicSalt = toBytes(randomSalt, PREFERRED_ENCODING);
 
 		if (logger.isDebugEnabled()) {
-			// 私有盐不打印
 			// logger.debug("私有盐={}", new String(privateSalt));
 			logger.debug("公有盐={}", new String(publicSalt));
 		}
@@ -88,13 +89,6 @@ public class SHA256Util {
 			return null;
 		}
 		byte[] combined = new byte[length];
-		// int i = 0;
-		// for (int j = 0; j < privateSaltLength; j++) {
-		// combined[i++] = privateSalt[j];
-		// }
-		// for (int j = 0; j < extraBytesLength; j++) {
-		// combined[i++] = publicSalt[j];
-		// }
 		System.arraycopy(privateSalt, 0, combined, 0, privateSaltLength - 1);
 		System.arraycopy(publicSalt, 0, combined, privateSaltLength, extraBytesLength - 1);
 		return combined;
@@ -138,5 +132,7 @@ public class SHA256Util {
 		// 解密后的用户密码
 		boolean flag = SHA256Util.equalsCipher(userpass, pass, randomText);
 		System.out.println("是否一致==》" + flag);
+		
+		System.out.println(new HmacUtils(HmacAlgorithms.HMAC_SHA_1,"1".getBytes()).hmacHex("hello"));
 	}
 }

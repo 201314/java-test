@@ -1,4 +1,4 @@
-package com.gitee.linzl.codec.aes;
+package com.gitee.linzl.codec;
 
 import java.security.Key;
 import java.security.Security;
@@ -42,7 +42,7 @@ public class AESUtil {
 	private static final String KEY_ALGORITHM = "AES";
 
 	// 加解密算法/工作模式/填充方式,Java6.0支持PKCS5Padding填充方式,BouncyCastle支持PKCS7Padding填充方式
-	private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS7Padding";
+	private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
 
 	// 密钥长度
 	private static final int KEYSIZE = 256; // 初始化密钥生成器:AES要求密钥长度为128,192,256位

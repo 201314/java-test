@@ -1,5 +1,6 @@
 package com.gitee.linzl.codec;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
 public class DESUtilTest {
@@ -7,7 +8,10 @@ public class DESUtilTest {
 	public void testAESKey() throws Exception {
 		String data = "我是个中国人qENl``";
 		byte[] randomkey = DESUtil.generateAESKey();
+		System.out.println("aes密钥长度:" + randomkey.length);
+		System.out.println("密钥:" + Hex.toHexString(randomkey));
 		byte[] encryptData = DESUtil.encryptAES(data.getBytes(), randomkey);
+		System.out.println("加密数据："+Hex.toHexString(encryptData));
 		// 解密
 		byte[] descryptData = DESUtil.decryptAES(encryptData, randomkey);
 		System.out.println("AESData==>" + new String(descryptData));

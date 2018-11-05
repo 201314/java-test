@@ -14,10 +14,13 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * JCE(Java Cryptography
+ * Extension)即Java密码扩展，是JDK1.4的一个重要部分。它是一组包，它们提供用于加密、密钥生成算法和协商以及 Message
+ * Authentication Code（MAC）算法的框架和实现
+ * 
  * java 自带的DES/3DES/AES 三种对称加密算法
  * 
  * @author linzl
- * 
  */
 public class DESUtil {
 	private final static String DES = "DES";

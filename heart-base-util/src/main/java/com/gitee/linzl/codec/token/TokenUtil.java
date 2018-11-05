@@ -1,7 +1,13 @@
 package com.gitee.linzl.codec.token;
 
+import java.io.DataInputStream;
+import java.io.InputStream;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
+
+import com.gitee.linzl.properties.ReadResourceUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.CompressionCodecs;
@@ -103,8 +109,48 @@ public class TokenUtil {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		String token = TokenUtil.createToken();
-		TokenUtil.parseToken(token);
+	/**
+	 * 解析Token
+	 * 
+	 * @param compactJws
+	 * @return
+	 * @throws Exception
+	 */
+	public String parseToken2(String compactJws) throws Exception {
+		byte[] keyBytes = null;
+		try (InputStream input = ReadResourceUtil.getInputStream("jwt/pub.key");
+				DataInputStream dis = new DataInputStream(input);) {
+
+			keyBytes = new byte[input.available()];
+			dis.readFully(keyBytes);
+		}
+		X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		Key key = kf.generatePublic(spec);
+		try {
+			// require表示必须包含该属性
+			Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(compactJws);
+
+			String head = claims.getHeader().toString();
+			System.out.println("head==>" + head);
+
+			// 用户添加的内容，这些需要拿来解析
+			String body = claims.getBody().toString();
+			System.out.println("body==>" + body);
+
+			String sign = claims.getSignature().toString();
+			System.out.println("sign==>" + sign);
+		} catch (MissingClaimException e) {
+			e.printStackTrace();
+		} catch (IncorrectClaimException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static void main(String[] args) throws Exception {
+		// String token = TokenUtil.createToken();
+		String token = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJJZCI6IjEiLCJuYW1lIjoiTXIuQUciLCJleHAiOjE1NDA4OTYxOTR9.g03LB_WDyBwvO1BPMlpxTQFgGrUQ9HPqSvC79uLl-bH0AkVEZaF9TFNzppF1o-IoNpZX4ZuN_zlQDtS7xiMxWrPQKQk3asZsHh5u807ffy2gZT_Gg9YMUha0vKH5oi6lyYGQe9ktrHWAo-pZtaqRAOf9mN5OA_CadeGy7fVuWLI";
+		new TokenUtil().parseToken2(token);
 	}
 }

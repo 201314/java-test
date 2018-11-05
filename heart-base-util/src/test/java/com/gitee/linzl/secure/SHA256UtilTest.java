@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.junit.Test;
 
-import com.gitee.linzl.codec.sha.SHA256Util;
+import com.gitee.linzl.crypto.message.SHA256Util;
 
 /**
  * 后面可考虑使用 apache shiro

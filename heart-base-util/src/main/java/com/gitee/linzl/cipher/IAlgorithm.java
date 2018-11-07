@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto;
+package com.gitee.linzl.cipher;
 
 /**
  * @description

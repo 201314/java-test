@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto.asymmetrical;
+package com.gitee.linzl.cipher.asymmetrical;
 
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -6,6 +6,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -16,10 +17,22 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import com.gitee.linzl.crypto.IAlgorithm;
+import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
  * 非对称加解密
+ * 
+ * 密钥管理: 密钥管理容易
+ * 
+ * 安全性:高
+ * 
+ * 速度:慢
+ * 
+ * 适合场景:适合小量数据加密，支持数字签名
+ * 
+ * 实际应用:采用非对称加密算法管理对称算法的密钥，用对称加密算法加密数据，即提高了加密速度，
+ * 
+ * 又实现了解密的安全RSA建议采用1024位的数字，ECC建议采用160位，AES采用128为即可。
  * 
  * @description
  * @author linzl
@@ -185,5 +198,51 @@ public class AsymmetricalCipherUtil {
 		cipher.init(Cipher.DECRYPT_MODE, secretKey);
 		// 执行解密操作
 		return cipher.doFinal(data);
+	}
+
+	/**
+	 * 对数据进行签名
+	 * 
+	 * @param data
+	 *            需要签名的数据
+	 * @param privateKey
+	 *            私钥
+	 * @param algorithm
+	 *            签名算法
+	 * @return
+	 * @throws Exception
+	 */
+	public static byte[] sign(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
+		// 用私钥对信息生成数字签名
+		String signAlgorithm = algorithm.getSignAlgorithm();
+		Signature signature = Signature.getInstance(signAlgorithm);
+		signature.initSign(privateKey);
+		signature.update(data);
+		return signature.sign();
+	}
+
+	/**
+	 * 验证签名
+	 * 
+	 * @param data
+	 *            签名前的数据
+	 * @param publicKey
+	 *            公钥
+	 * @param sign
+	 *            签名后的数据
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean verifySign(byte[] data, PublicKey publicKey, byte[] sign, IAlgorithm algorithm)
+			throws Exception {
+		// 用私钥对信息生成数字签名
+		String signAlgorithm = algorithm.getSignAlgorithm();
+		Signature signature = Signature.getInstance(signAlgorithm);
+		signature.initVerify(publicKey);
+		signature.update(data);
+
+		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
+		// 验证签名是否正常
+		return signature.verify(sign);
 	}
 }

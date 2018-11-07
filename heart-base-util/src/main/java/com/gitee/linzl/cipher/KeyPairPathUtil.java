@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto;
+package com.gitee.linzl.cipher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +14,34 @@ import com.gitee.linzl.properties.ReadResourceUtil;
  * 
  * PS:签名：私钥签名，公钥验签。用自己的私钥签名，把公钥给别人。
  * 
+ * Java生成的公私钥格式为 pkcs8, 而openssl默认生成的公私钥格式为 pkcs1，两者的密钥实际上是不能直接互用的
+ * <p/>
+ * openssl默认使用的是PEM格式，经过base64编码
+ * <p/>
+ * java加载密钥文件，不能带有注解
+ * <p/>
+ * --生成私钥，编码是PKCS#1格式
+ * <p/>
+ * openssl genrsa -out rsa_private_key.pem 1024
+ * <p/>
+ * --生成公钥
+ * <p/>
+ * openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem -pubout
+ * <p/>
+ * --私钥不能直接被使用，需要进行PKCS#8编码
+ * <p/>
+ * openssl pkcs8 -topk8 -in rsa_private_key.pem -out pkcs8_rsa_private_key.pem
+ * -nocrypt
+ * 
+ * 将rsa_public_key.pem内容复制给客户端加密用
+ * 
  * @author linzl
  * 
  *         非对称加密
  * @creatDate 2016年10月31日
  */
-public class KeyPathUtil {
-	private static final Logger logger = LoggerFactory.getLogger(KeyPathUtil.class);
+public class KeyPairPathUtil {
+	private static final Logger logger = LoggerFactory.getLogger(KeyPairPathUtil.class);
 
 	private static byte[] public_key_byte;
 	private static byte[] private_key_byte;

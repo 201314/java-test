@@ -1,6 +1,6 @@
-package com.gitee.linzl.crypto.asymmetrical;
+package com.gitee.linzl.cipher.asymmetrical;
 
-import com.gitee.linzl.crypto.IAlgorithm;
+import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
  * JDK默认支持

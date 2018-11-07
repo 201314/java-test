@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto;
+package com.gitee.linzl.cipher;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -9,8 +9,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.crypto.asymmetrical.AsymmetricalCipherUtil;
-import com.gitee.linzl.crypto.asymmetrical.RSACipherAlgorithms;
+import com.gitee.linzl.cipher.IAlgorithm;
+import com.gitee.linzl.cipher.KeyPairPathUtil;
+import com.gitee.linzl.cipher.asymmetrical.AsymmetricalCipherUtil;
+import com.gitee.linzl.cipher.asymmetrical.RSACipherAlgorithms;
 
 public class RSATest {
 	private String text = null;
@@ -36,7 +38,7 @@ public class RSATest {
 
 	private void execute(IAlgorithm algorithm) throws Exception {
 		System.out.println("start===========指定密钥===========start");
-		byte[] publicKey = KeyPathUtil.getPublicKeyFile();
+		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
 		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
 		System.out.println("公钥长度:" + publicKey.length);
 
@@ -44,7 +46,7 @@ public class RSATest {
 		System.out.println("加密：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
-		byte[] privateKey = KeyPathUtil.getPrivateKeyFile();
+		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
 		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
 		System.out.println("私钥长度:" + privateKey.length);
 

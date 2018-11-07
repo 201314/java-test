@@ -1,6 +1,6 @@
-package com.gitee.linzl.crypto.symmetric;
+package com.gitee.linzl.cipher.symmetric;
 
-import com.gitee.linzl.crypto.IAlgorithm;
+import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
  * JDK默认支持
@@ -16,7 +16,6 @@ import com.gitee.linzl.crypto.IAlgorithm;
  */
 public enum AESCipherAlgorithms implements IAlgorithm {
 	// ============AES============
-	// TODO 加解密有问题 --start
 	AES_CBC_NOPADDING_128("AES", "AES/CBC/NoPadding", 128),
 
 	AES_CBC_NOPADDING_192("AES", "AES/CBC/NoPadding", 192),
@@ -28,7 +27,6 @@ public enum AESCipherAlgorithms implements IAlgorithm {
 	AES_CBC_PKCS5PADDING_192("AES", "AES/CBC/PKCS5Padding", 192),
 
 	AES_CBC_PKCS5PADDING_256("AES", "AES/CBC/PKCS5Padding", 256),
-	// TODO 加解密有问题 --end
 
 	AES_ECB_NOPADDING_128("AES", "AES/ECB/NoPadding", 128),
 

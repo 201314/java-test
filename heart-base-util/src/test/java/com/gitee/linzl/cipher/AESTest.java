@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto;
+package com.gitee.linzl.cipher;
 
 import javax.crypto.spec.IvParameterSpec;
 
@@ -6,8 +6,9 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.crypto.symmetric.AESCipherAlgorithms;
-import com.gitee.linzl.crypto.symmetric.SymmetricCipherUtil;
+import com.gitee.linzl.cipher.IAlgorithm;
+import com.gitee.linzl.cipher.symmetric.AESCipherAlgorithms;
+import com.gitee.linzl.cipher.symmetric.SymmetricCipherUtil;
 
 public class AESTest {
 	private String text = null;

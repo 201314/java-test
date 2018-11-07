@@ -8,7 +8,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import com.gitee.linzl.crypto.message.MD5Util;
+import com.gitee.linzl.cipher.message.DigestUtilsExt;
 import com.gitee.linzl.file.event.ProgressListener;
 import com.gitee.linzl.file.model.FileProgressPart;
 
@@ -31,7 +31,7 @@ public class FileTest {
 		try {
 			File file = new File("D:\\trawe_store\\trawe_store1.zip");
 			fileUtil.asynSplitFile(file, 40 * 1024, listener);
-			System.out.println("文件MD5：" + MD5Util.md5Hex(file));
+			System.out.println("文件MD5：" + DigestUtilsExt.md5Hex(file));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,4 +1,4 @@
-package com.gitee.linzl.crypto.symmetric;
+package com.gitee.linzl.cipher.symmetric;
 
 import java.security.Key;
 import java.security.KeyPair;
@@ -15,16 +15,35 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
 
-import com.gitee.linzl.crypto.IAlgorithm;
+import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
- * JCE(Java Cryptography Extension)即Java密码扩展，是JDK1.4的一个重要部分。
+ * 对称加解密工具：加密密钥与解密密钥相同。
  * 
- * 它是一组包，它们提供用于加密、密钥生成算法和协商以及 Message Authentication Code（MAC）算法的框架和实现
+ * 密钥管理:比较难，不适合互联网，一般用于内部系统
  * 
+ * 安全性:中
  * 
- * 对称加解密工具
+ * 速度:快好几个数量级
+ * 
+ * 适合场景:适合大量数据加密处理，不支持数字签名
+ * 
+ * 实际应用:采用非对称加密算法管理对称算法的密钥，用对称加密算法加密数据，即提高了加密速度，
+ * 
+ * 又实现了解密的安全RSA建议采用1024位的数字，ECC建议采用160位，AES采用128为即可。
+ * 
+ * DES(Data Encryption Standard): 数据加密标准，速度较快，适用于加密大量数据的场合;
+ * 
+ * 3DES(Triple DES): 是基于DES，对一块数据用三个不同的密钥进行三次加密，强度更高;
+ * 
+ * AES(Advanced Encryption Standard): 高级加密标准，是下一代的加密算法标准，速度快，安全级别高，AES 标准的一个实现是
+ * Rijndael 算法;
+ * 
+ * RC2和RC4:用变长密钥对大量数据进行加密，比 DES 快;
+ * 
+ * Blowfish
  * 
  * @author linzl
  */
@@ -36,14 +55,7 @@ public class SymmetricCipherUtil {
 	 */
 	public static byte[] generateKey(IAlgorithm algorithm) throws Exception {
 		// 实例化密钥生成器
-		String algorithmName = null;
-		// if (algorithm instanceof DefaultCipherAlgorithms) {
-		algorithmName = algorithm.getKeyAlgorithm();
-		// } else {
-		// Security.addProvider(new BouncyCastleProvider());
-		// algorithmName = algorithm.getAlgorithm();
-		// }
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithmName);
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.getKeyAlgorithm());
 		keyGenerator.init(algorithm.getSize());
 		// 生成密钥
 		SecretKey secretKey = keyGenerator.generateKey();
@@ -60,13 +72,7 @@ public class SymmetricCipherUtil {
 	 * @throws Exception
 	 */
 	public static Key toKey(byte[] key, IAlgorithm algorithm) throws Exception {
-		String algorithmName = null;
-		// if (algorithm instanceof DefaultCipherAlgorithms) {
-		algorithmName = algorithm.getKeyAlgorithm();
-		// } else {
-		// algorithmName = algorithm.getAlgorithm();
-		// }
-		return new SecretKeySpec(key, algorithmName);
+		return new SecretKeySpec(key, algorithm.getKeyAlgorithm());
 	}
 
 	/**
@@ -109,6 +115,10 @@ public class SymmetricCipherUtil {
 		return encrypt(data, secretKey, algorithm);
 	}
 
+	public static String encryptHex(String data, byte[] key, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(encrypt(data, key, algorithm));
+	}
+
 	/**
 	 * @param data
 	 *            待加密数据
@@ -128,10 +138,19 @@ public class SymmetricCipherUtil {
 		return output;
 	}
 
+	public static String encryptHex(String data, Key key, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(encrypt(data, key, algorithm));
+	}
+
 	public static byte[] encrypt(String data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return encrypt(data, secretKey, algorithm, iv);
+	}
+
+	public static String encryptHex(String data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv)
+			throws Exception {
+		return Hex.toHexString(encrypt(data, key, algorithm, iv));
 	}
 
 	/**
@@ -154,10 +173,18 @@ public class SymmetricCipherUtil {
 		return output;
 	}
 
+	public static String encryptHex(String data, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
+		return Hex.toHexString(encrypt(data, key, algorithm, iv));
+	}
+
 	public static byte[] bcEncrypt(String data, byte[] key, IAlgorithm algorithm) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return bcEncrypt(data, secretKey, algorithm);
+	}
+
+	public static String bcEncryptHex(String data, byte[] key, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(bcEncrypt(data, key, algorithm));
 	}
 
 	public static byte[] bcEncrypt(String data, Key secretKey, IAlgorithm algorithm) throws Exception {
@@ -168,6 +195,10 @@ public class SymmetricCipherUtil {
 		byte[] output = cipher.doFinal(data.getBytes());
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
+	}
+
+	public static String bcEncryptHex(String data, Key secretKey, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(bcEncrypt(data, secretKey, algorithm));
 	}
 
 	/**
@@ -182,6 +213,10 @@ public class SymmetricCipherUtil {
 	public static byte[] decrypt(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
 		Key secretKey = toKey(key, algorithm);
 		return decrypt(data, secretKey, algorithm);
+	}
+
+	public static String decryptHex(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(decrypt(data, key, algorithm));
 	}
 
 	/**
@@ -201,9 +236,18 @@ public class SymmetricCipherUtil {
 		return cipher.doFinal(data);
 	}
 
+	public static String decryptHex(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(decrypt(data, secretKey, algorithm));
+	}
+
 	public static byte[] decrypt(byte[] data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
 		Key secretKey = toKey(key, algorithm);
 		return decrypt(data, secretKey, algorithm, iv);
+	}
+
+	public static String decryptHex(byte[] data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv)
+			throws Exception {
+		return Hex.toHexString(decrypt(data, key, algorithm, iv));
 	}
 
 	public static byte[] decrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
@@ -215,9 +259,18 @@ public class SymmetricCipherUtil {
 		return cipher.doFinal(data);
 	}
 
+	public static String decryptHex(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
+			throws Exception {
+		return Hex.toHexString(decrypt(data, secretKey, algorithm, iv));
+	}
+
 	public static byte[] bcDecrypt(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
 		Key secretKey = toKey(key, algorithm);
 		return bcDecrypt(data, secretKey, algorithm);
+	}
+
+	public static String bcDecryptHex(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(bcDecrypt(data, key, algorithm));
 	}
 
 	public static byte[] bcDecrypt(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
@@ -226,6 +279,10 @@ public class SymmetricCipherUtil {
 		cipher.init(Cipher.DECRYPT_MODE, secretKey);
 		// 执行解密操作
 		return cipher.doFinal(data);
+	}
+
+	public static String bcDecryptHex(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(bcDecrypt(data, secretKey, algorithm));
 	}
 
 	/**
@@ -247,6 +304,10 @@ public class SymmetricCipherUtil {
 		signature.initSign(privateKey);
 		signature.update(data);
 		return signature.sign();
+	}
+
+	public static String signHex(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
+		return Hex.toHexString(sign(data, privateKey, algorithm));
 	}
 
 	/**

@@ -18,6 +18,9 @@ import java.io.InputStream;
  */
 public class MyClassLoader extends ClassLoader {
 
+	/**
+	 * 查找class
+	 */
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		byte[] classData = getClassData(name); // 根据类的二进制名称,获得该class文件的字节码数组

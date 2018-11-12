@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 public class CompletionServiceTest {
 
 	public static void main(String[] args) {
-		ExecutorService pool = Executors.newFixedThreadPool(8); // 需要2s，如果将8改成10，则只需要1s
+		ExecutorService pool = Executors.newFixedThreadPool(8);
 		CompletionService<Boolean> cs = new ExecutorCompletionService<Boolean>(pool);
 		Callable<Boolean> task = new Callable<Boolean>() {
 			public Boolean call() {

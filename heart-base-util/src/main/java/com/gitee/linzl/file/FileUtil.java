@@ -2,11 +2,13 @@ package com.gitee.linzl.file;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -127,6 +129,55 @@ public class FileUtil {
 			result = new String(b);
 		}
 		return result;
+	}
+
+	/**
+	 * 读取文件最后多少行
+	 * 
+	 * @param file
+	 * @param charset
+	 * @param count
+	 * @return
+	 * @throws Exception
+	 */
+	public static String readLastLine(File file, Charset charset, int count) throws Exception {
+		if (!file.exists() || file.isDirectory() || !file.canRead()) {
+			throw new Exception("文件不存在or目标为文件夹or文件不可读");
+		}
+
+		try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
+			long len = raf.length();
+			if (len == 0L) {
+				throw new Exception("文件为空");
+			}
+
+			long pos = len - 1;
+			while (count > 0 && pos > 0) {
+				pos--;
+				raf.seek(pos);
+				// 得到 count 行数据
+				if (raf.read() == '\n' || raf.read() == '\r') {
+					count--;
+				}
+			}
+			if (pos == 0) {
+				raf.seek(0);
+			}
+
+			byte[] bytes = new byte[(int) (len - pos)];
+			raf.read(bytes);
+
+			if (charset == null) {
+				return new String(bytes);
+			} else {
+				return new String(bytes, charset);
+			}
+		} catch (FileNotFoundException e) {
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+		}
+		return null;
 	}
 
 	/**

@@ -2,12 +2,14 @@ package com.gitee.linzl.lambda.collection;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.Before;
@@ -28,9 +30,14 @@ public class ListDemo {
 		Random random = new Random();
 		stuList = new ArrayList<Student>() {
 			{
-				for (int i = 0; i < 100; i++) {
-					add(new Student("student" + i, random.nextInt(50) + 50));
-				}
+				add(new Student("student1", 200));
+				add(new Student("student2", 110));
+				add(new Student("student3", 220));
+				add(new Student("student4", 420));
+				add(new Student("student5", 206));
+				add(new Student("student6", 290));
+				add(new Student("student7", 9200));
+				add(new Student("student8", 1200));
 			}
 		};
 	}
@@ -38,7 +45,7 @@ public class ListDemo {
 	@Test
 	public void listForEach() {
 		// 两种写法有何不同
-		stuList.stream().forEach(stu -> {
+		stuList.forEach(stu -> {
 			System.out.println(stu);
 		});
 
@@ -77,13 +84,15 @@ public class ListDemo {
 
 		Map<String, Student> map = stuList.stream().collect(Collectors.toMap(Student::getName, Function.identity()));
 		System.out.println(map);
+
+		String result = stuList.stream().map(Student::getName).collect(Collectors.joining(","));
+		System.out.println(result);
 	}
 
 	@Test
 	public void listMapToInt() {
-		// IntStream intStream = list.stream().mapToInt(string ->
-		// Integer.parseInt(string));
-		// System.out.println(intStream.sum());
+		IntStream intStream = stuList.stream().mapToInt(stu -> stu.getScore());
+		System.out.println(intStream.sum());
 	}
 
 	@Test
@@ -150,7 +159,13 @@ public class ListDemo {
 
 	@Test
 	public void listCollect() {
-
+		DoubleSummaryStatistics dss = stuList.stream().collect(Collectors.summarizingDouble(Student::getScore));
+		// 求平均值
+		System.out.println(dss.getAverage());
+		// 求最大值
+		System.out.println(dss.getMax());
+		// 求和
+		System.out.println(dss.getSum());
 	}
 
 	@Test
@@ -162,14 +177,6 @@ public class ListDemo {
 		list.add("44");
 		list.add("55");
 
-		// for (String str : list) {
-		// if (str.equals("33")) {
-		// System.out.println("结束");
-		// continue;
-		// }
-		// System.out.println("有没有搞错" + str);
-		// }
-
 		list.stream().forEach((str) -> {
 			if (str.equals("33")) {
 				System.out.println("结束11");
@@ -177,5 +184,7 @@ public class ListDemo {
 			}
 			System.out.println("有没有搞错" + str);
 		});
+
+		list.stream().anyMatch(str -> str.equals("33"));
 	}
 }

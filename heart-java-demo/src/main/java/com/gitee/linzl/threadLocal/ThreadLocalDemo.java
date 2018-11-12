@@ -1,5 +1,13 @@
 package com.gitee.linzl.threadLocal;
 
+/**
+ * ThreadLocal，数据与当前线程绑定，相当于一个副本，达到共享的作用，且多个线程前互不影响
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2018年10月14日
+ */
 public class ThreadLocalDemo {
 	public static ThreadLocal<String> tl = new ThreadLocal<>();
 

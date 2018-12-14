@@ -2,12 +2,13 @@ package com.gitee.linzl.xml;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XmlRootElement(name = "root")
+@XStreamAlias(value = "root1")
 public class Root {
-	@XmlElement(name = "hotel")
+	@XStreamAlias(value = "hotel")
+	private List<Hotel> hotel;
+
 	public List<Hotel> getHotel() {
 		return hotel;
 	}
@@ -15,6 +16,4 @@ public class Root {
 	public void setHotel(List<Hotel> hotel) {
 		this.hotel = hotel;
 	}
-
-	private List<Hotel> hotel;
 }

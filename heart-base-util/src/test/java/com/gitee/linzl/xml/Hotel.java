@@ -1,25 +1,17 @@
 package com.gitee.linzl.xml;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XmlRootElement(name = "hotel")
+@XStreamAlias(value = "hotel")
 public class Hotel {
-	// private String title;
 	private int id;
 	private String name;
-	private Map map = new HashMap() {
-		{
-			put("1", "age");
-			put("2", "height");
-		}
-	};
 
-	@XmlElement(name = "roomTypeVO")
+	@XStreamAlias(value = "testHello")
+	private List<RoomTypeVO> roomTypeVOs;
+
 	public List<RoomTypeVO> getRoomTypeVOs() {
 		return roomTypeVOs;
 	}
@@ -28,9 +20,6 @@ public class Hotel {
 		this.roomTypeVOs = roomTypeVOs;
 	}
 
-	private List<RoomTypeVO> roomTypeVOs;
-
-	// @XmlElement(name = "id")
 	public int getId() {
 		return id;
 	}
@@ -39,30 +28,12 @@ public class Hotel {
 		this.id = id;
 	}
 
-	// @XmlElement(name = "name")
 	public String getName() {
 		return name;
-	}
-
-	public Map getMap() {
-		return map;
-	}
-
-	public void setMap(Map map) {
-		this.map = map;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	// @XmlAttribute
-	// public String getTitle() {
-	// return title;
-	// }
-
-	// public void setTitle(String title) {
-	// this.title = title;
-	// }
 
 }

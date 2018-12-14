@@ -48,7 +48,9 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 	}
 
 	public Dom4jStrategy() {
-		this.doc = DocumentHelper.createDocument(DocumentHelper.createElement("root"));
+		// this.doc =
+		// DocumentHelper.createDocument(DocumentHelper.createElement("root"));
+		this.doc = DocumentHelper.createDocument();
 	}
 
 	public Dom4jStrategy read(File file) {

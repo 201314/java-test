@@ -1,9 +1,13 @@
 package com.gitee.linzl.xml;
 
-public class RoomTypeVO {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-	// /@XmlElement(name = "typeid")
-	// @XmlAttribute(name = "typeid")
+@XStreamAlias(value = "roomTypeVO_how")
+public class RoomTypeVO {
+	private int typeid;
+	private String typename;
+	private String price;
+
 	public int getTypeid() {
 		return typeid;
 	}
@@ -12,7 +16,6 @@ public class RoomTypeVO {
 		this.typeid = typeid;
 	}
 
-	// @XmlElement(name = "typename")
 	public String getTypename() {
 		return typename;
 	}
@@ -21,7 +24,6 @@ public class RoomTypeVO {
 		this.typename = typename;
 	}
 
-	// @XmlElement(name = "price")
 	public String getPrice() {
 		return price;
 	}
@@ -29,9 +31,4 @@ public class RoomTypeVO {
 	public void setPrice(String price) {
 		this.price = price;
 	}
-
-	private int typeid;
-	private String typename;
-	private String price;
-
 }

@@ -174,10 +174,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom2</artifactId>
-			<version>2.0.5</version>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.11.1</version>
 		</dependency>
+
 
 		<!-- 支持zip压缩解压，且使用密码 -->
 		<dependency>

@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author linzl
  * @date 2017/01/09
  */
-public class RegexUtil {
+public class ValidationUtil {
 	/**
 	 * 手机号码验证表达式
 	 */
@@ -475,7 +475,7 @@ public class RegexUtil {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("用户名验证：" + RegexUtil.isUserName("e22222222"));
+		System.out.println("用户名验证：" + ValidationUtil.isUserName("e22222222"));
 		// System.out.println("密码验证："+RegexUtil.isDigits("0"));
 		// System.out.println("密码验证："+RegexUtil.isPwd("jjj9090--"));
 		// System.out.println("手机号码验证: "+RegexUtil.isCellPhone("18918611111"));

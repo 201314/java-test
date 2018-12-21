@@ -2,6 +2,7 @@ package com.gitee.linzl.ext;
 
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 主鍵生成器
@@ -9,7 +10,6 @@ import java.util.UUID;
  * @author linzl
  */
 public class KeyGeneratorUtil {
-
 	/**
 	 * 主键生成器使用这个做为ID
 	 * 
@@ -21,6 +21,10 @@ public class KeyGeneratorUtil {
 
 	public static String getTimstamp() {
 		return String.valueOf(Calendar.getInstance().getTimeInMillis());
+	}
+
+	public static long getRandomId() {
+		return ThreadLocalRandom.current().nextLong();
 	}
 
 	public static void main(String args[]) {

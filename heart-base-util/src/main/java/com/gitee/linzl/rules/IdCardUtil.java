@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.gitee.linzl.codec.HexUtil;
-
 public class IdCardUtil {
 	@SuppressWarnings("serial")
 	private static Map<String, String> cityCodeMap = new HashMap<String, String>() {
@@ -146,12 +144,12 @@ public class IdCardUtil {
 
 		char c[] = null;
 		// 是否都为数字
-		if (RegexUtil.isDigits(idCard17)) {
+		if (ValidationUtil.isDigits(idCard17)) {
 			c = idCard17.toCharArray();
 		}
 
 		if (null != c) {
-			int bit[] = HexUtil.charToInt(c);
+			int[] bit = char2Int(c);
 
 			int sum17 = getPowerSum(bit);
 
@@ -177,7 +175,7 @@ public class IdCardUtil {
 			return null;
 		}
 
-		if (RegexUtil.isDigits(idCard)) {
+		if (ValidationUtil.isDigits(idCard)) {
 			// 获取出生年月日
 			String birthday = idCard.substring(6, 12);
 			Date birthdate = null;
@@ -194,7 +192,7 @@ public class IdCardUtil {
 			char c[] = idCard17.toCharArray();
 			if (null != c) {
 				// 将字符数组转为整型数组
-				int bit[] = HexUtil.charToInt(c);
+				int[] bit = char2Int(c);
 
 				int sum17 = getPowerSum(bit);
 
@@ -225,6 +223,22 @@ public class IdCardUtil {
 			sum = sum + bit[index] * power[index];
 		}
 		return sum % 11;
+	}
+
+	/**
+	 * 将字符数组转为整型数组
+	 * 
+	 * @param c
+	 * @return
+	 * @throws NumberFormatException
+	 */
+	public static int[] char2Int(char[] c) throws NumberFormatException {
+		int[] a = new int[c.length];
+		int k = 0;
+		for (char temp : c) {
+			a[k++] = Integer.parseInt(String.valueOf(temp));
+		}
+		return a;
 	}
 
 	public static void main(String[] args) {

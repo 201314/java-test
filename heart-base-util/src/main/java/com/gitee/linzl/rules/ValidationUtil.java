@@ -2,6 +2,7 @@ package com.gitee.linzl.rules;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -218,7 +219,7 @@ public class ValidationUtil {
 	 * 
 	 * @param text
 	 */
-	public final static boolean isZipCode(String text) {
+	public final static boolean isPostalCode(String text) {
 		return match(text, POSTALCODE);
 	}
 
@@ -398,64 +399,73 @@ public class ValidationUtil {
 		return textStr;// 返回文本字符串
 	}
 
-	public final static boolean isNull(Object[] objs) {
-		if (objs == null || objs.length == 0)
-			return true;
-		return false;
+	public final static boolean isEmpty(String str) {
+		return str == null || str.trim().length() == 0 || "null".equals(str.toLowerCase());
 	}
 
-	public final static boolean isNull(Integer integer) {
+	public final static boolean isNotEmtpy(String str) {
+		return !isEmpty(str);
+	}
+
+	public final static boolean isEmpty(Integer integer) {
 		if (integer == null || integer == 0)
 			return true;
 		return false;
 	}
 
-	public final static boolean isNull(Collection<?> collection) {
+	public final static boolean isNotEmtpy(Integer integer) {
+		return !isEmpty(integer);
+	}
+
+	public final static boolean isEmpty(Long longs) {
+		if (longs == null || longs == 0)
+			return true;
+		return false;
+	}
+
+	public final static boolean isNotEmtpy(Long longs) {
+		return !isEmpty(longs);
+	}
+
+	public final static boolean isEmpty(Collection<?> collection) {
 		if (collection == null || collection.size() == 0) {
 			return true;
 		}
 		return false;
 	}
 
-	public final static boolean isNull(Map<Object, Object> map) {
+	public final static boolean isNotEmtpy(Collection<?> collection) {
+		return !isEmpty(collection);
+	}
+
+	public final static boolean isEmpty(Map<Object, Object> map) {
 		if (map == null || map.size() == 0) {
 			return true;
 		}
 		return false;
 	}
 
-	public final static boolean isNull(String str) {
-		return str == null || "".equals(str.trim()) || "null".equals(str.toLowerCase());
+	public final static boolean isNotEmtpy(Map<Object, Object> map) {
+		return !isEmpty(map);
 	}
 
-	public final static boolean isNull(Long longs) {
-		if (longs == null || longs == 0)
+	public final static boolean isEmpty(Object obj) {
+		return Objects.isNull(obj);
+	}
+
+	public final static boolean isNotEmtpy(Object obj) {
+		return Objects.nonNull(obj);
+	}
+
+	public final static boolean isEmpty(Object[] objs) {
+		if (objs == null || objs.length == 0) {
 			return true;
+		}
 		return false;
 	}
 
-	public final static boolean isNotNull(Long longs) {
-		return !isNull(longs);
-	}
-
-	public final static boolean isNotNull(String str) {
-		return !isNull(str);
-	}
-
-	public final static boolean isNotNull(Collection<?> collection) {
-		return !isNull(collection);
-	}
-
-	public final static boolean isNotNull(Map<Object, Object> map) {
-		return !isNull(map);
-	}
-
-	public final static boolean isNotNull(Integer integer) {
-		return !isNull(integer);
-	}
-
-	public final static boolean isNotNull(Object[] objs) {
-		return !isNull(objs);
+	public final static boolean isNotEmtpy(Object[] objs) {
+		return !isEmpty(objs);
 	}
 
 	/**

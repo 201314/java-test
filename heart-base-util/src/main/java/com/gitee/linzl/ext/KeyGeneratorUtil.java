@@ -1,8 +1,15 @@
 package com.gitee.linzl.ext;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.gitee.linzl.codec.ConvertUtil;
+import com.gitee.linzl.date.DateFormatUtil;
+import com.gitee.linzl.lang.StringUtil;
 
 /**
  * 主鍵生成器
@@ -27,9 +34,32 @@ public class KeyGeneratorUtil {
 		return ThreadLocalRandom.current().nextLong();
 	}
 
-	public static void main(String args[]) {
-		System.out.println("111==>" + getUUID());
-		System.out.println("222==>" + getTimstamp().length());
+	/**
+	 * 自增ID,不能含有特殊字符
+	 * 
+	 * @param src
+	 * @return
+	 */
+	public static String autoIncrease(String src) {
+		return StringUtil.autoIncrease(src);
 	}
 
+	/**
+	 * not Thread safe
+	 * 
+	 * @param prefix
+	 * @return
+	 */
+	public static String createRuleId(String prefix) {
+		return prefix + DateFormatUtil.format(new Date(), "yyMMddHHmmss")
+				+ ThreadLocalRandom.current().ints(100000, 999999).findAny().getAsInt();
+	}
+
+	public static void main(String[] args) throws Exception {
+		InetAddress ip = InetAddress.getLocalHost();
+		System.out.println(ip.getHostAddress());
+		NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+		byte[] mac = network.getHardwareAddress();
+		System.out.println(ConvertUtil.byte2Hex(mac));
+	}
 }

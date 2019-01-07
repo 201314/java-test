@@ -247,9 +247,7 @@ public class ConvertUtil {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < buf.length; i++) {
 			String hex = Integer.toHexString(buf[i] & 0xFF);
-			if (hex.length() == 1) {
-				hex = '0' + hex;
-			}
+			hex = hex.length() == 1 ? 0 + hex : hex;
 			sb.append(hex.toUpperCase());
 		}
 		return sb.toString();
@@ -548,6 +546,10 @@ public class ConvertUtil {
 			string.append((char) data);
 		}
 		return string.toString();
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(unicode2String("\\u670D\\u52A1\\u7A97"));
 	}
 
 }

@@ -38,7 +38,21 @@ public enum AESCipherAlgorithms implements IAlgorithm {
 
 	AES_ECB_PKCS5PADDING_192("AES", "AES/ECB/PKCS5Padding", 192),
 	// 超过JDK默认长度,扩展的JCE
-	AES_ECB_PKCS5PADDING_256("AES", "AES/ECB/PKCS5Padding", 256);
+	AES_ECB_PKCS5PADDING_256("AES", "AES/ECB/PKCS5Padding", 256),
+
+	// 支持BouncyCastleProvider TODO 测试
+	// AES/CBC/PKCS7Padding
+	BC_AES_CBC_PKCS7PADDING_128("AES", "AES/CBC/PKCS7Padding", 128),
+
+	BC_AES_CBC_PKCS7PADDING_192("AES", "AES/CBC/PKCS7Padding", 192),
+
+	BC_AES_CBC_PKCS7PADDING_256("AES", "AES/CBC/PKCS7Padding", 256),
+
+	BC_AES_ECB_PKCS7PADDING_128("AES", "AES/ECB/PKCS7Padding", 128),
+
+	BC_AES_ECB_PKCS7PADDING_192("AES", "AES/ECB/PKCS7Padding", 192),
+
+	BC_AES_ECB_PKCS7PADDING_256("AES", "AES/ECB/PKCS7Padding", 256);
 
 	private String keyAlgorithm;
 	private String cipherAlgorithm;

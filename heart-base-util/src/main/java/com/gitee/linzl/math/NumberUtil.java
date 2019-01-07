@@ -23,4 +23,5 @@ public class NumberUtil {
 		return nullToDefault(number, 0L);
 	}
 
+	
 }

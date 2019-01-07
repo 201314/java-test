@@ -21,14 +21,14 @@ public class StringUtilTest {
 		String a6 = "009z";
 		String a7 = "00Zz";
 		String a8 = "00zz";
-		System.out.println(a1 + "==" + StringUtil.increase(a1));
-		System.out.println(a2 + "==" + StringUtil.increase(a2));
-		System.out.println(a3 + "==" + StringUtil.increase(a3));
-		System.out.println(a4 + "==" + StringUtil.increase(a4));
-		System.out.println(a5 + "==" + StringUtil.increase(a5));
-		System.out.println(a6 + "==" + StringUtil.increase(a6));
-		System.out.println(a7 + "==" + StringUtil.increase(a7));
-		System.out.println(a8 + "==" + StringUtil.increase(a8));
+		System.out.println(a1 + "==" + StringUtil.autoIncrease(a1));
+		System.out.println(a2 + "==" + StringUtil.autoIncrease(a2));
+		System.out.println(a3 + "==" + StringUtil.autoIncrease(a3));
+		System.out.println(a4 + "==" + StringUtil.autoIncrease(a4));
+		System.out.println(a5 + "==" + StringUtil.autoIncrease(a5));
+		System.out.println(a6 + "==" + StringUtil.autoIncrease(a6));
+		System.out.println(a7 + "==" + StringUtil.autoIncrease(a7));
+		System.out.println(a8 + "==" + StringUtil.autoIncrease(a8));
 	}
 
 	public void filter() {

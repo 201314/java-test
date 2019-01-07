@@ -5,8 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 日期格式化类
@@ -18,7 +18,7 @@ public class DateFormatUtil {
 	private static final String YYYY_MM_DD = "yyyy-MM-dd";
 
 	// 格式化SimpleDateFormat实例化 池
-	private static Map map = new HashMap();
+	private static Map<String, SimpleDateFormat> map = new ConcurrentHashMap<>();
 
 	/**
 	 * 获取SimpleDateFormat
@@ -30,7 +30,7 @@ public class DateFormatUtil {
 	private static SimpleDateFormat getDateFormat(String pattern) {
 		if (pattern != null && pattern.trim().length() > 0) {
 			if (map.get(pattern) == null) {
-				map.put(pattern, new SimpleDateFormat(pattern));
+				map.putIfAbsent(pattern, new SimpleDateFormat(pattern));
 			}
 		} else {
 			try {
@@ -99,8 +99,7 @@ public class DateFormatUtil {
 	 * @throws ParseException
 	 */
 	public static Date stringToDate(String str, String pattern) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-		return sdf.parse(str);
+		return getDateFormat(pattern).parse(str);
 	}
 
 	/**

@@ -7,8 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class StringUtil {
 	// 开始字符，比如字符0
 	private static char startChar = '0';
@@ -39,16 +37,6 @@ public class StringUtil {
 	}
 
 	/**
-	 * 判空
-	 * 
-	 * @param source
-	 * @return
-	 */
-	public static boolean isNotEmpty(String source) {
-		return !"null".equals(source) && StringUtils.isNotEmpty(source);
-	}
-
-	/**
 	 * 判断source是否与传入参数中的其中一个相等
 	 * 
 	 * @param source
@@ -75,7 +63,19 @@ public class StringUtil {
 	 * @param source
 	 * @return
 	 */
-	public static String increase(String source) {
+	public static String autoIncrease(String source) {
+		return increaseByStep(source, 1);
+	}
+
+	/**
+	 * 按步长递增字符串，特殊字符除外
+	 * 
+	 * @param source
+	 * @param step
+	 *            增长步长
+	 * @return
+	 */
+	public static String increaseByStep(String source, int step) {
 		char[] inputCharArray = source.toCharArray();
 		boolean carryFlag = false;
 		int length = inputCharArray.length - 1;
@@ -88,13 +88,13 @@ public class StringUtil {
 					carryFlag = true;
 				} else {
 					do {
-						inputCharArray[ii]++;
+						inputCharArray[ii] += step;
 					} while (exclusionArray(inputCharArray[ii]));
 				}
 			} else {
 				if (carryFlag) {
 					do {
-						inputCharArray[ii]++;
+						inputCharArray[ii] += step;
 					} while (exclusionArray(inputCharArray[ii]));
 
 					tempChar = inputCharArray[ii];
@@ -348,22 +348,22 @@ public class StringUtil {
 	/**
 	 * 在source前补zeroNum个0
 	 * 
-	 * @param zeroNum
 	 * @param source
+	 * @param zeroNum
 	 * @return
 	 */
-	public static String appendZeroBefore(int zeroNum, String source) {
+	public static String appendZeroBefore(String source, int zeroNum) {
 		return String.format("%0" + zeroNum + "d", 0) + source;
 	}
 
 	/**
 	 * 在source后补zeroNum个0
 	 * 
-	 * @param zeroNum
 	 * @param source
+	 * @param zeroNum
 	 * @return
 	 */
-	public static String appendZeroAfter(int zeroNum, String source) {
+	public static String appendZeroAfter(String source, int zeroNum) {
 		return source + String.format("%0" + zeroNum + "d", 0);
 	}
 
@@ -382,5 +382,4 @@ public class StringUtil {
 		Matcher m = p.matcher(str);
 		return m.replaceAll("").trim();
 	}
-
 }

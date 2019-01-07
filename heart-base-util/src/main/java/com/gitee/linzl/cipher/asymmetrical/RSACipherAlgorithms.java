@@ -20,6 +20,9 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * @date 2018年11月2日
  */
 public enum RSACipherAlgorithms implements IAlgorithm {
+	// 支持BouncyCastleProvider TODO 测试
+	RSA_None_PKCS1PADDING_1024("RSA", "RSA/None/PKCS1Padding", 1024),
+
 	// 非对称加解密 RSA, DSA, EC
 	// ============RSA============
 	// JDK支持

@@ -55,10 +55,8 @@ public class SystemClock {
 				return thread;
 			}
 		});
-		scheduler.scheduleAtFixedRate(new Runnable() {
-			public void run() {
-				now.set(System.currentTimeMillis());
-			}
+		scheduler.scheduleAtFixedRate(() -> {
+			now.set(System.currentTimeMillis());
 		}, period, period, TimeUnit.MILLISECONDS);
 	}
 

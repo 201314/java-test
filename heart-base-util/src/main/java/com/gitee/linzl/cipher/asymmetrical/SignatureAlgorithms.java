@@ -5,6 +5,8 @@ import com.gitee.linzl.cipher.IAlgorithm;
 /**
  * JDK默认支持
  * 
+ * 签名算法：私钥签名，公钥验签
+ * 
  * @description
  * @author linzl
  * @email 2225010489@qq.com
@@ -12,13 +14,13 @@ import com.gitee.linzl.cipher.IAlgorithm;
  */
 public enum SignatureAlgorithms implements IAlgorithm {
 	RawDSA("DSA", "RawDSA", null), // 只能20个字节
-
+	// 将正文通过SHA1散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
 	SHA1withDSA("DSA", "SHA1withDSA", null),
-
+	// 将正文通过SHA224散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
 	SHA224withDSA("DSA", "SHA224withDSA", null),
-
+	// 将正文通过SHA256散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
 	SHA256withDSA("DSA", "SHA256withDSA", null),
-
+	// 将正文通过MD2数字摘要后，将密文再次通过生成的RSA密钥加密，生成数字签名
 	MD2withRSA("RSA", "MD2withRSA", null),
 	// 将正文通过MD5数字摘要后，将密文再次通过生成的RSA密钥加密，生成数字签名
 	MD5withRSA("RSA", "MD5withRSA", 512),
@@ -47,7 +49,7 @@ public enum SignatureAlgorithms implements IAlgorithm {
 
 	@Override
 	public Integer getSize() {
-		return null;
+		return this.size;
 	}
 
 	@Override
@@ -59,5 +61,4 @@ public enum SignatureAlgorithms implements IAlgorithm {
 	public String getSignAlgorithm() {
 		return signAlgorithm;
 	}
-
 }

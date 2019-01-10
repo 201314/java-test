@@ -13,8 +13,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
-import com.gitee.linzl.http.HttpClientUtil;
-
 /**
  * 
  * @author linzl
@@ -28,6 +26,14 @@ public class HttpClientUtilTest {
 		params.put("name1", "11");
 		params.put("name2", "22");
 		HttpClientUtil.httpGet(url, params);
+	}
+
+	@Test
+	public void postJson() {
+		String url = "http://localhost:8080/hello";
+		String json = "{\"authCode\":\"1Ictlh5dRc40kSZo8t+YQlzik3MOQSQ+bsBq4Ztad+w=\",\"deviceNo\":\"10021001\",\"merchantMac\":\"13450284C79AF1EDEB0A07AFC57C4E17D1E6B1629F098E710241B29E6EC94AB851CD151CFD9F5A039820AD5A07E51C299879371035ECE42B885450EE71DB72C1\",\"orderAmt\":1,\"orderNo\":\"df228f7504b64c2aa251c5dce991ef5d00000\",\"requestTime\":\"190109160329\",\"vehTypeCode\":\"3\",\"vehplateColorCode\":\"2\",\"vehplateNo\":\"绮�A00002\",\"version\":\"2.0\"}";
+		String resultJson = HttpClientUtil.postJson(url, json);
+		System.out.println(resultJson);
 	}
 
 	@Test

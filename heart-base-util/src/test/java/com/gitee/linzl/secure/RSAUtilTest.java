@@ -1,10 +1,12 @@
 package com.gitee.linzl.secure;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gitee.linzl.cipher.message.DigestUtilsExt;
 import com.gitee.linzl.codec.rsa.util.RSAUtil;
 
 /**
@@ -22,6 +24,8 @@ public class RSAUtilTest {
 	@Before
 	public void init() {
 		encryptByte = RSAUtil.encrypt(encryptStr.getBytes()).getBytes();
+		System.out.println(Hex.toHexString(encryptByte));
+		System.out.println(DigestUtilsExt.md5Hex(Hex.toHexString(encryptByte)));
 	}
 
 	@Test

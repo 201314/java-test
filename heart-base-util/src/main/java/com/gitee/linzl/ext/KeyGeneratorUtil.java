@@ -8,8 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.gitee.linzl.codec.ConvertUtil;
-import com.gitee.linzl.date.DateFormatUtil;
 import com.gitee.linzl.lang.StringUtil;
+import com.gitee.linzl.time.DateFormatUtil;
 
 /**
  * 主鍵生成器

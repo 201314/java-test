@@ -121,12 +121,12 @@ public class RSAUtil {
 	/**
 	 * RSA 加密
 	 * 
-	 * @param decryptText
+	 * @param encryptText
 	 *            需要加密的文本
 	 * @return
 	 */
-	public static String encrypt(byte[] decryptText) {
-		return encrypt(decryptText, RSASecure.getPublicKeyFile());
+	public static String encrypt(byte[] encryptText) {
+		return encrypt(encryptText, RSASecure.getPublicKeyFile());
 	}
 
 	/**
@@ -138,9 +138,9 @@ public class RSAUtil {
 	 *            公钥文件
 	 * @return
 	 */
-	public static String encrypt(String decryptText, File publicKeyFile) {
+	public static String encrypt(String encryptText, File publicKeyFile) {
 		try {
-			return encrypt(decryptText.getBytes(), FileUtils.readFileToByteArray(publicKeyFile));
+			return encrypt(encryptText.getBytes(), FileUtils.readFileToByteArray(publicKeyFile));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -150,15 +150,15 @@ public class RSAUtil {
 	/**
 	 * RSA 加密
 	 * 
-	 * @param decryptText
+	 * @param encryptText
 	 *            需要加密的文本
 	 * @param publicKeyFile
 	 *            公钥文件
 	 * @return
 	 */
-	public static String encrypt(byte[] decryptText, InputStream publicKeyFile) {
+	public static String encrypt(byte[] encryptText, InputStream publicKeyFile) {
 		try {
-			return encrypt(decryptText, IOUtils.toByteArray(publicKeyFile));
+			return encrypt(encryptText, IOUtils.toByteArray(publicKeyFile));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

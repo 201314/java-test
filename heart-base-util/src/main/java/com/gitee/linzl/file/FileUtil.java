@@ -183,44 +183,59 @@ public class FileUtil {
 	/**
 	 * 写文件
 	 * 
-	 * @param fileName
-	 *            目标文件名
+	 * @param file
+	 *            目标文件
 	 * @param fileContent
 	 *            写入的内容
 	 * @return
 	 * @throws Exception
 	 */
-	public static boolean write(File file, String fileContent) throws Exception {
-		if (!file.isFile()) {
+	public static boolean write(File file, byte[] fileContent) throws Exception {
+		return write(file, fileContent, false);
+	}
+
+	/**
+	 * 写文件
+	 * 
+	 * @param file
+	 *            目标文件
+	 * @param fileContent
+	 *            写入的内容
+	 * @param append
+	 *            是否追加在文件末尾
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean write(File file, byte[] fileContent, boolean append) throws Exception {
+		if (!file.exists() || !file.isFile()) {
 			throw new Exception("file不是文件");
 		}
 
 		boolean result = false;
-		try (OutputStream fs = new FileOutputStream(file)) {
-			byte[] b = fileContent.getBytes();
-			fs.write(b);
+		try (OutputStream fs = new FileOutputStream(file, append)) {
+			fs.write(fileContent);
 			result = true;
 		}
 		return result;
 	}
 
 	/**
-	 * 追加内容到指定文件
+	 * 将内容写进文件头,文件内容大的时候不建议这么做
 	 * 
 	 * @param file
 	 * @param fileContent
 	 * @return
-	 * @throws IOException
 	 */
-	public static boolean append(File file, String fileContent) throws IOException {
+	public static boolean writeHead(File file, byte[] fileContent) throws IOException {
 		boolean result = false;
 		if (file.exists() && file.isFile()) {
-			try (RandomAccessFile rFile = new RandomAccessFile(file, "rw");) {
-				byte[] b = fileContent.getBytes();
-				long originLen = file.length();
-				rFile.setLength(originLen + b.length);
-				rFile.seek(originLen);
-				rFile.write(b);
+			long originLen = file.length();
+			byte[] readFile = new byte[(int) originLen];
+			try (RandomAccessFile rFile = new RandomAccessFile(file, "rw")) {
+				rFile.read(readFile);// 读取所有文件内容
+				rFile.seek(0);
+				rFile.write(fileContent);
+				rFile.write(readFile);
 				result = true;
 			}
 		}
@@ -317,5 +332,9 @@ public class FileUtil {
 		public int compare(File o1, File o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		writeHead(new File("D://CZ9700000630000020190117103159.txt"), "我是中国人".getBytes());
 	}
 }

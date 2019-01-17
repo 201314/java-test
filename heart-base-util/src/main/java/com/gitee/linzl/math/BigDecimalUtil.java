@@ -33,6 +33,12 @@ public class BigDecimalUtil {
 		return multiply(yuan, "100");
 	}
 
+	public static String format(long number,int length) {// 或者是double
+		DecimalFormat df = new DecimalFormat("00000000");
+		// 补够8位数
+		return df.format(number);
+	}
+
 	/**
 	 * 加法
 	 * 

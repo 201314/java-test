@@ -368,6 +368,28 @@ public class StringUtil {
 	}
 
 	/**
+	 * 将source被足fullLength长度，前补空格
+	 * 
+	 * @param source
+	 * @param fullLength
+	 * @return
+	 */
+	public static String appendSpaceBefore(String source, int fullLength) {
+		return String.format("%" + fullLength + "s", source);
+	}
+
+	/**
+	 * 将source被足fullLength长度，后补空格
+	 * 
+	 * @param source
+	 * @param fullLength
+	 * @return
+	 */
+	public static String appendSpaceAfter(String source, int fullLength) {
+		return String.format("%-" + fullLength + "s", source);
+	}
+
+	/**
 	 * 过滤特殊字符
 	 * 
 	 * @param str
@@ -381,5 +403,10 @@ public class StringUtil {
 		Pattern p = Pattern.compile(regEx);
 		Matcher m = p.matcher(str);
 		return m.replaceAll("").trim();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(appendSpaceBefore("hello", 10));
+		System.out.println(appendZeroBefore("哈哈", 9));
 	}
 }

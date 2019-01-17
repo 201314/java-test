@@ -1,8 +1,11 @@
 package com.gitee.linzl.time;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -71,10 +74,6 @@ public class DateFormatUtil {
 	 * @return
 	 */
 	public static String format(Date date, String pattern) {
-		// Instant instant = date.toInstant();
-		// ZoneId zoneId = ZoneId.systemDefault();
-		// LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-		// return format(localDateTime, pattern);
 		return new SimpleDateFormat(pattern).format(date);
 	}
 
@@ -91,7 +90,7 @@ public class DateFormatUtil {
 	}
 
 	public static String format(LocalDateTime date, String pattern) {
-		return date.format(DateTimeFormatter.ofPattern(pattern));
+		return DateTimeFormatter.ofPattern(pattern).format(date);
 	}
 
 	public static Date parse2Date(String text) {
@@ -99,11 +98,13 @@ public class DateFormatUtil {
 	}
 
 	public static Date parse2Date(String text, String pattern) {
-		ZoneId zoneId = ZoneId.systemDefault();
-		LocalDateTime localDateTime = parse2LocalDateTime(text, pattern);
-		ZonedDateTime zdt = localDateTime.atZone(zoneId);
-		Date date = Date.from(zdt.toInstant());
-		return date;
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		try {
+			return sdf.parse(text);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static LocalDate parse2LocalDate(String text) {
@@ -120,6 +121,80 @@ public class DateFormatUtil {
 
 	public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
 		return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
+	}
+
+	public static Date toDate(LocalDateTime localDateTime) {
+		ZoneId zoneId = ZoneId.systemDefault();
+		ZonedDateTime zdt = localDateTime.atZone(zoneId);
+		return Date.from(zdt.toInstant());
+	}
+
+	public static Date toDate(LocalDate localDate) {
+		ZoneId zoneId = ZoneId.systemDefault();
+		ZonedDateTime zdt = localDate.atStartOfDay(zoneId);
+		return Date.from(zdt.toInstant());
+	}
+
+	public static LocalDateTime toLocalDateTime(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalDateTime();
+	}
+
+	public static LocalDateTime toLocalDateTime(LocalDate date) {
+		return date.atStartOfDay();
+	}
+
+	/**
+	 * 
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 00:00
+	 * @return
+	 */
+	public static LocalDateTime toMinLocalDateTime(Date date) {
+		return toMinLocalDateTime(toLocalDate(date));
+	}
+
+	/**
+	 * 
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 00:00
+	 * @return
+	 */
+	public static LocalDateTime toMinLocalDateTime(LocalDate date) {
+		return LocalDateTime.of(date, LocalTime.MIN);
+	}
+
+	/**
+	 * 
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 23:59:59.999999999
+	 * @return
+	 */
+	public static LocalDateTime toMaxLocalDateTime(Date date) {
+		return toMaxLocalDateTime(toLocalDate(date));
+	}
+
+	/**
+	 * 
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 23:59:59.999999999
+	 * @return
+	 */
+	public static LocalDateTime toMaxLocalDateTime(LocalDate date) {
+		return LocalDateTime.of(date, LocalTime.MAX);
+	}
+
+	public static LocalDate toLocalDate(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalDate();
+	}
+
+	public static LocalTime toLocalTime(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalTime();
 	}
 
 	/**
@@ -194,5 +269,12 @@ public class DateFormatUtil {
 			s.insert(0, String.valueOf(year));
 		}
 		return s.toString();
+	}
+
+	public static void main(String[] args) {
+		parse2LocalDateTime("2019-11-12 11:11:23");
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		System.out.println(toLocalDateTime(cal.getTime()));
 	}
 }

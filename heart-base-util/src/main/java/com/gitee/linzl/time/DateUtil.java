@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -19,7 +20,8 @@ public class DateUtil {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.withYear(year);
 		localDate = localDate.withMonth(month);
-		localDate = localDate.withDayOfMonth(1);
+		// localDate = localDate.withDayOfMonth(1);
+		localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
 		return localDate;
 	}
 
@@ -32,8 +34,9 @@ public class DateUtil {
 	 */
 	public static LocalDateTime getEndDay(int year, int month) {
 		LocalDateTime localDate = getFirstDay(year, month);
-		localDate = localDate.plusMonths(1);
-		localDate = localDate.minusDays(1);
+		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
+		// localDate = localDate.plusMonths(1);
+		// localDate = localDate.minusDays(1);
 		return localDate;
 	}
 
@@ -47,7 +50,8 @@ public class DateUtil {
 	public static LocalDateTime getFirstDayBeforeMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.minusMonths(month);
-		localDate = localDate.withDayOfMonth(1);
+		// localDate = localDate.withDayOfMonth(1);
+		localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
 		return localDate;
 	}
 
@@ -61,7 +65,8 @@ public class DateUtil {
 	public static LocalDateTime getFistDayAfterMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.plusMonths(month);
-		localDate = localDate.withDayOfMonth(1);
+		// localDate = localDate.withDayOfMonth(1);
+		localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
 		return localDate;
 	}
 
@@ -74,8 +79,9 @@ public class DateUtil {
 	public static LocalDateTime getEndDayBeforeMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.minusMonths(month - 1);
-		localDate = localDate.withDayOfMonth(1);
-		localDate = localDate.minusDays(1);
+		// localDate = localDate.withDayOfMonth(1);
+		// localDate = localDate.minusDays(1);
+		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
 		return localDate;
 	}
 
@@ -89,8 +95,9 @@ public class DateUtil {
 	public static LocalDateTime getEndDayAfterMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.plusMonths(month + 1);
-		localDate = localDate.withDayOfMonth(1);
-		localDate = localDate.minusDays(1);
+		// localDate = localDate.withDayOfMonth(1);
+		// localDate = localDate.minusDays(1);
+		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
 		return localDate;
 	}
 
@@ -459,11 +466,11 @@ public class DateUtil {
 		System.out.println("下周第一天:" + getFirstDayNextWeek());
 		System.out.println("下周最后一天:" + getEndDayNextWeek());
 
-		System.out.println("-2个月前或后的第一天：" + getFirstDayBeforeMonth(-2));
-		System.out.println("-2个月前的最后一天：" + getEndDayBeforeMonth(-2));
+		System.out.println("2个月前或后的第一天：" + getFirstDayBeforeMonth(2));
+		System.out.println("2个月前的最后一天：" + getEndDayBeforeMonth(2));
 
-		System.out.println("2013年3月的第一天:" + getFirstDay(2013, 2));
-		System.out.println("2013年3月的最后一天:" + getEndDay(2013, 2));
+		System.out.println("2013年2月的第一天:" + getFirstDay(2013, 2));
+		System.out.println("2013年2月的最后一天:" + getEndDay(2013, 2));
 
 		Calendar cl = Calendar.getInstance();
 		cl.set(Calendar.YEAR, 2019);
@@ -471,5 +478,6 @@ public class DateUtil {
 		cl.set(Calendar.DAY_OF_MONTH, 1);
 		System.out.println(cl.getTime());
 		System.out.println("2019年1月1号5周后:" + getFirstDayAssignWeek(cl.getTime(), 1));
+
 	}
 }

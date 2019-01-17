@@ -1,5 +1,11 @@
 package com.gitee.linzl.codec;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,6 +94,39 @@ public class ConvertUtil {
 		return crc.getValue();
 	}
 
+	public static long crc32(File file) {
+		InputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return crc32(inputStream);
+	}
+
+	public static long crc32(InputStream inputStream) {
+		CRC32 crc = new CRC32();
+		try {
+			byte[] bytes = new byte[1024];
+			int cnt;
+			while ((cnt = inputStream.read(bytes)) != -1) {
+				// 读最后时，可能没有1024字节
+				crc.update(bytes, 0, cnt);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (null != inputStream) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return crc.getValue();
+	}
+
 	/**
 	 * 
 	 * 计算CRC32校验码 (Modbus)
@@ -98,6 +137,14 @@ public class ConvertUtil {
 	 */
 	public static String crc32ToHex(byte[] data) {
 		return Long.toHexString(crc32(data)).toUpperCase();
+	}
+
+	public static String crc32ToHex(File file) {
+		return Long.toHexString(crc32(file)).toUpperCase();
+	}
+
+	public static String crc32ToHex(InputStream inputStream) {
+		return Long.toHexString(crc32(inputStream)).toUpperCase();
 	}
 
 	public static String fullFormatHex(short value) {
@@ -547,7 +594,7 @@ public class ConvertUtil {
 		}
 		return string.toString();
 	}
-	
+
 	public static void main(String[] args) {
 		System.out.println(unicode2String("\\u670D\\u52A1\\u7A97"));
 	}

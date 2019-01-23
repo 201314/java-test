@@ -91,9 +91,10 @@ public class SocketClientUtil {
 	public String receive(String charset) {
 		StringBuilder sb = new StringBuilder(64);
 		try {
+			int rs = 0;
 			byte[] bs = new byte[1024];
-			while (client.getInputStream().read(bs) != -1) {
-				String d = new String(bs, charset);
+			while ((rs = client.getInputStream().read(bs)) != -1) {
+				String d = new String(bs, 0, rs, charset);
 				sb.append(d);
 				return sb.toString();
 			}

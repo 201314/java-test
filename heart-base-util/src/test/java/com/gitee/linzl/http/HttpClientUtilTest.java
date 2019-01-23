@@ -13,6 +13,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
+import com.gitee.linzl.network.HttpClientUtil;
+
 /**
  * 
  * @author linzl

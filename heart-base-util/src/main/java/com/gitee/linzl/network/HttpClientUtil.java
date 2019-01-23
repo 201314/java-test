@@ -1,4 +1,4 @@
-package com.gitee.linzl.http;
+package com.gitee.linzl.network;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *         2016年11月11日
  */
 public class HttpClientUtil {
-	private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(HttpClientUtil.class);
 	// 设置连接超时时间,单位毫秒
 	private static final int connectionTimeout = 60000;
 	// 设置读取超时\套接字超时时间,单位毫秒
@@ -154,7 +154,7 @@ public class HttpClientUtil {
 				httpClient.close();
 			}
 		} catch (Exception e) {
-			logger.error("HttpClient 关闭资源出错 ", e);
+			log.error("HttpClient 关闭资源出错 ", e);
 		}
 	}
 
@@ -174,7 +174,7 @@ public class HttpClientUtil {
 			httpResponse = httpClient.execute(httpGet);
 			result = getResult();
 		} catch (Exception e) {
-			logger.error("HttpClient get服务出错", e);
+			log.error("HttpClient get服务出错", e);
 		} finally {
 			closeHttp();
 		}
@@ -213,7 +213,7 @@ public class HttpClientUtil {
 			httpResponse = httpClient.execute(httpGet);
 			result = getResult();
 		} catch (Exception e) {
-			logger.error("HttpClient get服务出错", e);
+			log.error("HttpClient get服务出错", e);
 		} finally {
 			closeHttp();
 		}
@@ -266,7 +266,7 @@ public class HttpClientUtil {
 
 			long length = entity.getContentLength();
 			if (length <= 0) {
-				logger.error("下载文件不存在！");
+				log.error("下载文件不存在！");
 				return;
 			}
 

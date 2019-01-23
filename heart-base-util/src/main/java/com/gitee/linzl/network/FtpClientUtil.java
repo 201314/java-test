@@ -1,4 +1,4 @@
-package com.gitee.linzl.ftp;
+package com.gitee.linzl.network;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +21,7 @@ import org.apache.commons.net.ftp.FTPReply;
  * @email 2225010489@qq.com
  * @date 2018年8月27日
  */
-public class FtpUtil {
+public class FtpClientUtil {
 	// ftp服务器地址
 	public String hostname = "192.168.1.249";
 	// ftp服务器端口号默认为21
@@ -36,7 +36,7 @@ public class FtpUtil {
 	/**
 	 * 初始化ftp服务器
 	 */
-	public FtpUtil() {
+	public FtpClientUtil() {
 		ftpClient = new FTPClient();
 		ftpClient.setControlEncoding("UTF-8");
 		try {
@@ -285,7 +285,7 @@ public class FtpUtil {
 	}
 
 	public static void main(String[] args) {
-		FtpUtil ftp = new FtpUtil();
+		FtpClientUtil ftp = new FtpClientUtil();
 		// ftp.uploadFile("ftpFile/data", "123.docx", "E://123.docx");
 		// ftp.downloadFile("ftpFile/data", "123.docx", "F://");
 		ftp.deleteFile("ftpFile/data", "123.docx");

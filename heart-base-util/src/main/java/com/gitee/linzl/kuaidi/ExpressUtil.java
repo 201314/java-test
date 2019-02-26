@@ -8,7 +8,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gitee.linzl.http.HttpClientUtil;
+import com.gitee.linzl.network.HttpClientUtil;
 
 /**
  * 快递单号查询接口

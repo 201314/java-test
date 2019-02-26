@@ -44,8 +44,13 @@ public class FtpClientUtil {
 			ftpClient.login(username, password); // 登录ftp服务器
 			int replyCode = ftpClient.getReplyCode(); // 是否成功登录服务器
 			if (!FTPReply.isPositiveCompletion(replyCode)) {
+				ftpClient.disconnect();
 				System.out.println("connect failed...ftp服务器:" + this.hostname + ":" + this.port);
 			}
+			ftpClient.setDefaultTimeout(2 * 1000);
+			ftpClient.setConnectTimeout(2 * 1000);
+			ftpClient.setDataTimeout(2 * 1000);
+			ftpClient.setBufferSize(1024 * 2);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -92,19 +97,10 @@ public class FtpClientUtil {
 			ftpClient.makeDirectory(pathname);
 			ftpClient.changeWorkingDirectory(pathname);
 			ftpClient.storeFile(fileName, inputStream);
-			inputStream.close();
-			ftpClient.logout();
 			flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (ftpClient.isConnected()) {
-				try {
-					ftpClient.disconnect();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 			if (null != inputStream) {
 				try {
 					inputStream.close();
@@ -217,7 +213,6 @@ public class FtpClientUtil {
 	 */
 	public boolean downloadFile(String pathname, String filename, String localpath) {
 		boolean flag = false;
-		OutputStream os = null;
 		try {
 			// 切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
@@ -225,30 +220,16 @@ public class FtpClientUtil {
 			for (FTPFile file : ftpFiles) {
 				if (file.getName().equalsIgnoreCase(filename)) {
 					File localFile = new File(localpath, file.getName());
-					os = new FileOutputStream(localFile);
-					ftpClient.retrieveFile(file.getName(), os);
-					os.close();
+					try (OutputStream os = new FileOutputStream(localFile);) {
+						ftpClient.retrieveFile(file.getName(), os);
+					} catch (Exception e) {
+						throw e;
+					}
 				}
 			}
-			ftpClient.logout();
 			flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (ftpClient.isConnected()) {
-				try {
-					ftpClient.disconnect();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (null != os) {
-				try {
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return flag;
 	}
@@ -267,21 +248,28 @@ public class FtpClientUtil {
 		try {
 			// 切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
-			ftpClient.dele(filename);
-			ftpClient.logout();
+			ftpClient.deleteFile(filename);
 			flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (ftpClient.isConnected()) {
-				try {
-					ftpClient.disconnect();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return flag;
+	}
+
+	/**
+	 * 退出并关闭FTP连接
+	 */
+	public void close() {
+		if (this.ftpClient != null) {
+			try {
+				this.ftpClient.logout();// 退出FTP服务器,退出登录
+				if (ftpClient.isConnected()) {
+					ftpClient.disconnect();// 关闭FTP服务器的连接
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("连接FTP服务失败！", e);
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -289,6 +277,7 @@ public class FtpClientUtil {
 		// ftp.uploadFile("ftpFile/data", "123.docx", "E://123.docx");
 		// ftp.downloadFile("ftpFile/data", "123.docx", "F://");
 		ftp.deleteFile("ftpFile/data", "123.docx");
+		ftp.close();
 		System.out.println("ok");
 	}
 }

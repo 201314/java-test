@@ -1,12 +1,13 @@
 package com.gitee.linzl.cipher;
 
+import java.util.Base64;
+
 import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.cipher.IAlgorithm;
 import com.gitee.linzl.cipher.symmetric.DESCipherAlgorithms;
 import com.gitee.linzl.cipher.symmetric.SymmetricCipherUtil;
 
@@ -74,7 +75,7 @@ public class DESTest {
 
 	@Test
 	public void DESEDE_ECB_NOPADDING_168() throws Exception {
-		text = "12345678";// 必须是8的倍数
+		text = "1234567812345678";// 必须是8的倍数
 		excute(DESCipherAlgorithms.DESEDE_ECB_NOPADDING_168);
 	}
 
@@ -93,6 +94,7 @@ public class DESTest {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
 		System.out.println("密钥长度:" + key.length);
 		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		System.out.println("密钥base64：" + Base64.getEncoder().encodeToString(key));
 
 		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8 };// 长度必须是8
 		// 用密钥初始化Cipher对象
@@ -107,13 +109,16 @@ public class DESTest {
 	}
 
 	private void excute(IAlgorithm aes) throws Exception {
+		System.out.println("text16进制:" + Hex.toHexString(text.getBytes()));
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
 		System.out.println("密钥长度:" + key.length);
 		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		System.out.println("密钥base64：" + Base64.getEncoder().encodeToString(key));
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text, key, aes);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		System.out.println("加密base64：" + Base64.getEncoder().encodeToString(encryptData));
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes);
 		System.out.println("解密: " + new String(decryptData));

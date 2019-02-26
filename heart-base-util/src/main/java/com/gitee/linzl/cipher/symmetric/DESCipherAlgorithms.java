@@ -15,17 +15,17 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * @date 2018年11月2日
  */
 public enum DESCipherAlgorithms implements IAlgorithm {
-	// ============DES============
+	// ============DES 单倍长============,密钥长度必须是8字节
 	DES_CBC_NOPADDING_56("DES", "DES/CBC/NoPadding", 56),
 
 	DES_CBC_PKCS5PADDING_56("DES", "DES/CBC/PKCS5Padding", 56),
-
+	// 默认使用该模式
 	DES_ECB_NOPADDING_56("DES", "DES/ECB/NoPadding", 56),
 
 	DES_ECB_PKCS5PADDING_56("DES", "DES/ECB/PKCS5Padding", 56),
 
-	// ============DESede============
-	// 3DES，也称为3DESede或TripleDES
+	// ============DESede ============
+	// 3DES，也称为3DESede或TripleDES,(3倍长)密钥长度必须是24字节
 	DESEDE_CBC_NOPADDING_112("DESede", "DESede/CBC/NoPadding", 112),
 
 	DESEDE_CBC_NOPADDING_168("DESede", "DESede/CBC/NoPadding", 168),

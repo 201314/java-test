@@ -115,7 +115,7 @@ public class AESTest {
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
-		byte[] encryptData = SymmetricCipherUtil.encrypt(text, key, aes, ips);
+		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes, ips);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
@@ -134,7 +134,7 @@ public class AESTest {
 		System.out.println("密钥长度:" + key.length);
 		System.out.println("密钥16进制：" + Hex.toHexString(key));
 
-		byte[] encryptData = SymmetricCipherUtil.encrypt(text, key, aes);
+		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
@@ -147,7 +147,7 @@ public class AESTest {
 		System.out.println("密钥长度:" + key.length);
 		System.out.println("密钥16进制：" + Hex.toHexString(key));
 
-		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text, key, aes);
+		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
@@ -164,7 +164,7 @@ public class AESTest {
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
-		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text, key, aes, ips);
+		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes, ips);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 

@@ -9,8 +9,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.cipher.IAlgorithm;
-import com.gitee.linzl.cipher.KeyPairPathUtil;
 import com.gitee.linzl.cipher.asymmetrical.AsymmetricalCipherUtil;
 import com.gitee.linzl.cipher.asymmetrical.RSACipherAlgorithms;
 
@@ -42,7 +40,7 @@ public class RSATest {
 		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
 		System.out.println("公钥长度:" + publicKey.length);
 
-		byte[] encryptData = AsymmetricalCipherUtil.bcEncrypt(text, pubKey, algorithm);
+		byte[] encryptData = AsymmetricalCipherUtil.bcEncrypt(text.getBytes(), pubKey, algorithm);
 		System.out.println("加密：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
@@ -62,7 +60,7 @@ public class RSATest {
 		PublicKey pubKey = keyPair.getPublic();
 		System.out.println("公钥长度:" + pubKey.getEncoded().length);
 
-		byte[] encryptData = AsymmetricalCipherUtil.encrypt(text, pubKey, algorithm);
+		byte[] encryptData = AsymmetricalCipherUtil.encrypt(text.getBytes(), pubKey, algorithm);
 		System.out.println("加密：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 

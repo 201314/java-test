@@ -1,12 +1,6 @@
 package com.gitee.linzl.cipher.symmetric;
 
 import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -15,7 +9,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Hex;
 
 import com.gitee.linzl.cipher.IAlgorithm;
 
@@ -76,30 +69,6 @@ public class SymmetricCipherUtil {
 	}
 
 	/**
-	 * 随机生成密钥对,非对称加解密，一般情况下不使用，只用于测试
-	 * 
-	 * @param algorithm
-	 * @return
-	 */
-	public static KeyPair generateKeyPair(IAlgorithm algorithm) {
-		// 实例化密钥生成器
-		String algorithmName = algorithm.getKeyAlgorithm();
-		// Security.addProvider(new BouncyCastleProvider());
-
-		KeyPairGenerator keyPairGen = null;
-		try {
-			keyPairGen = KeyPairGenerator.getInstance(algorithmName);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		if (algorithm.getSize() != null && algorithm.getSize() >= 0) {
-			keyPairGen.initialize(algorithm.getSize());
-		}
-		KeyPair keyPair = keyPairGen.generateKeyPair();
-		return keyPair;
-	}
-
-	/**
 	 * @param data
 	 *            待加密数据
 	 * @param key
@@ -108,22 +77,12 @@ public class SymmetricCipherUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(String data, Key secretKey, IAlgorithm algorithm) throws Exception {
+	public static byte[] encrypt(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
-		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-		return output;
-	}
-
-	public static byte[] bcEncrypt(String data, Key secretKey, IAlgorithm algorithm) throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
-		// 实例化Cipher对象，它用于完成实际的加密操作
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}
@@ -138,24 +97,34 @@ public class SymmetricCipherUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(String data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
+	public static byte[] encrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
 			throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}
 
-	public static byte[] bcEncrypt(String data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
+	public static byte[] bcEncrypt(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
+		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
+		// 实例化Cipher对象，它用于完成实际的加密操作
+		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+		// 初始化Cipher对象，设置为加密模式
+		byte[] output = cipher.doFinal(data);
+		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
+		return output;
+	}
+
+	public static byte[] bcEncrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
 			throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}
@@ -213,33 +182,16 @@ public class SymmetricCipherUtil {
 	 * @return 加密后的数据
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(String data, byte[] key, IAlgorithm algorithm) throws Exception {
+	public static byte[] encrypt(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return encrypt(data, secretKey, algorithm);
 	}
 
-	public static byte[] encrypt(String data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
+	public static byte[] encrypt(byte[] data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return encrypt(data, secretKey, algorithm, iv);
-	}
-
-	public static String encryptHex(String data, byte[] key, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(encrypt(data, key, algorithm));
-	}
-
-	public static String encryptHex(String data, Key key, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(encrypt(data, key, algorithm));
-	}
-
-	public static String encryptHex(String data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv)
-			throws Exception {
-		return Hex.toHexString(encrypt(data, key, algorithm, iv));
-	}
-
-	public static String encryptHex(String data, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-		return Hex.toHexString(encrypt(data, key, algorithm, iv));
 	}
 
 	/**
@@ -261,24 +213,6 @@ public class SymmetricCipherUtil {
 		return decrypt(data, secretKey, algorithm, iv);
 	}
 
-	public static String decryptHex(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(decrypt(data, key, algorithm));
-	}
-
-	public static String decryptHex(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(decrypt(data, secretKey, algorithm));
-	}
-
-	public static String decryptHex(byte[] data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv)
-			throws Exception {
-		return Hex.toHexString(decrypt(data, key, algorithm, iv));
-	}
-
-	public static String decryptHex(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
-			throws Exception {
-		return Hex.toHexString(decrypt(data, secretKey, algorithm, iv));
-	}
-
 	/**
 	 * 使用BouncyCastleProvider
 	 * 
@@ -288,24 +222,16 @@ public class SymmetricCipherUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] bcEncrypt(String data, byte[] key, IAlgorithm algorithm) throws Exception {
+	public static byte[] bcEncrypt(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return bcEncrypt(data, secretKey, algorithm);
 	}
 
-	public static byte[] bcEncrypt(String data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
+	public static byte[] bcEncrypt(byte[] data, byte[] key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
 		// 还原密钥
 		Key secretKey = toKey(key, algorithm);
 		return bcEncrypt(data, secretKey, algorithm);
-	}
-
-	public static String bcEncryptHex(String data, byte[] key, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(bcEncrypt(data, key, algorithm));
-	}
-
-	public static String bcEncryptHex(String data, Key secretKey, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(bcEncrypt(data, secretKey, algorithm));
 	}
 
 	public static byte[] bcDecrypt(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
@@ -318,61 +244,4 @@ public class SymmetricCipherUtil {
 		return bcDecrypt(data, secretKey, algorithm, iv);
 	}
 
-	public static String bcDecryptHex(byte[] data, byte[] key, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(bcDecrypt(data, key, algorithm));
-	}
-
-	public static String bcDecryptHex(byte[] data, Key secretKey, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(bcDecrypt(data, secretKey, algorithm));
-	}
-
-	/**
-	 * 对数据进行签名
-	 * 
-	 * @param data
-	 *            需要签名的数据
-	 * @param privateKey
-	 *            私钥
-	 * @param algorithm
-	 *            签名算法
-	 * @return
-	 * @throws Exception
-	 */
-	public static byte[] sign(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
-		// 用私钥对信息生成数字签名
-		String signAlgorithm = algorithm.getSignAlgorithm();
-		Signature signature = Signature.getInstance(signAlgorithm);
-		signature.initSign(privateKey);
-		signature.update(data);
-		return signature.sign();
-	}
-
-	public static String signHex(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
-		return Hex.toHexString(sign(data, privateKey, algorithm));
-	}
-
-	/**
-	 * 验证签名
-	 * 
-	 * @param data
-	 *            签名前的数据
-	 * @param publicKey
-	 *            公钥
-	 * @param sign
-	 *            签名后的数据
-	 * @return
-	 * @throws Exception
-	 */
-	public static boolean verifySign(byte[] data, PublicKey publicKey, byte[] sign, IAlgorithm algorithm)
-			throws Exception {
-		// 用私钥对信息生成数字签名
-		String signAlgorithm = algorithm.getSignAlgorithm();
-		Signature signature = Signature.getInstance(signAlgorithm);
-		signature.initVerify(publicKey);
-		signature.update(data);
-
-		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-		// 验证签名是否正常
-		return signature.verify(sign);
-	}
 }

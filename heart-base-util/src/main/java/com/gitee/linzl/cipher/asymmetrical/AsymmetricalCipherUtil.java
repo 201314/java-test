@@ -1,5 +1,6 @@
 package com.gitee.linzl.cipher.asymmetrical;
 
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -122,12 +123,12 @@ public class AsymmetricalCipherUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(String data, PublicKey key, IAlgorithm algorithm) throws Exception {
+	public static byte[] encrypt(byte[] data, PublicKey key, IAlgorithm algorithm) throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, key);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}
@@ -143,23 +144,34 @@ public class AsymmetricalCipherUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(String data, PublicKey key, IAlgorithm algorithm, IvParameterSpec iv)
+	public static byte[] encrypt(byte[] data, PublicKey key, IAlgorithm algorithm, IvParameterSpec iv)
 			throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}
 
-	public static byte[] bcEncrypt(String data, PublicKey secretKey, IAlgorithm algorithm) throws Exception {
+	public static byte[] bcEncrypt(byte[] data, PublicKey secretKey, IAlgorithm algorithm) throws Exception {
 		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
 		// 实例化Cipher对象，它用于完成实际的加密操作
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data.getBytes());
+		byte[] output = cipher.doFinal(data);
+		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
+		return output;
+	}
+
+	public static byte[] bcEncrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
+			throws Exception {
+		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
+		// 实例化Cipher对象，它用于完成实际的加密操作
+		cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
+		// 初始化Cipher对象，设置为加密模式
+		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
 		return output;
 	}

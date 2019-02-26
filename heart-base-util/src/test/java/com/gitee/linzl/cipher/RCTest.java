@@ -4,7 +4,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.cipher.IAlgorithm;
 import com.gitee.linzl.cipher.symmetric.RCCipherAlgorithms;
 import com.gitee.linzl.cipher.symmetric.SymmetricCipherUtil;
 
@@ -33,7 +32,7 @@ public class RCTest {
 		System.out.println("密钥长度:" + key.length);
 		System.out.println("密钥16进制：" + Hex.toHexString(key));
 
-		byte[] encryptData = SymmetricCipherUtil.encrypt(text, key, aes);
+		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
 		System.out.println("加密后：" + encryptData);
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 

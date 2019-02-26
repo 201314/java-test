@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -269,6 +270,13 @@ public class ConvertUtil {
 				| (((long) a[6] & 0xFF) << 8) | (((long) a[7] & 0xFF) << 0));
 	}
 
+	public static long byte2Long2(byte[] value) {
+		ByteBuffer buffer = ByteBuffer.allocate(8);
+		buffer.put(value, 0, value.length);
+		buffer.flip();// need flip
+		return buffer.getLong();
+	}
+
 	public static float byte2Float(byte[] value) {
 		return Float.intBitsToFloat(byte2Int(value));
 	}
@@ -377,6 +385,13 @@ public class ConvertUtil {
 			byteNum[ix] = (byte) ((value & 0xFF) >> offset);
 		}
 		return byteNum;
+	}
+
+	public static byte[] long2Byte2(long value) {
+		// 或者
+		ByteBuffer buffer = ByteBuffer.allocate(8);
+		buffer.putLong(0, value);
+		return buffer.array();
 	}
 
 	public static char long2Ascii(long value) {

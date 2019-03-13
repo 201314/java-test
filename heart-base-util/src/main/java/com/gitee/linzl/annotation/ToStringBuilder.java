@@ -11,13 +11,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ToStringBuilder {
 	private static String charsetName;
 	// TODO 增加Map 缓存一些属性数据
+
+	public static String toString(Object object) {
+		return toString(object, "gb2312", "|", System.lineSeparator());
+	}
+
+	public static String toString(Object object, String charset) {
+		return toString(object, charset, "|", System.lineSeparator());
+	}
 
 	/**
 	 * @param object
@@ -43,28 +49,22 @@ public class ToStringBuilder {
 		}
 		AccessibleObject.setAccessible(fields, true);
 
-		List<Order> list = new ArrayList<>();
-		Map<String, Field> map = new HashMap<String, Field>();
-
+		List<Field> list = new ArrayList<>();
 		for (Field field : fieldList) {
 			FieldEncrypt fileField = field.getAnnotation(FieldEncrypt.class);
 			if (fileField != null) {
-				Order order = new Order();
-				order.setOrder(fileField.order());
-				order.setName(field.getName());
-				list.add(order);
-				map.put(field.getName(), field);
+				list.add(field);
 			}
 		}
 		// 排序
-		list.sort((order1, order2) -> {
-			return Integer.compare(order1.getOrder(), order2.getOrder());
+		list.sort((first, second) -> {
+			return Integer.compare(first.getAnnotation(FieldEncrypt.class).order(),
+					second.getAnnotation(FieldEncrypt.class).order());
 		});
 
 		StringBuilder sb = new StringBuilder();
 		// 组装数据
-		list.stream().forEach((order) -> {
-			Field field = map.get(order.getName());
+		list.stream().forEach((field) -> {
 			field.setAccessible(true);
 			FieldEncrypt fileField = field.getAnnotation(FieldEncrypt.class);
 

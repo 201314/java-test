@@ -1,9 +1,16 @@
 package com.gitee.linzl.time;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,21 +29,6 @@ public class DateUtil {
 		localDate = localDate.withMonth(month);
 		// localDate = localDate.withDayOfMonth(1);
 		localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
-		return localDate;
-	}
-
-	/**
-	 * 某一年某一个月的最后一天
-	 * 
-	 * @param year
-	 * @param month
-	 * @return
-	 */
-	public static LocalDateTime getEndDay(int year, int month) {
-		LocalDateTime localDate = getFirstDay(year, month);
-		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
-		// localDate = localDate.plusMonths(1);
-		// localDate = localDate.minusDays(1);
 		return localDate;
 	}
 
@@ -62,11 +54,107 @@ public class DateUtil {
 	 *            参数必须大于0
 	 * @return
 	 */
-	public static LocalDateTime getFistDayAfterMonth(int month) {
+	public static LocalDateTime getFirstDayAfterMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.plusMonths(month);
 		// localDate = localDate.withDayOfMonth(1);
 		localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
+		return localDate;
+	}
+
+	/**
+	 * 几周前的第一天
+	 *
+	 * @param week
+	 *            参数必须大于0
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayBeforeWeek(int week) {
+		return getFirstDayBeforeWeek(LocalDateTime.now(), week);
+	}
+
+	/**
+	 * 某个date日期,几周前的第一天
+	 * 
+	 * @param week
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayBeforeWeek(Date date, int week) {
+		LocalDateTime localDate = toLocalDateTime(date);
+		return getFirstDayBeforeWeek(localDate, week);
+	}
+
+	public static LocalDateTime getFirstDayBeforeWeek(LocalDateTime date, int week) {
+		date = date.minusWeeks(week);
+		date = date.with(DayOfWeek.MONDAY);
+		return date;
+	}
+
+	/**
+	 * 几周后的第一天
+	 *
+	 * @param week
+	 *            参数必须大于0
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayAfterWeek(int week) {
+		return getFirstDayAfterWeek(LocalDateTime.now(), week);
+	}
+
+	/**
+	 * 某个date日期,几周后的第一天
+	 * 
+	 * @param week
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayAfterWeek(Date date, int week) {
+		LocalDateTime localDate = toLocalDateTime(date);
+		return getFirstDayAfterWeek(localDate, week);
+	}
+
+	public static LocalDateTime getFirstDayAfterWeek(LocalDateTime date, int week) {
+		date = date.plusWeeks(week);
+		date = date.with(DayOfWeek.MONDAY);
+		return date;
+	}
+
+	/**
+	 * 上一周第一天
+	 * 
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayLastWeek() {
+		return getFirstDayBeforeWeek(LocalDateTime.now(), 1);
+	}
+
+	/**
+	 * 本周第一天
+	 * 
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayCurrentWeek() {
+		return getFirstDayAfterWeek(LocalDateTime.now(), 0);
+	}
+
+	/**
+	 * 下一周第一天
+	 * 
+	 * @return
+	 */
+	public static LocalDateTime getFirstDayNextWeek() {
+		return getFirstDayAfterWeek(LocalDateTime.now(), 1);
+	}
+
+	/**
+	 * 某一年某一个月的最后一天
+	 * 
+	 * @param year
+	 * @param month
+	 * @return
+	 */
+	public static LocalDateTime getEndDay(int year, int month) {
+		LocalDateTime localDate = getFirstDay(year, month);
+		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
 		return localDate;
 	}
 
@@ -78,9 +166,7 @@ public class DateUtil {
 	 */
 	public static LocalDateTime getEndDayBeforeMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
-		localDate = localDate.minusMonths(month - 1);
-		// localDate = localDate.withDayOfMonth(1);
-		// localDate = localDate.minusDays(1);
+		localDate = localDate.minusMonths(month);
 		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
 		return localDate;
 	}
@@ -95,37 +181,7 @@ public class DateUtil {
 	public static LocalDateTime getEndDayAfterMonth(int month) {
 		LocalDateTime localDate = LocalDateTime.now();
 		localDate = localDate.plusMonths(month + 1);
-		// localDate = localDate.withDayOfMonth(1);
-		// localDate = localDate.minusDays(1);
 		localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
-		return localDate;
-	}
-
-	/**
-	 * 几周前的第一天
-	 *
-	 * @param week
-	 *            参数必须大于0
-	 * @return
-	 */
-	public static LocalDateTime getFirstDayBeforeWeek(int week) {
-		LocalDateTime localDate = LocalDateTime.now();
-		localDate = localDate.minusWeeks(week);
-		localDate = localDate.with(DayOfWeek.MONDAY);
-		return localDate;
-	}
-
-	/**
-	 * 几周后的第一天
-	 *
-	 * @param week
-	 *            参数必须大于0
-	 * @return
-	 */
-	public static LocalDateTime getFirstDayAfterWeek(int week) {
-		LocalDateTime localDate = LocalDateTime.now();
-		localDate = localDate.plusWeeks(week);
-		localDate = localDate.with(DayOfWeek.MONDAY);
 		return localDate;
 	}
 
@@ -137,9 +193,24 @@ public class DateUtil {
 	 * @return
 	 */
 	public static LocalDateTime getEndDayBeforeWeek(int week) {
-		LocalDateTime localDate = getFirstDayBeforeWeek(week);
-		localDate = localDate.plusDays(6);
-		return localDate;
+		return getEndDayBeforeWeek(LocalDateTime.now(), week);
+	}
+
+	/**
+	 * 某个date日期,几周前或后的最后一天
+	 * 
+	 * @param week
+	 * @return
+	 */
+	public static LocalDateTime getEndDayBeforeWeek(Date date, int week) {
+		LocalDateTime localDate = toLocalDateTime(date);
+		return getEndDayBeforeWeek(localDate, week);
+	}
+
+	public static LocalDateTime getEndDayBeforeWeek(LocalDateTime date, int week) {
+		date = date.minusWeeks(week);
+		date = date.with(DayOfWeek.SUNDAY);
+		return date;
 	}
 
 	/**
@@ -150,21 +221,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static LocalDateTime getEndDayAfterWeek(int week) {
-		LocalDateTime localDate = getEndDayBeforeWeek(week);
-		localDate = localDate.plusDays(6);
-		return localDate;
-	}
-
-	/**
-	 * 某个date日期,几周前或后的第一天
-	 * 
-	 * @param week
-	 * @return
-	 */
-	public static LocalDateTime getFirstDayAssignWeek(Date date, int week) {
-		LocalDateTime localDate = getSubtractDate(date, 0, 0, 7 * week);
-		localDate = localDate.with(DayOfWeek.MONDAY);
-		return localDate;
+		return getEndDayAfterWeek(LocalDateTime.now(), week);
 	}
 
 	/**
@@ -173,37 +230,15 @@ public class DateUtil {
 	 * @param week
 	 * @return
 	 */
-	public static LocalDateTime getEndDayAssignWeek(Date date, int week) {
-		LocalDateTime localDate = getFirstDayAssignWeek(date, week);
-		localDate = localDate.plusDays(6);
-		return localDate;
+	public static LocalDateTime getEndDayAfterWeek(Date date, int week) {
+		LocalDateTime localDate = toLocalDateTime(date);
+		return getEndDayAfterWeek(localDate, week);
 	}
 
-	/**
-	 * 本周第一天
-	 * 
-	 * @return
-	 */
-	public static LocalDateTime getFirstDayCurrentWeek() {
-		return getFirstDayAssignWeek(new Date(), 0);
-	}
-
-	/**
-	 * 本周最后一天
-	 * 
-	 * @return
-	 */
-	public static LocalDateTime getEndDayCurrentWeek() {
-		return getEndDayAssignWeek(new Date(), 0);
-	}
-
-	/**
-	 * 上一周第一天
-	 * 
-	 * @return
-	 */
-	public static LocalDateTime getFirstDayLastWeek() {
-		return getFirstDayAssignWeek(new Date(), -1);
+	public static LocalDateTime getEndDayAfterWeek(LocalDateTime date, int week) {
+		date = date.plusWeeks(week);
+		date = date.with(DayOfWeek.SUNDAY);
+		return date;
 	}
 
 	/**
@@ -212,16 +247,16 @@ public class DateUtil {
 	 * @return
 	 */
 	public static LocalDateTime getEndDayLastWeek() {
-		return getEndDayAssignWeek(new Date(), -1);
+		return getEndDayBeforeWeek(LocalDateTime.now(), 1);
 	}
 
 	/**
-	 * 下一周第一天
+	 * 本周最后一天
 	 * 
 	 * @return
 	 */
-	public static LocalDateTime getFirstDayNextWeek() {
-		return getFirstDayAssignWeek(new Date(), 1);
+	public static LocalDateTime getEndDayCurrentWeek() {
+		return getEndDayAfterWeek(LocalDateTime.now(), 0);
 	}
 
 	/**
@@ -230,51 +265,95 @@ public class DateUtil {
 	 * @return
 	 */
 	public static LocalDateTime getEndDayNextWeek() {
-		return getEndDayAssignWeek(new Date(), 1);
+		return getEndDayAfterWeek(LocalDateTime.now(), 1);
 	}
 
 	/**
-	 * 与当前年相差Year年的日历
+	 * 当前年份增加
 	 * 
-	 * @param year
-	 * @return
+	 * @param years
 	 */
-	public static LocalDateTime getSubtractYear(int year) {
-		return getSubtractDate(new Date(), year, 0, 0);
+	public static LocalDateTime plusYears(int years) {
+		return LocalDateTime.now().plusYears(years);
 	}
 
 	/**
-	 * 与当前月份相差month月的日历
+	 * 当前月份增加
 	 * 
-	 * @param month
-	 * @return
+	 * @param months
 	 */
-	public static LocalDateTime getSubtractMonth(int month) {
-		return getSubtractDate(new Date(), 0, month, 0);
+	public static LocalDateTime plusMonths(int month) {
+		return LocalDateTime.now().plusMonths(month);
 	}
 
 	/**
-	 * 与当前天相差day天的日历
+	 * 当前天增加
 	 * 
-	 * @param day
-	 * @return
+	 * @param days
 	 */
-	public static LocalDateTime getSubtractDay(int day) {
-		return getSubtractDate(new Date(), 0, 0, day);
+	public static LocalDateTime plusDays(int days) {
+		return LocalDateTime.now().plusDays(days);
 	}
 
 	/**
-	 * 计算两个日期时间差（毫秒） （差值转化为指定格式的差值 ，如 转化为多少秒，转化为多少时 , 多少月，多少年，多少周） 比较常用
+	 * 当前小时增加
 	 * 
-	 * @param first
-	 * @param second
-	 * @return
+	 * @param hours
 	 */
-	public static long subtractDate(Date first, Date second) {
-		long firstTime = first.getTime();
-		long secondTime = second.getTime();
-		long subTime = firstTime - secondTime;
-		return subTime > 0 ? subTime : -subTime;
+	public static LocalDateTime plusHours(int hours) {
+		return LocalDateTime.now().plusHours(hours);
+	}
+
+	/**
+	 * 当前时间加多少分钟
+	 * 
+	 * @param minutes
+	 */
+	public static LocalDateTime plusMinutes(int minutes) {
+		return LocalDateTime.now().plusMinutes(minutes);
+	}
+
+	/**
+	 * 当前时间加多少秒数
+	 * 
+	 * @param seconds
+	 */
+	public static LocalDateTime plusSeconds(int seconds) {
+		return LocalDateTime.now().plusSeconds(seconds);
+	}
+
+	public static LocalDateTime minusYears(int years) {
+		return LocalDateTime.now().minusYears(years);
+	}
+
+	public static LocalDateTime minusMonths(int month) {
+		return LocalDateTime.now().minusMonths(month);
+	}
+
+	public static LocalDateTime minusDays(int days) {
+		return LocalDateTime.now().minusDays(days);
+	}
+
+	public static LocalDateTime minusHours(int hours) {
+		return LocalDateTime.now().minusHours(hours);
+	}
+
+	/**
+	 * 当前时间减多少分钟
+	 * 
+	 * @param minutes
+	 */
+	public static LocalDateTime minusMinutes(int minutes) {
+		return LocalDateTime.now().minusMinutes(minutes);
+	}
+
+	/**
+	 * 当前时间减多少秒数
+	 * 
+	 * @param seconds
+	 */
+	public static LocalDateTime minusSeconds(int seconds) {
+		return LocalDateTime.now().minusSeconds(seconds);
 	}
 
 	/**
@@ -284,9 +363,20 @@ public class DateUtil {
 	 * @param second
 	 * @return
 	 */
-	public static long subtractDay(Date first, Date second) {
-		long subtract = subtractDate(first, second);
+	public static long days(Date first, Date second) {
+		long subtract = milliSeconds(first, second);
 		return subtract / (24 * 60 * 60 * 1000);
+	}
+
+	/**
+	 * 计算时差天数
+	 * 
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public static long days(LocalDateTime startTime, LocalDateTime endTime) {
+		return compare(startTime, endTime).toDays();
 	}
 
 	/**
@@ -296,9 +386,13 @@ public class DateUtil {
 	 * @param second
 	 * @return
 	 */
-	public static long subtractHour(Date first, Date second) {
-		long subtract = subtractDate(first, second);
+	public static long hours(Date first, Date second) {
+		long subtract = milliSeconds(first, second);
 		return subtract / (1 * 60 * 60 * 1000);
+	}
+
+	public static long hours(LocalDateTime startTime, LocalDateTime endTime) {
+		return compare(startTime, endTime).toHours();
 	}
 
 	/**
@@ -308,9 +402,13 @@ public class DateUtil {
 	 * @param second
 	 * @return
 	 */
-	public static long subtractMin(Date first, Date second) {
-		long subtract = subtractDate(first, second);
+	public static long minutes(Date first, Date second) {
+		long subtract = milliSeconds(first, second);
 		return subtract / (1 * 60 * 1000);
+	}
+
+	public static long minutes(LocalDateTime startTime, LocalDateTime endTime) {
+		return compare(startTime, endTime).toMinutes();
 	}
 
 	/**
@@ -320,9 +418,38 @@ public class DateUtil {
 	 * @param second
 	 * @return
 	 */
-	public static long subtractSecond(Date first, Date second) {
-		long subtract = subtractDate(first, second);
+	public static long seconds(Date first, Date second) {
+		long subtract = milliSeconds(first, second);
 		return subtract / 1000;
+	}
+
+	/**
+	 * 计算时差秒数
+	 * 
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	public static long seconds(LocalDateTime startTime, LocalDateTime endTime) {
+		return compare(startTime, endTime).getSeconds();
+	}
+
+	/**
+	 * 计算两个日期时间差（毫秒） （差值转化为指定格式的差值 ，如 转化为多少秒，转化为多少时 , 多少月，多少年，多少周） 比较常用
+	 * 
+	 * @param first
+	 * @param second
+	 * @return
+	 */
+	public static long milliSeconds(Date first, Date second) {
+		long firstTime = first.getTime();
+		long secondTime = second.getTime();
+		long subTime = firstTime - secondTime;
+		return subTime > 0 ? subTime : -subTime;
+	}
+
+	public static long milliSeconds(LocalDateTime startTime, LocalDateTime endTime) {
+		return compare(startTime, endTime).toMillis();
 	}
 
 	/**
@@ -334,7 +461,7 @@ public class DateUtil {
 	 * @param dayOfMonth
 	 * @return
 	 */
-	public static LocalDateTime getSubtractDate(Date date, int year, int month, int dayOfMonth) {
+	public static LocalDateTime subtract(Date date, int year, int month, int dayOfMonth) {
 		Instant instant = date.toInstant();
 		ZoneId zoneId = ZoneId.systemDefault();
 		LocalDateTime localDate = instant.atZone(zoneId).toLocalDateTime();
@@ -345,115 +472,102 @@ public class DateUtil {
 	}
 
 	/**
-	 * 当前年份增加
-	 * 
-	 * @param years
+	 * 计算时差
 	 */
-	public static LocalDateTime plusYears(int years) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusYears(years);
-		return now;
+	public static Duration compare(LocalDateTime startTime, LocalDateTime endTime) {
+		return Duration.between(startTime, endTime);
 	}
 
-	public static LocalDateTime minusYears(int years) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusYears(years);
-		return now;
+	public static Date parse2Date(String text, String pattern) {
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		try {
+			return sdf.parse(text);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static LocalDate parse2LocalDate(String text, String pattern) {
+		return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern));
+	}
+
+	public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
+		return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
+	}
+
+	public static Date toDate(LocalDateTime localDateTime) {
+		ZoneId zoneId = ZoneId.systemDefault();
+		ZonedDateTime zdt = localDateTime.atZone(zoneId);
+		return Date.from(zdt.toInstant());
+	}
+
+	public static Date toDate(LocalDate localDate) {
+		ZoneId zoneId = ZoneId.systemDefault();
+		ZonedDateTime zdt = localDate.atStartOfDay(zoneId);
+		return Date.from(zdt.toInstant());
+	}
+
+	public static LocalDateTime toLocalDateTime(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalDateTime();
+	}
+
+	public static LocalDateTime toLocalDateTime(LocalDate date) {
+		return date.atStartOfDay();
 	}
 
 	/**
-	 * 当前月份增加
 	 * 
-	 * @param months
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 00:00
+	 * @return
 	 */
-	public static LocalDateTime plusMonths(int month) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusMonths(month);
-		return now;
-	}
-
-	public static LocalDateTime minusMonths(int month) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusMonths(month);
-		return now;
+	public static LocalDateTime toMinLocalDateTime(Date date) {
+		return toMinLocalDateTime(toLocalDate(date));
 	}
 
 	/**
-	 * 当前天增加
 	 * 
-	 * @param days
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 00:00
+	 * @return
 	 */
-	public static LocalDateTime plusDays(int days) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusDays(days);
-		return now;
-	}
-
-	public static LocalDateTime minusDays(int days) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusDays(days);
-		return now;
+	public static LocalDateTime toMinLocalDateTime(LocalDate date) {
+		return LocalDateTime.of(date, LocalTime.MIN);
 	}
 
 	/**
-	 * 当前小时增加
 	 * 
-	 * @param hours
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 23:59:59.999999999
+	 * @return
 	 */
-	public static LocalDateTime plusHours(int hours) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusHours(hours);
-		return now;
-	}
-
-	public static LocalDateTime minusHours(int hours) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusHours(hours);
-		return now;
+	public static LocalDateTime toMaxLocalDateTime(Date date) {
+		return toMaxLocalDateTime(toLocalDate(date));
 	}
 
 	/**
-	 * 当前时间加多少分钟
 	 * 
-	 * @param minutes
+	 * @param date
+	 *            2018-11-11 转换成 2018-11-11 23:59:59.999999999
+	 * @return
 	 */
-	public static LocalDateTime plusMinutes(int minutes) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusMinutes(minutes);
-		return now;
+	public static LocalDateTime toMaxLocalDateTime(LocalDate date) {
+		return LocalDateTime.of(date, LocalTime.MAX);
 	}
 
-	/**
-	 * 当前时间减多少分钟
-	 * 
-	 * @param minutes
-	 */
-	public static LocalDateTime minusMinutes(int minutes) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusMinutes(minutes);
-		return now;
+	public static LocalDate toLocalDate(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalDate();
 	}
 
-	/**
-	 * 当前时间加多少秒数
-	 * 
-	 * @param seconds
-	 */
-	public static LocalDateTime plusSeconds(int seconds) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.plusSeconds(seconds);
-		return now;
-	}
-
-	/**
-	 * 当前时间减多少秒数
-	 * 
-	 * @param seconds
-	 */
-	public static LocalDateTime minusSeconds(int seconds) {
-		LocalDateTime now = LocalDateTime.now();
-		now = now.minusSeconds(seconds);
-		return now;
+	public static LocalTime toLocalTime(Date date) {
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return instant.atZone(zoneId).toLocalTime();
 	}
 
 	public static void main(String[] args) {
@@ -466,7 +580,7 @@ public class DateUtil {
 		System.out.println("下周第一天:" + getFirstDayNextWeek());
 		System.out.println("下周最后一天:" + getEndDayNextWeek());
 
-		System.out.println("2个月前或后的第一天：" + getFirstDayBeforeMonth(2));
+		System.out.println("2个月前的第一天：" + getFirstDayBeforeMonth(2));
 		System.out.println("2个月前的最后一天：" + getEndDayBeforeMonth(2));
 
 		System.out.println("2013年2月的第一天:" + getFirstDay(2013, 2));
@@ -477,7 +591,6 @@ public class DateUtil {
 		cl.set(Calendar.MONTH, 0);
 		cl.set(Calendar.DAY_OF_MONTH, 1);
 		System.out.println(cl.getTime());
-		System.out.println("2019年1月1号5周后:" + getFirstDayAssignWeek(cl.getTime(), 1));
-
+		System.out.println("2019年1月1号5周后的第一天:" + getFirstDayAfterWeek(cl.getTime(), 5));
 	}
 }

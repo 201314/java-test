@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.gitee.linzl.properties.ReadResourceUtil;
 
 /**
- * PS:数据加密传输:获得平台的公钥加密，平台自己的私钥解密，不能颠倒顺序
+ * PS:
  * 
  * PS:签名：私钥签名，公钥验签。用自己的私钥签名，把公钥给别人。
  * 

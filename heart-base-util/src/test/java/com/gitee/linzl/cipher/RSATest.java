@@ -17,11 +17,16 @@ public class RSATest {
 
 	@Before
 	public void init() {
-		text = "站在云端，敲下键盘，望着通往世界另一头的那扇窗，只为做那读懂0和1的人。。";
+		text = "11站在云端，敲下键盘，望着通往世界另一头的那扇窗，只为做那读懂0和1的人。。";
 		System.out.println("原文：" + text);
 	}
 
 	// =============非对称加密测试=============
+	@Test
+	public void RSA_None_PKCS1PADDING_1024() throws Exception {
+		execute(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024);
+	}
+
 	@Test
 	public void RSA_ECB_PKCS1PADDING_1024() throws Exception {
 		execute(RSACipherAlgorithms.RSA_ECB_PKCS1PADDING_1024);
@@ -42,6 +47,7 @@ public class RSATest {
 
 		byte[] encryptData = AsymmetricalCipherUtil.bcEncrypt(text.getBytes(), pubKey, algorithm);
 		System.out.println("加密：" + encryptData);
+		System.out.println("base64:"+Base64.encodeBase64String(encryptData));
 		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
 
 		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();

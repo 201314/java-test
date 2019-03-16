@@ -22,7 +22,7 @@ public class Dom4jStrategyTest {
 	public void readAsText() throws Exception {
 		InputStream is = XmlStrategy.class.getClassLoader().getResourceAsStream("com/gitee/linzl/xml/xmlRead.xml");
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		XmlStrategy strategy = xmlStrategy.getXmlStrategy("dom4j");
+		XmlStrategy strategy = xmlStrategy.get("dom4j");
 		strategy.read(is);
 		System.out.println("没有格式化：" + strategy.readAsText());
 		System.out.println("==格式化==：" + strategy.readAsText(true));
@@ -32,7 +32,7 @@ public class Dom4jStrategyTest {
 	public void write() throws Exception {
 		InputStream is = XmlStrategy.class.getClassLoader().getResourceAsStream("com/gitee/linzl/xml/xmlRead.xml");
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		XmlStrategy strategy = xmlStrategy.getXmlStrategy("dom4j");
+		XmlStrategy strategy = xmlStrategy.get("dom4j");
 		strategy.read(is);
 		strategy.write(new File("D:/dom4j2.xml"));
 		strategy.write(new File("D://dom4j2-format.xml"), true);
@@ -78,7 +78,7 @@ public class Dom4jStrategyTest {
 		vo.setChildNodes(childNodes);
 
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 		try {
 			strategy.appendToRoot(vo);
 			strategy.write(new File("D://create.xml"), true);
@@ -98,7 +98,7 @@ public class Dom4jStrategyTest {
 		list.add(child2);
 
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 		try {
 			strategy.appendToRoot(list);
 			strategy.write(new File("D://list.xml"), true);
@@ -139,7 +139,7 @@ public class Dom4jStrategyTest {
 		list.add(child);
 
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 		strategy.read(new File("D://create.xml"));
 		try {
 			Node node = strategy.selectNode("/root/first/first211[@age11='永远18岁11']", strategy.getDoc());
@@ -153,7 +153,7 @@ public class Dom4jStrategyTest {
 	@Test
 	public void appendAfterNode() throws Exception {
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 
 		Node node = strategy.selectNode("/root/first/first211[@age11='永远18岁11']", strategy.getDoc());
 		NodeVo vo = new NodeVo();
@@ -180,7 +180,7 @@ public class Dom4jStrategyTest {
 	@Test
 	public void appendListAfterNode() throws Exception {
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 
 		Node node = strategy.selectNode("/root/first/first211[@age11='永远18岁11']", strategy.getDoc());
 		NodeVo vo = new NodeVo();
@@ -207,7 +207,7 @@ public class Dom4jStrategyTest {
 	@Test
 	public void appendBeforeNode() throws Exception {
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 		strategy.read(new File("D://hello.xml"));
 
 		Node node = strategy.selectNode("/root/first/first211[@age11='永远18岁11']", strategy.getDoc());
@@ -233,7 +233,7 @@ public class Dom4jStrategyTest {
 	@Test
 	public void recursiveFromRoot() throws Exception {
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 
 		strategy.read(new File("D://hello.xml"));
 		strategy.recursiveFromRoot();
@@ -242,7 +242,7 @@ public class Dom4jStrategyTest {
 	@Test
 	public void recursiveFromElement() throws Exception {
 		CompositeXmlStrategy xmlStrategy = new CompositeXmlStrategy();
-		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.getXmlStrategy("dom4j");
+		Dom4jStrategy strategy = (Dom4jStrategy) xmlStrategy.get("dom4j");
 		strategy.read(new File("D://qwe.xml"));
 		strategy.write(new File("D://jaxb2.xml"), true);
 	}

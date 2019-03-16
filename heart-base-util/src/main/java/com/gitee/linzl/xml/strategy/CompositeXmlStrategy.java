@@ -21,11 +21,11 @@ public class CompositeXmlStrategy {
 		xmlStrategys.add(new Dom4jStrategy());
 	}
 
-	public void addXmlStrategy(XmlStrategy xmlStrategy) {
+	public void add(XmlStrategy xmlStrategy) {
 		xmlStrategys.add(xmlStrategy);
 	}
 
-	public void clearXmlStrategy() {
+	public void clear() {
 		xmlStrategys.clear();
 	}
 
@@ -35,7 +35,7 @@ public class CompositeXmlStrategy {
 	 * @param xmlType
 	 * @return
 	 */
-	public XmlStrategy getXmlStrategy(String xmlType) {
+	public XmlStrategy get(String xmlType) {
 		XmlStrategy result = xmlStrategysCache.get(xmlType);
 
 		if (result == null) {

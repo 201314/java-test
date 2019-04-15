@@ -91,6 +91,13 @@ public class ReflectionUtils {
 		return list.toArray(new Field[0]);
 	}
 
+	/**
+	 * 给属性赋值
+	 * 
+	 * @param field
+	 * @param target
+	 * @param value
+	 */
 	public void setField(Field field, Object target, Object value) {
 		try {
 			field.setAccessible(true);
@@ -100,6 +107,13 @@ public class ReflectionUtils {
 		}
 	}
 
+	/**
+	 * 获取属性值
+	 * 
+	 * @param field
+	 * @param target
+	 * @return
+	 */
 	public Object getField(Field field, Object target) {
 		try {
 			field.setAccessible(true);

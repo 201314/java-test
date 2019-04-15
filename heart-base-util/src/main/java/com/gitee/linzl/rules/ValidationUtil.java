@@ -54,7 +54,7 @@ public class ValidationUtil {
 	/**
 	 * 18身份证号码验证
 	 */
-	public static final String ID_NUMBER = "^[1-9]\\\\d{5}(18|19|(2\\\\d))\\\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|[1-2]0|3[0-1])\\\\d{3}[0-9Xx]$";
+	public static final String ID_NUMBER = "^[1-9]\\d{5}(18|19|(2\\d))\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|[1-2]0|3[0-1])\\d{3}[0-9Xx]$";
 	/**
 	 * 邮政编码验证
 	 */
@@ -80,6 +80,10 @@ public class ValidationUtil {
 	 * 验证字符，只能包含中文、英文、数字、下划线等字符。
 	 */
 	public static final String STRING_CHECK = "^[a-zA-Z0-9\u4e00-\u9fa5-_]+$";
+	/**
+	 * 车牌号码
+	 */
+	public static final String CAR_NO = "^([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z0-9]{1}[A-Z0-9]{1}([京津沪渝桂蒙宁新藏冀晋辽吉黑苏浙皖赣闽鲁粤鄂湘豫川云贵陕甘青琼])?[A-NP-Z0-9]{1}[A-NP-Z0-9]{3}[A-NP-Z0-9挂学警港澳领试超外]{1}([A-NP-Z0-9外])?)|([A-Z0-9]{7})$";
 
 	/**
 	 * 用户名不少于两位且只能为汉字、英文、数字及_ 最少2位 最多16位
@@ -485,7 +489,9 @@ public class ValidationUtil {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("用户名验证：" + ValidationUtil.isUserName("e22222222"));
+		System.out.println("0或4:" + ValidationUtil.match("湘EG9135",
+				"^([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z0-9]{1}[A-Z0-9]{1}([京津沪渝桂蒙宁新藏冀晋辽吉黑苏浙皖赣闽鲁粤鄂湘豫川云贵陕甘青琼])?[A-NP-Z0-9]{1}[A-NP-Z0-9]{3}[A-NP-Z0-9挂学警港澳领试超外]{1}([A-NP-Z0-9外])?)|([A-Z0-9]{7})$"));
+		// System.out.println("用户名验证：" + ValidationUtil.isUserName("e22222222"));
 		// System.out.println("密码验证："+RegexUtil.isDigits("0"));
 		// System.out.println("密码验证："+RegexUtil.isPwd("jjj9090--"));
 		// System.out.println("手机号码验证: "+RegexUtil.isCellPhone("18918611111"));
@@ -503,8 +509,7 @@ public class ValidationUtil {
 		// System.out.println("判断合法字符:
 		// "+RegexUtil.isRightfulString("abc_-11AAA"));
 		// System.out.println("邮政编码验证: "+RegexUtil.isZipCode("162406"));
-		// System.out.println("身份证号码验证: "+RegexUtil.isIdCardNo("3505
-		// 2419880210133e"));
+		System.out.println("身份证号码验证: " + isIdCardNo("35052419880210133X"));
 
 		// System.out.println("匹配密码: "+RegexUtil.isPwd("d888d_ddddd"));
 		// System.out.println("匹配密码: "+RegexUtil.isUrl("http://baidu.com"));

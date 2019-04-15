@@ -14,8 +14,8 @@ public @interface FieldDecrypt {
 	/** 解密前,需求中规定需要截取的长度 */
 	int length() default 0;
 
-	/** 默认使用空格填充 */
-	Padding padding() default Padding.SPACE;
+	/** 默认使用空填充 */
+	String padding() default "";
 
 	/** 默认使用右填充 */
 	PaddingDirection direct() default PaddingDirection.RIGHT;

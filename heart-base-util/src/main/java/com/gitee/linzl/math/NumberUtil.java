@@ -1,5 +1,7 @@
 package com.gitee.linzl.math;
 
+import java.text.NumberFormat;
+
 public class NumberUtil {
 	/**
 	 * 判断是否空值
@@ -23,5 +25,17 @@ public class NumberUtil {
 		return nullToDefault(number, 0L);
 	}
 
-	
+	/**
+	 * 可以将科学记数转成原来的值
+	 * 
+	 * @param d
+	 * @return
+	 */
+	public static Long double2Long(double d) {
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setGroupingUsed(false);
+		String str = nf.format(d);
+		Long value = Long.parseLong(str);
+		return value;
+	}
 }

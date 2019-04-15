@@ -592,5 +592,18 @@ public class DateUtil {
 		cl.set(Calendar.DAY_OF_MONTH, 1);
 		System.out.println(cl.getTime());
 		System.out.println("2019年1月1号5周后的第一天:" + getFirstDayAfterWeek(cl.getTime(), 5));
+
+		Calendar todayEnd = Calendar.getInstance();
+		// Calendar.HOUR 12小时制
+		// HOUR_OF_DAY 24小时制
+		todayEnd.set(Calendar.HOUR_OF_DAY, 23);
+		todayEnd.set(Calendar.MINUTE, 59);
+		todayEnd.set(Calendar.SECOND, 59);
+		todayEnd.set(Calendar.MILLISECOND, 999);
+		System.out.println("时差:" + (todayEnd.getTimeInMillis() - new Date().getTime()));
+
+		LocalDateTime startTime = LocalDateTime.now();
+		LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+		System.out.println("时差:" + (compare(startTime, endTime).toMillis()));
 	}
 }

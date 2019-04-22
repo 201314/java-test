@@ -25,7 +25,7 @@ public class FileCreateModel {
 	/**
 	 * 总金额14位,不足前补零
 	 */
-	@FieldEncrypt(order = 2, length = 14, padding = Padding.ZERO, direct = PaddingDirection.LEFT)
+	@FieldEncrypt(order = 2, length = 14, padding = "0", direct = PaddingDirection.LEFT)
 	private long chargeMoney;
 	/**
 	 * 生成时间 格式为yyyyMMddHHmmss
@@ -79,7 +79,7 @@ public class FileCreateModel {
 	}
 
 	public String compute() {
-		return ToStringBuilder.toString(this, "gb2312", "|", System.lineSeparator());
+		return ToStringBuilder.toString(this);
 	}
 
 	public static void main(String[] args) {
@@ -89,6 +89,14 @@ public class FileCreateModel {
 		model.setChargeMoney(101);
 		model.setGenTime(new Date());
 		model.setBankName("支付宝网商银行");
-		System.out.println(model.compute());
+
+		FileCreateModel model1 = new FileCreateModel();
+		model1.setSumDate(LocalDateTime.now());
+		model1.setBankId("9700001");
+		model1.setChargeMoney(101);
+		model1.setGenTime(new Date());
+		model1.setBankName("支付宝网商银行");
+		System.out.println("111:" + ToStringBuilder.toString(model));
+		System.out.println("222:" + ToStringBuilder.toString(model1));
 	}
 }

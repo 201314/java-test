@@ -108,4 +108,10 @@ public class FtpClientUtilTest {
 				"105_(\\d{8})_(\\d{13})_TB_DisputeData.txt");
 		util.close();
 	}
+
+	@Test
+	public void downloadDir() {
+		util.download("/11", new File("D://etc//localFtp"), null, null, true);
+		util.close();
+	}
 }

@@ -428,8 +428,8 @@ public class FtpClientUtil {
 		List<String> downList = null;
 		FTPFile[] ftpFiles = null;
 		try {
-			// ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-			// ftpClient.enterLocalPassiveMode();
+//			ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+//			 ftpClient.enterLocalPassiveMode();
 			boolean changeFtpDir = ftpClient.changeWorkingDirectory(ftpDir);
 			if (!changeFtpDir) {
 				return downList;
@@ -451,6 +451,7 @@ public class FtpClientUtil {
 					FileUtils.forceMkdir(dir);
 					download(ftpDir + "/" + file.getName(), dir, regex, type, recursion);
 				} else if (file.isFile()) {
+					ftpClient.changeWorkingDirectory(ftpDir);
 					String fileName = file.getName();// 文件名
 					boolean isMatch = false;
 					if (type == RegexEnum.START_REGEX) {

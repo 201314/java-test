@@ -5,6 +5,14 @@ import java.security.ProtectionDomain;
 
 import day08.reflex.Husband;
 
+/**
+ * TODO 参考 org.springframework.util.ReflectionUtils 写一个工具类
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2019年2月25日
+ */
 public class ClassUtil {
 
 	public static void main(String[] args) throws Exception {

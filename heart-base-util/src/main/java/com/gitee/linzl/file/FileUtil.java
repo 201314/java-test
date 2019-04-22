@@ -2,10 +2,11 @@ package com.gitee.linzl.file;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -132,6 +134,25 @@ public class FileUtil {
 	}
 
 	/**
+	 * 读取文件的行数
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static int readLineNumber(File file) {
+		try (LineNumberReader reader = new LineNumberReader(new FileReader(file));) {
+			if (Objects.nonNull(file) && file.exists()) {
+				long fileLength = file.length();
+				reader.skip(fileLength);
+				return reader.getLineNumber();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	/**
 	 * 读取文件最后多少行
 	 * 
 	 * @param file
@@ -169,15 +190,9 @@ public class FileUtil {
 
 			if (charset == null) {
 				return new String(bytes);
-			} else {
-				return new String(bytes, charset);
 			}
-		} catch (FileNotFoundException e) {
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} finally {
+			return new String(bytes, charset);
 		}
-		return null;
 	}
 
 	/**

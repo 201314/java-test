@@ -26,4 +26,11 @@ public class IOUtilTest {
 		File destFile = new File("d:/testDir/测试中文中文1");
 		IOUtil.decompressionFiles(zipFile, destFile);
 	}
+	
+	@Test
+	public void tarFiles() throws IOException {
+		File zipFile = new File("D:\\etc\\身份信息");
+		File destFile = new File("D:\\etc\\身份信息.tar.gz");
+		IOUtil.compressionFiles(zipFile, destFile);
+	}	
 }

@@ -2,14 +2,17 @@ package com.gitee.linzl.network;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,12 +20,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.gitee.linzl.file.FileUtil;
 
 /**
  * FTP上传下载文件,不做加解密处理
@@ -32,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @email 2225010489@qq.com
  * @date 2018年8月27日
  */
-public class FtpClientUtil {
+public class FtpClientUtil implements Closeable {
 	private static final Logger log = LoggerFactory.getLogger(FtpClientUtil.class);
 	// ftp服务器地址
 	private String ip;
@@ -57,6 +63,7 @@ public class FtpClientUtil {
 	}
 
 	private FTPClient ftpClient = null;
+	private DecimalFormat format = new DecimalFormat("0.00%");
 
 	public FtpClientUtil(String ip, String username, String password) {
 		this(ip, DEFAULT_PORT, username, password);
@@ -82,6 +89,11 @@ public class FtpClientUtil {
 		ftpClient.setControlEncoding("UTF-8");
 		ftpClient.setCharset(Charset.forName("UTF-8"));// 解决中文乱码问题
 		try {
+			ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+			// 被动模式,ftp服务器开放端口给客户端连接,客户端被动接收,适合在部署在内网客户端，因为一般有防火墙限制,客户端很难开放端口给ftp服务端
+			// ftpClient.enterLocalPassiveMode();
+			// 主动模式,客户端主动开放端口给ftp服务器,适合在外网
+			// ftpClient.enterLocalActiveMode();
 			ftpClient.connect(ip, port); // 连接ftp服务器
 			int replyCode = ftpClient.getReplyCode(); // 是否成功登录服务器
 			if (!FTPReply.isPositiveCompletion(replyCode)) {
@@ -304,7 +316,7 @@ public class FtpClientUtil {
 		if (Objects.isNull(file) || !file.isFile()) {
 			throw new Exception("只能上传文件");
 		}
-		return upload(ftpDir, new BufferedInputStream(new FileInputStream(file)), fileName);
+		return upload(ftpDir, new FileInputStream(file), fileName);
 	}
 
 	/**
@@ -312,22 +324,77 @@ public class FtpClientUtil {
 	 * 
 	 * @param fileName
 	 *            上传到ftp的文件名
-	 * @param inputStream
+	 * @param input
 	 *            输入文件流
 	 * @return
 	 */
-	public boolean upload(String ftpDir, InputStream inputStream, String fileName) {
+	public boolean upload(String ftpDir, FileInputStream input, String fileName) {
 		boolean flag = false;
 		try {
 			changeWorkingDirectory(ftpDir);
-			ftpClient.storeFile(fileName, inputStream);
+			// TODO 可能已经上传完毕，要使用真实的文件名判断一下
+			FTPFile[] file2 = ftpClient.listFiles(ftpDir + "/" + fileName);
+			String tmpFileName = FilenameUtils.getBaseName(fileName) + ".tmp";
+			FTPFile[] file = ftpClient.listFiles(ftpDir + "/" + tmpFileName);
+
+			BufferedInputStream buf = new BufferedInputStream(input);
+			long beginSize = 0;
+			long endSize = FileUtil.fileSize(input);
+			if (Objects.nonNull(file) && file.length > 0) {
+				beginSize = file[0].getSize();
+				log.debug("已存在上传文件:{},大小:{}", file[0].getName(), file[0].getSize());
+			}
+
+			log.debug("读取文件:{},开始位置:{},文件大小:{},", fileName, beginSize, endSize);
+			ftpClient.setRestartOffset(beginSize);
+			// ftpClient.storeFile(fileName, inputStream);
+			OutputStream out = ftpClient.storeFileStream(tmpFileName);
+
+			byte[] bytes = new byte[1024];
+			long ingSize = 0;
+			long waitSize = endSize - beginSize;
+			int readLength = 0;
+
+			double nowPercent = beginSize / (double) endSize;
+			double finishPercent = 0;
+			buf.skip(beginSize);
+
+			log.debug(">>>>>上传进度:{}", format.format(nowPercent));
+			while ((readLength = buf.read(bytes)) != -1) {
+				out.write(bytes, 0, readLength);
+				ingSize += readLength;
+				log.debug("共读取到:{},等待读取:{},", ingSize, waitSize);
+				if (ingSize >= waitSize) {
+					log.debug(">>>>>上传进度:100%");
+				} else {
+					// 每次比上一次增加1%(0.01),则打印
+					double currentPercent = (ingSize + beginSize) / (double) endSize;
+
+					BigDecimal bd1 = new BigDecimal(Double.toString(currentPercent));
+					BigDecimal bd2 = new BigDecimal(Double.toString(finishPercent));
+					double subValue = bd1.subtract(bd2).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+					if (subValue > 0.05) {
+						log.debug(">>>>>上传进度:{}", format.format(currentPercent));
+						finishPercent = currentPercent;
+					}
+				}
+			}
+			if (Objects.nonNull(input)) {
+				out.flush();
+				out.close();
+				// 使用storeFileStream 、 retrieveFileStream 必须调用此方法
+				// 使用storeFile 、 retrieveFile 默认调用了此方法
+				ftpClient.completePendingCommand();
+				reName(tmpFileName, fileName);
+			}
 			flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (null != inputStream) {
+			if (null != input) {
 				try {
-					inputStream.close();
+					input.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -428,8 +495,8 @@ public class FtpClientUtil {
 		List<String> downList = null;
 		FTPFile[] ftpFiles = null;
 		try {
-//			ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-//			 ftpClient.enterLocalPassiveMode();
+			// ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+			// ftpClient.enterLocalPassiveMode();
 			boolean changeFtpDir = ftpClient.changeWorkingDirectory(ftpDir);
 			if (!changeFtpDir) {
 				return downList;
@@ -451,7 +518,6 @@ public class FtpClientUtil {
 					FileUtils.forceMkdir(dir);
 					download(ftpDir + "/" + file.getName(), dir, regex, type, recursion);
 				} else if (file.isFile()) {
-					ftpClient.changeWorkingDirectory(ftpDir);
 					String fileName = file.getName();// 文件名
 					boolean isMatch = false;
 					if (type == RegexEnum.START_REGEX) {
@@ -474,15 +540,55 @@ public class FtpClientUtil {
 					try {
 						FileUtils.forceMkdir(localDir);
 					} catch (Exception e) {
-						log.error("创建目录异常：" + e.getMessage());
+						log.error("创建目录异常:{}", e.getMessage());
 					}
 					File localFile = new File(localDir, fileName);
-					try (OutputStream out = new FileOutputStream(localFile);
+
+					long endSize = file.getSize();
+					long beginSize = localFile.length();
+					long waitSize = endSize - beginSize;
+					if (localFile.exists() && waitSize <= 0) {// 文件已存在
+						continue;
+					}
+					ftpClient.changeWorkingDirectory(ftpDir);
+					try (OutputStream out = new FileOutputStream(localFile, true);
 							BufferedOutputStream buffer = new BufferedOutputStream(out);) {
-						if (ftpClient.retrieveFile(fileName, buffer)) {
-							log.info("download file name is:{}", fileName);
-							downList.add(localFile.getAbsolutePath());
+						log.debug("读取文件:{},开始位置:{},文件大小:{},", fileName, beginSize, endSize);
+						ftpClient.setRestartOffset(beginSize);
+						InputStream input = ftpClient.retrieveFileStream(fileName);
+						byte[] bytes = new byte[1024];
+						long ingSize = 0;
+						int readLength = 0;
+
+						double nowPercent = beginSize / (double) endSize;
+						double finishPercent = 0;
+						log.debug(">>>>>下载进度:{}", format.format(nowPercent));
+						while ((readLength = input.read(bytes)) != -1) {
+							out.write(bytes, 0, readLength);
+							ingSize += readLength;
+							if (ingSize >= waitSize) {
+								log.debug(">>>>>下载进度:100%");
+							} else {
+								// 每次比上一次增加1%(0.01),则打印
+								double currentPercent = (ingSize + beginSize) / (double) endSize;
+
+								BigDecimal bd1 = new BigDecimal(Double.toString(currentPercent));
+								BigDecimal bd2 = new BigDecimal(Double.toString(finishPercent));
+								double subValue = bd1.subtract(bd2).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+								if (subValue > 0.01) {
+									log.debug(">>>>>下载进度:{}", format.format(currentPercent));
+									finishPercent = currentPercent;
+								}
+							}
 						}
+						if (Objects.nonNull(input)) {
+							input.close();
+							// 使用storeFileStream 、 retrieveFileStream 必须调用此方法
+							// 使用storeFile 、 retrieveFile 默认调用了此方法
+							ftpClient.completePendingCommand();
+						}
+						downList.add(localFile.getAbsolutePath());
 					}
 				}
 			}
@@ -495,7 +601,7 @@ public class FtpClientUtil {
 	/**
 	 * 退出并关闭FTP连接
 	 */
-	public void close() {
+	public void close() throws IOException {
 		if (Objects.nonNull(this.ftpClient) && this.ftpClient.isConnected()) {
 			try {
 				this.ftpClient.logout();// 退出FTP服务器,退出登录
@@ -503,6 +609,8 @@ public class FtpClientUtil {
 			} catch (Exception e) {
 				throw new RuntimeException("连接FTP服务失败！", e);
 			}
+			log.debug("成功关闭ftp");
 		}
+
 	}
 }

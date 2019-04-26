@@ -2,6 +2,7 @@ package com.gitee.linzl.file;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -347,6 +349,27 @@ public class FileUtil {
 		public int compare(File o1, File o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
+	}
+
+	public static long fileSize(File file) {
+		try {
+			return fileSize(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public static long fileSize(FileInputStream file) {
+		try {
+			FileChannel fc = file.getChannel();
+			return fc.size();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	public static void main(String[] args) throws IOException {

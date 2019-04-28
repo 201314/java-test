@@ -18,22 +18,45 @@ public class ToStringBuilder {
 	// 类名，对应的字段
 	public static final Map<String, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
 
+	/**
+	 * 默认采用gb2312
+	 * 
+	 * @param object
+	 * @return
+	 */
 	public static String toString(Object object) {
 		return toString(object, Charset.forName("gb2312"));
 	}
 
+	/**
+	 * @param object
+	 *            要转换成的对象,默认用|隔开
+	 * @param charset
+	 *            内容编码
+	 * @return
+	 */
 	public static String toString(Object object, Charset charset) {
 		return toString(object, charset, "|");
 	}
 
+	/**
+	 * @param object
+	 *            要转换成的对象
+	 * @param charset
+	 *            内容编码
+	 * @param separator
+	 *            每个字段间的分隔符
+	 * @return
+	 */
 	public static String toString(Object object, Charset charset, String separator) {
 		return toString(object, charset, separator, System.lineSeparator());
 	}
 
 	/**
 	 * @param object
-	 * @param charsetName
-	 *            编码
+	 *            要转换成的对象
+	 * @param charset
+	 *            内容编码
 	 * @param separator
 	 *            每个字段间的分隔符
 	 * @param end
@@ -58,15 +81,15 @@ public class ToStringBuilder {
 
 			List<Field> list = new ArrayList<>();
 			for (Field field : fieldList) {
-				FieldEncrypt fileField = field.getAnnotation(FieldEncrypt.class);
+				FileField fileField = field.getAnnotation(FileField.class);
 				if (fileField != null) {
 					list.add(field);
 				}
 			}
 			// 排序
 			list.sort((first, second) -> {
-				return Integer.compare(first.getAnnotation(FieldEncrypt.class).order(),
-						second.getAnnotation(FieldEncrypt.class).order());
+				return Integer.compare(first.getAnnotation(FileField.class).order(),
+						second.getAnnotation(FileField.class).order());
 			});
 			cacheFields = list.toArray(new Field[0]);
 			declaredFieldsCache.put(fullPath, cacheFields);
@@ -78,7 +101,7 @@ public class ToStringBuilder {
 		// 组装数据
 		for (Field field : cacheFields) {
 			field.setAccessible(true);
-			FieldEncrypt fileField = field.getAnnotation(FieldEncrypt.class);
+			FileField fileField = field.getAnnotation(FileField.class);
 
 			try {
 				String value = "";

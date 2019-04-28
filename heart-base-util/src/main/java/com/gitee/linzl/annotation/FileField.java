@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
-public @interface FieldEncrypt {
+public @interface FileField {
 	/** 生成文件中内容顺序 */
 	int order() default 0;
 
@@ -25,4 +25,7 @@ public @interface FieldEncrypt {
 
 	/** 加密方式 */
 	Class<? extends Encrypt> encrypt() default NoneEncrypt.class;
+
+	/** 解密方式 */
+	Class<? extends Decrypt> decrypt() default NoneDecrypt.class;
 }

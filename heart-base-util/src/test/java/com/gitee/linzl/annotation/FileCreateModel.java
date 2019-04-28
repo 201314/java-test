@@ -15,27 +15,27 @@ public class FileCreateModel {
 	/**
 	 * 汇总日期 格式为yyyyMMdd
 	 */
-	@FieldEncrypt(order = 0, length = 8, format = "yyyyMMdd")
+	@FileField(order = 0, length = 8, format = "yyyyMMdd")
 	private LocalDateTime sumDate;
 	/**
 	 * 银行编号7位:测试数据 9700000
 	 */
-	@FieldEncrypt(order = 1, length = 7)
+	@FileField(order = 1, length = 7)
 	private String bankId;
 	/**
 	 * 总金额14位,不足前补零
 	 */
-	@FieldEncrypt(order = 2, length = 14, padding = "0", direct = PaddingDirection.LEFT)
+	@FileField(order = 2, length = 14, padding = "0", direct = PaddingDirection.LEFT)
 	private long chargeMoney;
 	/**
 	 * 生成时间 格式为yyyyMMddHHmmss
 	 */
-	@FieldEncrypt(order = 3, length = 14, format = "yyyyMMddHHmmss")
+	@FileField(order = 3, length = 14, format = "yyyyMMddHHmmss")
 	private Date genTime;
 	/**
 	 * 银行名称长度60,不足后补空格
 	 */
-	@FieldEncrypt(order = 4, length = 60)
+	@FileField(order = 4, length = 60)
 	private String bankName;
 
 	public LocalDateTime getSumDate() {

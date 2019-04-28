@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -32,6 +33,15 @@ import com.gitee.linzl.file.FileUtil;
 
 /**
  * FTP上传下载文件,不做加解密处理
+ * 
+ * PORT中文称为主动模式，工作原理：
+ * 
+ * FTP客户端连接到FTP服务器的21端口，发送用户名和密码登录，登录成功后要列表列表或者读取数据时，客户端随机开放一个端口（1024以上），
+ * 发送PORT命令到FTP服务器，告诉服务器客户端采用主动模式并开放端口;
+ * FTP服务器收到PORT主动模式命令和端口号后，通过服务器的20端口和客户端开放的端口连接
+ * 
+ * PASV是Passive的缩写，中文成为被动模式，工作原理：FTP客户端连接到FTP服务器的21端口，发送用户名和密码登录，登录成功后要list列表或者读取数据时，发送PASV命令到FTP服务器，
+ * 服务器在本地随机开放一个端口（1024以上），然后把开放的端口告诉客户端， 客户端再连接到服务器开放的端口进行数据传输
  * 
  * @description
  * @author linzl
@@ -76,35 +86,60 @@ public class FtpClientUtil implements Closeable {
 		this.password = password;
 	}
 
-	/**
-	 * 初始化ftp服务器
-	 */
-	public void init() {
-		ftpClient = new FTPClient();
-		// FTPClientConfig ftpClientConfig = new
-		// FTPClientConfig(FTPClientConfig.SYST_NT);
-		// ftpClientConfig.setServerTimeZoneId(TimeZone.getDefault().getID());
-		// this.ftpClient.configure(ftpClientConfig);
+	public void connect() {
+		connect(false, null, null);
+	}
 
+	/**
+	 * 连接ftp服务器
+	 * 
+	 * @param isActiveMode
+	 *            true 表示使用主动模式,false表示被动模式
+	 * @param activeExternalIPAddress
+	 *            本机内网IP
+	 * @param reportActiveExternalIPAddress
+	 *            本机外网IP(经过NAT)
+	 */
+	public void connect(boolean isActiveMode, String activeExternalIPAddress, String reportActiveExternalIPAddress) {
+		ftpClient = new FTPClient();
 		ftpClient.setControlEncoding("UTF-8");
 		ftpClient.setCharset(Charset.forName("UTF-8"));// 解决中文乱码问题
 		try {
 			ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-			// 被动模式,ftp服务器开放端口给客户端连接,客户端被动接收,适合在部署在内网客户端，因为一般有防火墙限制,客户端很难开放端口给ftp服务端
-			// ftpClient.enterLocalPassiveMode();
-			// 主动模式,客户端主动开放端口给ftp服务器,适合在外网
-			// ftpClient.enterLocalActiveMode();
+			ftpClient.setDefaultTimeout(2 * 1000);
+			ftpClient.setConnectTimeout(2 * 1000);// 连接超时设置,建议采用配置
 			ftpClient.connect(ip, port); // 连接ftp服务器
 			int replyCode = ftpClient.getReplyCode(); // 是否成功登录服务器
-			if (!FTPReply.isPositiveCompletion(replyCode)) {
-				ftpClient.disconnect();
-				log.debug("connect failed...ftp服务器:{},端口:{}", this.ip, this.port);
+			if (FTPReply.isPositiveCompletion(replyCode)) {
+				if (ftpClient.login(username, password)) {// 登录ftp服务器
+					if (isActiveMode) {
+						// 主动模式,客户端主动开放端口给ftp服务器,适合在外网
+						ftpClient.enterLocalActiveMode();
+						// 主动模式下设置客户方端口范围9000-9100,限制下端口开放范围
+						ftpClient.setActivePortRange(9000, 9100);
+					} else {
+						// 被动模式,ftp服务器开放端口给客户端连接,客户端被动接收,适合在部署在内网客户端，因为一般有防火墙限制,客户端很难开放端口给ftp服务端
+						ftpClient.enterLocalPassiveMode();
+					}
+
+					// 本机内网IP
+					if (StringUtils.isNotBlank(activeExternalIPAddress)) {
+						ftpClient.setActiveExternalIPAddress(activeExternalIPAddress);
+					}
+					// 本机外网IP（经过NAT）
+					if (StringUtils.isNotBlank(reportActiveExternalIPAddress)) {
+						ftpClient.setReportActiveExternalIPAddress(reportActiveExternalIPAddress);
+					}
+					// 设置下数据连接超时时间
+					ftpClient.setDataTimeout(10 * 1000);
+					ftpClient.setSoTimeout(10 * 1000);
+					ftpClient.setBufferSize(1024 * 2);
+				} else {
+					log.debug("login failed...ftp服务器:{},端口:{},账号:{}", this.ip, this.port, this.username);
+				}
 			} else {
-				ftpClient.login(username, password); // 登录ftp服务器
-				ftpClient.setDefaultTimeout(2 * 1000);
-				ftpClient.setConnectTimeout(2 * 1000);
-				ftpClient.setDataTimeout(2 * 1000);
-				ftpClient.setBufferSize(1024 * 2);
+				close();
+				log.debug("connect failed...ftp服务器:{},端口:{}", this.ip, this.port);
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -392,7 +427,7 @@ public class FtpClientUtil implements Closeable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (null != input) {
+			if (Objects.nonNull(input)) {
 				try {
 					input.close();
 				} catch (IOException e) {
@@ -503,7 +538,7 @@ public class FtpClientUtil implements Closeable {
 			}
 
 			ftpFiles = ftpClient.listFiles();
-			if (ftpFiles == null || ftpFiles.length <= 0) {
+			if (Objects.isNull(ftpFiles) || ftpFiles.length <= 0) {
 				return downList;
 			}
 

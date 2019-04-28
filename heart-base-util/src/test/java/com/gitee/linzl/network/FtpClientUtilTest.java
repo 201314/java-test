@@ -12,7 +12,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void mkdir() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.mkdir("/test/", new File("hello/who/are/you"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -22,7 +22,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void mkdirParent() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.mkdirParent(new File("/hello1/who1/are1/you"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -32,7 +32,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void listFileNames() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			String[] file = util.listFileNames("/test");
 			System.out.println(Arrays.toString(file));
 		} catch (IOException e) {
@@ -43,7 +43,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void listFiles() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			List<String> list = util.listFiles("/test", false);
 			System.out.println(list);
 		} catch (IOException e) {
@@ -54,7 +54,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void reName() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.changeWorkingDirectory("/test/新建文件夹");
 			util.reName("测试修改名称", "测试修改名称.txt");
 		} catch (IOException e) {
@@ -104,7 +104,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadAll() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.downloadAll("/ConsumptionFiles", new File("D://etc//localFtp"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -114,7 +114,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadStartWith() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.downloadStartWith("/ConsumptionFiles", new File("D://etc//localFtp"), "105_20180102_1514823600100");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -124,7 +124,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadEndWith() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.downloadEndWith("/ConsumptionFiles", new File("D://etc//localFtp"), "TB_DisputeData.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -134,7 +134,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadEqualWith() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.downloadEqualWith("/ConsumptionFiles", new File("D://etc//localFtp"),
 					"105_20180102_1514823600100_TB_SettlementData.txt");
 		} catch (IOException e) {
@@ -145,7 +145,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadMatchWith() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.downloadMatchWith("/ConsumptionFiles", new File("D://etc//localFtp"),
 					"105_(\\d{8})_(\\d{13})_TB_DisputeData.txt");
 		} catch (IOException e) {
@@ -156,7 +156,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void downloadDir() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.download("/11", new File("D://etc//localFtp"), null, null, true);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -169,7 +169,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void breakDownload() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.download("/11/中国人民.iso", new File("D://etc//localFtp"), null, null, false);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -182,7 +182,7 @@ public class FtpClientUtilTest {
 	@Test
 	public void breakUpload() {
 		try (FtpClientUtil util = new FtpClientUtil("127.0.0.1", "linzl", "linzl");) {
-			util.init();
+			util.connect();
 			util.upload("/11", new File("D:\\etc\\localFtp\\中国人民.iso"));
 		} catch (IOException e) {
 			e.printStackTrace();

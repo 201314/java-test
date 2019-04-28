@@ -3,6 +3,9 @@ package com.gitee.linzl.annotation;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 一般用在银行、交通系统的文件生成
  * 
@@ -11,6 +14,8 @@ import java.util.Date;
  * @email 2225010489@qq.com
  * @date 2019年2月26日
  */
+@Setter
+@Getter
 public class FileCreateModel {
 	/**
 	 * 汇总日期 格式为yyyyMMdd
@@ -37,50 +42,6 @@ public class FileCreateModel {
 	 */
 	@FileField(order = 4, length = 60)
 	private String bankName;
-
-	public LocalDateTime getSumDate() {
-		return sumDate;
-	}
-
-	public void setSumDate(LocalDateTime sumDate) {
-		this.sumDate = sumDate;
-	}
-
-	public String getBankId() {
-		return bankId;
-	}
-
-	public void setBankId(String bankId) {
-		this.bankId = bankId;
-	}
-
-	public long getChargeMoney() {
-		return chargeMoney;
-	}
-
-	public void setChargeMoney(long chargeMoney) {
-		this.chargeMoney = chargeMoney;
-	}
-
-	public Date getGenTime() {
-		return genTime;
-	}
-
-	public void setGenTime(Date genTime) {
-		this.genTime = genTime;
-	}
-
-	public String getBankName() {
-		return bankName;
-	}
-
-	public void setBankName(String bankName) {
-		this.bankName = bankName;
-	}
-
-	public String compute() {
-		return ToStringBuilder.toString(this);
-	}
 
 	public static void main(String[] args) {
 		FileCreateModel model = new FileCreateModel();

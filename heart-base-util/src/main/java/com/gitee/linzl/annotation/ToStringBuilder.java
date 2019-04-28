@@ -72,11 +72,14 @@ public class ToStringBuilder {
 			List<Field> fieldList = new ArrayList<>();
 			Field[] fields = clazz.getDeclaredFields();
 			Collections.addAll(fieldList, fields);
-			while (clazz.getSuperclass() != null) {
-				clazz = clazz.getSuperclass();
-				Field[] superFields = clazz.getDeclaredFields();
+			
+			Class tmp = clazz;
+			while (tmp.getSuperclass() != null) {
+				tmp = clazz.getSuperclass();
+				Field[] superFields = tmp.getDeclaredFields();
 				Collections.addAll(fieldList, superFields);
 			}
+		 
 			AccessibleObject.setAccessible(fields, true);
 
 			List<Field> list = new ArrayList<>();

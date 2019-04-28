@@ -27,18 +27,25 @@ public class ToObjectBuilder {
 	 * @param end
 	 *            属性拼装完成后的结束符
 	 * @return
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	public static <T> T toObject(int start, String content, Class<? extends T> clazz, String separator, String end) {
+	public static <T> T toObject(int start, String content, Class<T> clazz, String separator, String end)
+			throws NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
 		String fullPath = clazz.getName();
 		Field[] cacheFields = declaredFieldsCache.get(fullPath);
 		if (cacheFields == null) {// 未缓存
 			System.out.println("未缓存");
 			List<Field> fieldList = new ArrayList<>();
 			Field[] fields = clazz.getDeclaredFields();
+
 			Collections.addAll(fieldList, fields);
-			while (clazz.getSuperclass() != null) {
-				clazz = (Class<? extends T>) clazz.getSuperclass();
-				Field[] superFields = clazz.getDeclaredFields();
+			Class tmp = clazz;
+			while (tmp.getSuperclass() != null) {
+				tmp = clazz.getSuperclass();
+				Field[] superFields = tmp.getDeclaredFields();
 				Collections.addAll(fieldList, superFields);
 			}
 			AccessibleObject.setAccessible(fields, true);
@@ -63,12 +70,7 @@ public class ToObjectBuilder {
 
 		String[] columns = content.split(separator);
 
-		T instance = null;
-		try {
-			instance = clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e1) {
-			e1.printStackTrace();
-		}
+		T obj = (T) clazz.newInstance();
 		// 组装数据
 		for (int index = 0, length = cacheFields.length; index < length; index++) {
 			Field field = cacheFields[index];
@@ -80,21 +82,40 @@ public class ToObjectBuilder {
 				Class<? extends Encrypt> enCls = fileField.encrypt();
 				Encrypt encrypt = enCls.newInstance();
 				value = encrypt.encrypt(value);
+
 				String format = fileField.format();
 				if (field.getType().isAssignableFrom(LocalDateTime.class)) {
-					field.set(instance, LocalDateTime.parse(value, DateTimeFormatter.ofPattern(format)));
+					field.set(obj, LocalDateTime.parse(value, DateTimeFormatter.ofPattern(format)));
 				} else if (field.getType().isAssignableFrom(LocalDate.class)) {
-					field.set(instance, LocalDate.parse(value, DateTimeFormatter.ofPattern(format)));
+					field.set(obj, LocalDate.parse(value, DateTimeFormatter.ofPattern(format)));
 				} else if (field.getType().isAssignableFrom(Date.class)) {
 					SimpleDateFormat sdf = new SimpleDateFormat(format);
-					field.set(instance, sdf.parse(value));
+					field.set(obj, sdf.parse(value));
+				} else if (field.getType().isAssignableFrom(byte.class)
+						|| field.getType().isAssignableFrom(Byte.class)) {
+					field.set(obj, Byte.valueOf(value));
+				} else if (field.getType().isAssignableFrom(short.class)
+						|| field.getType().isAssignableFrom(Short.class)) {
+					field.set(obj, Short.valueOf(value));
+				} else if (field.getType().isAssignableFrom(int.class)
+						|| field.getType().isAssignableFrom(Integer.class)) {
+					field.set(obj, Integer.valueOf(value));
+				} else if (field.getType().isAssignableFrom(long.class)
+						|| field.getType().isAssignableFrom(Long.class)) {
+					field.set(obj, Long.valueOf(value));
+				} else if (field.getType().isAssignableFrom(float.class)
+						|| field.getType().isAssignableFrom(Float.class)) {
+					field.set(obj, Float.valueOf(value));
+				} else if (field.getType().isAssignableFrom(double.class)
+						|| field.getType().isAssignableFrom(Double.class)) {
+					field.set(obj, Double.valueOf(value));
 				} else {
-					field.set(instance, value);
+					field.set(obj, String.valueOf(value));
 				}
 			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | ParseException e) {
 				e.printStackTrace();
 			}
 		}
-		return instance;
+		return obj;
 	}
 }

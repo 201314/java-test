@@ -32,8 +32,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * httpclient 传输数据工具
@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * 
  *         2016年11月11日
  */
+@Slf4j
 public class HttpClientUtil {
-	private static final Logger log = LoggerFactory.getLogger(HttpClientUtil.class);
 	// 设置连接超时时间,单位毫秒
 	private static final int connectionTimeout = 60000;
 	// 设置读取超时\套接字超时时间,单位毫秒
@@ -320,6 +320,7 @@ public class HttpClientUtil {
 
 			UrlEncodedFormEntity pramEntity = new UrlEncodedFormEntity(pairList, Consts.UTF_8);
 			httpPost.setEntity(pramEntity);
+			httpPost.setHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
 			httpResponse = httpClient.execute(httpPost);
 
 			result = getResult();
@@ -350,6 +351,7 @@ public class HttpClientUtil {
 
 			StringEntity entity = new StringEntity(json, Consts.UTF_8);// 解决中文乱码问题
 			httpPost.setEntity(entity);
+			httpPost.setHeader("Content-type", ContentType.APPLICATION_JSON.toString());
 			httpResponse = httpClient.execute(httpPost);
 
 			result = getResult();

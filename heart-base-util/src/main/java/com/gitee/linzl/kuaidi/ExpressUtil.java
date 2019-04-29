@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.gitee.linzl.network.HttpClientUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 快递单号查询接口
@@ -16,9 +16,8 @@ import com.gitee.linzl.network.HttpClientUtil;
  * @author liny
  *
  */
+@Slf4j
 public class ExpressUtil {
-	private static final Logger logger = LoggerFactory.getLogger(ExpressUtil.class);
-
 	public static ExpressEntity getExpressEntityInfo(ExpressEnum enums, String expressNumber) {
 		return getExpressEntityInfo(enums.getExpressCode(), expressNumber);
 	}
@@ -38,7 +37,7 @@ public class ExpressUtil {
 		list.add(new BasicNameValuePair("type", comCode));
 		list.add(new BasicNameValuePair("postid", expressNumber));
 		String result = HttpClientUtil.postForm(url, list);
-		logger.debug("快递查询结果result:{}", result);
+		log.debug("快递查询结果result:{}", result);
 		// JSONObject jsonObject = JSONObject.parseObject(result);
 		// return (ExpressEntity) JSONObject.toJavaObject(jsonObject,
 		// ExpressEntity.class);

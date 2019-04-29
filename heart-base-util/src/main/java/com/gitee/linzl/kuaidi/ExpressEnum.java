@@ -1,11 +1,14 @@
 package com.gitee.linzl.kuaidi;
 
+import lombok.Getter;
+
 /**
  * 快递编码与名称
  * 
  * @author linzl
  *
  */
+@Getter
 public enum ExpressEnum {
 	EMS("ems", "EMS快递"),
 
@@ -37,11 +40,4 @@ public enum ExpressEnum {
 		this.expressCompany = expressCompany;
 	}
 
-	public String getExpressCode() {
-		return expressCode;
-	}
-
-	public String getExpressCompany() {
-		return expressCompany;
-	}
 }

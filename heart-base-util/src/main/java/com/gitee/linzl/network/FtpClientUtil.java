@@ -26,10 +26,10 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.gitee.linzl.file.FileUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * FTP上传下载文件,不做加解密处理
@@ -48,8 +48,8 @@ import com.gitee.linzl.file.FileUtil;
  * @email 2225010489@qq.com
  * @date 2018年8月27日
  */
+@Slf4j
 public class FtpClientUtil implements Closeable {
-	private static final Logger log = LoggerFactory.getLogger(FtpClientUtil.class);
 	// ftp服务器地址
 	private String ip;
 	// ftp服务器端口号默认为21

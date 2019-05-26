@@ -86,6 +86,9 @@ public class FtpClientUtil implements Closeable {
 		this.password = password;
 	}
 
+	/**
+	 * 默认使用被动模式
+	 */
 	public void connect() {
 		connect(false, null, null);
 	}

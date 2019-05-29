@@ -346,47 +346,85 @@ public class StringUtil {
 	}
 
 	/**
-	 * 在source前补zeroNum个0
+	 * 在source前补fillLength个0
 	 * 
 	 * @param source
-	 * @param zeroNum
+	 * @param fillLength
 	 * @return
 	 */
-	public static String appendZeroBefore(String source, int zeroNum) {
-		return String.format("%0" + zeroNum + "d", 0) + source;
+	public static String appendZeroBefore(String source, int fillLength) {
+		return String.format("%0" + fillLength + "d", 0) + source;
 	}
 
 	/**
-	 * 在source后补zeroNum个0
+	 * 在source后补fillLength个0
 	 * 
 	 * @param source
-	 * @param zeroNum
+	 * @param fillLength
 	 * @return
 	 */
-	public static String appendZeroAfter(String source, int zeroNum) {
-		return source + String.format("%0" + zeroNum + "d", 0);
+	public static String appendZeroAfter(String source, int fillLength) {
+		return source + String.format("%0" + fillLength + "d", 0);
 	}
 
 	/**
-	 * 将source被足fullLength长度，前补空格
+	 * 将source前补fillLength长度空格
 	 * 
 	 * @param source
 	 * @param fullLength
 	 * @return
 	 */
-	public static String appendSpaceBefore(String source, int fullLength) {
-		return String.format("%" + fullLength + "s", source);
+	public static String appendSpaceBefore(String source, int fillLength) {
+		return String.format("%" + fillLength + "s", "") + source;
 	}
 
 	/**
-	 * 将source被足fullLength长度，后补空格
+	 * 将source后补fillLength长度空格
 	 * 
 	 * @param source
-	 * @param fullLength
+	 * @param fillLength
 	 * @return
 	 */
-	public static String appendSpaceAfter(String source, int fullLength) {
-		return String.format("%-" + fullLength + "s", source);
+	public static String appendSpaceAfter(String source, int fillLength) {
+		return source + String.format("%-" + fillLength + "s", "");
+	}
+
+	/**
+	 * 左填充
+	 * 
+	 * @param source
+	 *            源数据
+	 * @param fillLength
+	 *            需要填充的长度
+	 * @param pad
+	 *            填充内容
+	 * @return
+	 */
+	public static String appendBefore(String source, int fillLength, String pad) {
+		StringBuilder sb = new StringBuilder();
+		for (int start = 0; start < fillLength; start++) {
+			sb.append(pad);
+		}
+		return sb.toString() + source;
+	}
+
+	/**
+	 * 右填充
+	 * 
+	 * @param source
+	 *            源数据
+	 * @param fillLength
+	 *            需要填充的长度
+	 * @param pad
+	 *            填充内容
+	 * @return
+	 */
+	public static String appendAfter(String source, int fillLength, String pad) {
+		StringBuilder sb = new StringBuilder();
+		for (int start = 0; start < fillLength; start++) {
+			sb.append(pad);
+		}
+		return source + sb.toString();
 	}
 
 	/**

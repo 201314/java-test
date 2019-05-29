@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -26,8 +27,6 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-
-import com.gitee.linzl.file.FileUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -368,16 +367,15 @@ public class FtpClientUtil implements Closeable {
 	 */
 	public boolean upload(String ftpDir, FileInputStream input, String fileName) {
 		boolean flag = false;
-		try {
-			changeWorkingDirectory(ftpDir);
-			// TODO 可能已经上传完毕，要使用真实的文件名判断一下
-			FTPFile[] file2 = ftpClient.listFiles(ftpDir + "/" + fileName);
-			String tmpFileName = FilenameUtils.getBaseName(fileName) + ".tmp";
+		changeWorkingDirectory(ftpDir);
+		// TODO 可能已经上传完毕，要使用真实的文件名判断一下
+		// FTPFile[] file2 = ftpClient.listFiles(ftpDir + "/" + fileName);
+		String tmpFileName = FilenameUtils.getBaseName(fileName) + ".tmp";
+		try (BufferedInputStream buf = new BufferedInputStream(input);) {
 			FTPFile[] file = ftpClient.listFiles(ftpDir + "/" + tmpFileName);
-
-			BufferedInputStream buf = new BufferedInputStream(input);
 			long beginSize = 0;
-			long endSize = FileUtil.fileSize(input);
+			FileChannel fc = input.getChannel();
+			long endSize = fc.size();
 			if (Objects.nonNull(file) && file.length > 0) {
 				beginSize = file[0].getSize();
 				log.debug("已存在上传文件:{},大小:{}", file[0].getName(), file[0].getSize());
@@ -429,14 +427,6 @@ public class FtpClientUtil implements Closeable {
 			flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (Objects.nonNull(input)) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return flag;
 	}
@@ -649,6 +639,5 @@ public class FtpClientUtil implements Closeable {
 			}
 			log.debug("成功关闭ftp");
 		}
-
 	}
 }

@@ -46,7 +46,7 @@ import java.util.EnumSet;
  * 
  * flip：当前位置置为限制，然后将当前位置置为0，目的是将有数据部分的字节，由缓冲写入到通道中。通常用在读与写之间。
  * 
- * FileChannel 是线程安全的
+ * FileChannel 是线程安全的,只能通过已经打开的文件流获取FileChannel
  * 
  * @description
  * 
@@ -287,5 +287,4 @@ public class FileChannelDemo {
 			e.printStackTrace();
 		}
 	}
-
 }

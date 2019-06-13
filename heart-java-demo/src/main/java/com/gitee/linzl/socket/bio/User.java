@@ -1,4 +1,4 @@
-package com.gitee.linzl.socket.bio.moreClient;
+package com.gitee.linzl.socket.bio;
 
 import java.io.Serializable;
 

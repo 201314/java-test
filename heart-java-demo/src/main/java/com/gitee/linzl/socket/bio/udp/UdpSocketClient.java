@@ -20,7 +20,7 @@ public class UdpSocketClient {
 			DatagramPacket recPacket = new DatagramPacket(rec, rec.length);
 			socket.receive(recPacket);
 			byte[] data = recPacket.getData();
-			System.out.println("客户端接收到服务端:" + recPacket.getSocketAddress() + "的数据为:" + new String(data));
+			System.out.println("【BIO-UDP客户端】接收到服务端:" + recPacket.getSocketAddress() + "的数据为:" + new String(data));
 		}
 		socket.close();
 	}

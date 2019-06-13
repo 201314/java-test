@@ -66,11 +66,11 @@ public class SocketChannelClientDemo {
 //							key.interestOps(SelectionKey.OP_READ);
 						}
 					} else if (key.isReadable()) {// 缓存区可读
-						readBuf.clear();
 						channel = (SocketChannel) key.channel();
+						readBuf.clear();
 						channel.read(readBuf);
 						readBuf.flip();
-						System.out.println("客户端收到服务端响应的数据:" + getString(readBuf));
+						System.out.println("【NIO客户端】收到服务端响应的数据:" + getString(readBuf));
 						channel.register(selector, SelectionKey.OP_WRITE);
 					} else if (key.isWritable()) {// 缓存区可写
 						writeBuf.clear();

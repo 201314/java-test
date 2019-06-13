@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.gitee.linzl.nio.file.FilesDemo;
+import com.gitee.linzl.file.FilesDemo;
 
 public class FilesDemoTest {
 

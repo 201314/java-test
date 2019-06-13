@@ -13,7 +13,7 @@ public class UdpSocketServerDemo {
 			DatagramPacket recPacket = new DatagramPacket(rec, rec.length);
 			socket.receive(recPacket);
 			byte[] data = recPacket.getData();
-			System.out.println("接收到的数据为:" + new String(data));
+			System.out.println("【BIO-UDP服务端】接收到的数据为:" + new String(data));
 
 			String str = "我是udp服务器响应数据" + count + "==";
 			DatagramPacket packet = new DatagramPacket(str.getBytes(), str.getBytes().length,

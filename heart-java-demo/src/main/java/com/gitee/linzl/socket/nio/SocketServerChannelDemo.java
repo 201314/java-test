@@ -64,12 +64,12 @@ public class SocketServerChannelDemo {
 						}
 					} else if (key.isReadable()) {// 可读状态
 						try {
-							readBuf.clear();
 							SocketChannel socket = (SocketChannel) key.channel();
+							readBuf.clear();
 							int count = socket.read(readBuf);
 							if (count > 0) {
 								readBuf.flip();
-								System.out.println("服务端接收到客户端传递的数据:" + getString(readBuf));
+								System.out.println("【NIO服务端】接收到客户端传递的数据:" + getString(readBuf));
 								writeBuf.clear();
 								writeBuf.put(content.getBytes());
 								writeBuf.flip();

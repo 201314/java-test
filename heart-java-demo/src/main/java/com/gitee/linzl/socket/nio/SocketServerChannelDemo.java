@@ -43,7 +43,7 @@ public class SocketServerChannelDemo {
 
 		// 4.循环监听
 		while (true) {
-			selector.select();
+			int selectNum = selector.select();
 			Set<SelectionKey> set = selector.selectedKeys();
 			Iterator<SelectionKey> iter = set.iterator();
 			while (iter.hasNext()) {
@@ -55,6 +55,7 @@ public class SocketServerChannelDemo {
 						try {
 							ServerSocketChannel server = (ServerSocketChannel) key.channel();
 							SocketChannel socket = server.accept();
+							// 设置客户端为非阻塞模式
 							socket.configureBlocking(false);
 							socket.register(selector, SelectionKey.OP_READ);
 						} catch (ClosedChannelException e) {

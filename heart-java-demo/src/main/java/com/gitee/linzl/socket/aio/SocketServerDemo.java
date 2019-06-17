@@ -23,7 +23,7 @@ public class SocketServerDemo {
 				public void completed(AsynchronousSocketChannel ch, Void v) {
 					// 接收下一个监听
 					// 当有下一个客户端接入的时候 直接调用Server的accept方法，这样反复执行下去，保证多个客户端都可以阻塞
-					listener.accept(null, this);
+					listener.accept(v, this);
 
 					ByteBuffer readBuf = ByteBuffer.allocate(1024);
 					ByteBuffer writeBuf = ByteBuffer.allocate(1024);

@@ -23,7 +23,7 @@ public class SocketClientDemo {
 		OutputStream os = socket.getOutputStream();
 		os.write("我是中国人".getBytes());
 		os.flush();
-		// 关闭输入流
+		// 关闭输出流
 		socket.shutdownOutput();
 
 		// 3.获取服务器的响应

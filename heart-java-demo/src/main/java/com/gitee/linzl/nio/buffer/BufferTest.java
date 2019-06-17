@@ -14,7 +14,7 @@ public class BufferTest {
 		buf.put(35);// position位置：2 - > 3
 		System.out.println("35当前位置:" + buf.position());
 		// 把位置复位为0，也就是position位置：3 - > 0
-		buf.flip();//需要从头写或从头读的时候,调用该方法
+		buf.flip();//需要输出数据的时候,调用该方法
 		System.out.println("使用flip复位：" + buf);
 		System.out.println("限制为: " + buf.limit()); // 由于只装载了三个元素,所以可读取或者操作的元素为3 则limit=3
 		System.out.println("容量为: " + buf.capacity()); // 容量一旦初始化后不允许改变（warp方法包裹数组除外）
@@ -30,6 +30,7 @@ public class BufferTest {
 		}
 		System.out.println("buf对象遍历之后为: " + buf);
 
+		buf.rewind();//使缓冲区准备好重新读取已经包含的数据：它保持限制不变，并将位置设置为零。
 		// 2 wrap方法使用
 		/**
 		 * wrap方法会包裹一个数组: 一般这种用法不会先初始化缓存对象的长度，因为没有意义，最后还会被wrap所包裹的数组覆盖掉。

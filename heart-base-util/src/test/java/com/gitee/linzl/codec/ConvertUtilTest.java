@@ -32,19 +32,32 @@ public class ConvertUtilTest {
 	public void byteTest() {
 		String str = "POS88884";
 		String strHex = "504F533838383834";
-
 		System.out.println(new String(ConvertUtil.hex2Byte(strHex)));
+		byte value[] = { 0x41, (byte) 0xc8, 0, 0 };
+		System.out.println("byte 2 ascii:" + ConvertUtil.byte2Ascii(value));
+		System.out.println("byte 2 short:" + ConvertUtil.byte2Short(value));
+		System.out.println("byte 2 int:" + ConvertUtil.byte2Int(value));
+		System.out.println("to Int:" + ConvertUtil.toInt(value));
+		System.out.println("byte 2 long:" + ConvertUtil.byte2Long(value));
+
+		byte dd[] = { 0x41, (byte) 0xc8, 0, 0 };
+		System.out.println("to long:" + ConvertUtil.toLong(dd));
+		System.out.println("byte 2 float:" + ConvertUtil.byte2Float(value));
+		System.out.println("to float:" + ConvertUtil.toFloat(value));
+		System.out.println("byte 2 double:" + ConvertUtil.byte2Double(value));
+		System.out.println("to double:" + ConvertUtil.toDouble(dd));
 	}
 
 	@Test
 	public void shortTest() {
 		short value = 110;
 		byte[] bytes = ByteBuffer.allocate(2).putShort(value).array();
-		System.out.println(Arrays.toString(bytes));
+		System.out.println("short2Byte:" + ConvertUtil.toByte(value));
 
 		byte[] b = ConvertUtil.short2Byte(value);
 		System.out.println(Arrays.toString(b));
 		System.out.println("byte2Short:" + ConvertUtil.byte2Short(b));
+		System.out.println("toShort:" + ConvertUtil.toShort(b));
 		System.out.println("Ascii:" + ConvertUtil.short2Ascii(value));
 		System.out.println("to hex:" + Hex.toHexString(bytes));
 		System.out.println("Hex:" + ConvertUtil.short2Hex(value));
@@ -53,9 +66,10 @@ public class ConvertUtilTest {
 	@Test
 	public void charTest() {
 		char value = '3';
-		System.out.println("char to int:" + ConvertUtil.ascii2Int(value));
-		System.out.println("char to byte:" + Arrays.toString(ConvertUtil.ascii2Byte(value)));
-		System.out.println("char to hex:" + ConvertUtil.ascii2Hex(value));
+		System.out.println("char to int:" + ConvertUtil.char2Int(value));
+		System.out.println("char to byte:" + Arrays.toString(ConvertUtil.char2Byte(value)));
+		System.out.println("toByte:" + Arrays.toString(ConvertUtil.toByte(value)));
+		System.out.println("char to hex:" + ConvertUtil.char2Hex(value));
 		System.out.println("char to bin:" + Integer.toBinaryString(value));
 	}
 

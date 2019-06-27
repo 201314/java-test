@@ -3,11 +3,14 @@ package com.gitee.linzl.codec;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -47,12 +50,18 @@ public class ConvertUtil {
 		return mergeByte;
 	}
 
+	public static byte[] mergeByte(byte[] firstByte, byte[] secondByte) {
+		ByteBuffer target = ByteBuffer.allocate(firstByte.length + secondByte.length);
+		target.put(firstByte);
+		target.put(secondByte);
+		return target.array();
+	}
+
 	/**
 	 * 
 	 * 计算CRC16校验码
 	 *
-	 * @param data
-	 *            字节数组
+	 * @param data 字节数组
 	 * @return 校验码
 	 */
 	public static long crc16(byte[] data) {
@@ -75,8 +84,7 @@ public class ConvertUtil {
 	 * 
 	 * 计算CRC16校验码 (Modbus)
 	 *
-	 * @param data
-	 *            字节数组
+	 * @param data 字节数组
 	 * @return 校验码
 	 */
 	public static String crc16ToHex(byte[] data) {
@@ -96,13 +104,12 @@ public class ConvertUtil {
 	}
 
 	public static long crc32(File file) {
-		InputStream inputStream = null;
-		try {
-			inputStream = new BufferedInputStream(new FileInputStream(file));
-		} catch (FileNotFoundException e) {
+		try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file));) {
+			return crc32(inputStream);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return crc32(inputStream);
+		return 0;
 	}
 
 	public static long crc32(InputStream inputStream) {
@@ -111,19 +118,11 @@ public class ConvertUtil {
 			byte[] bytes = new byte[1024];
 			int cnt;
 			while ((cnt = inputStream.read(bytes)) != -1) {
-				// 读最后时，可能没有1024字节
+				// 读到最后，可能没有1024字节
 				crc.update(bytes, 0, cnt);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (null != inputStream) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return crc.getValue();
 	}
@@ -132,8 +131,7 @@ public class ConvertUtil {
 	 * 
 	 * 计算CRC32校验码 (Modbus)
 	 *
-	 * @param data
-	 *            字节数组
+	 * @param data 字节数组
 	 * @return 校验码
 	 */
 	public static String crc32ToHex(byte[] data) {
@@ -153,7 +151,7 @@ public class ConvertUtil {
 	}
 
 	public static String fullFormatHex(char value) {
-		return fullFormatHex(ascii2Hex(value));
+		return fullFormatHex(char2Hex(value));
 	}
 
 	/**
@@ -182,10 +180,10 @@ public class ConvertUtil {
 	 * 显示完整格式的16进制,占2个字节
 	 * 
 	 * @param data
-	 *            <p>
-	 *            OxFF --> Ox00FF
-	 *            <p>
-	 *            FF --> 00FF
+	 *             <p>
+	 *             OxFF --> Ox00FF
+	 *             <p>
+	 *             FF --> 00FF
 	 * @return
 	 */
 	public static String fullFormatHex(String data) {
@@ -208,7 +206,7 @@ public class ConvertUtil {
 	}
 
 	public static short bin2Short(String bin) {
-		return 0;
+		return Short.parseShort(bin, 2);
 	}
 
 	public static int bin2Int(String bin) {
@@ -235,6 +233,10 @@ public class ConvertUtil {
 		return (short) (((value[0] & 0xFF) << 8) | value[1] & 0xFF);
 	}
 
+	public static short toShort(byte[] value) {
+		return ByteBuffer.wrap(value).getShort();
+	}
+
 	public static int byte2Int(byte[] value) {
 		byte[] a = new byte[4];
 		int i = a.length - 1, j = value.length - 1;
@@ -248,6 +250,10 @@ public class ConvertUtil {
 		return (a[0] & 0xFF) << 24 | (a[1] & 0xFF) << 16
 
 				| (a[2] & 0xFF) << 8 | a[3] & 0xFF;
+	}
+
+	public static int toInt(byte[] value) {
+		return ByteBuffer.wrap(value).getInt();
 	}
 
 	public static long byte2Long(byte[] value) {
@@ -270,10 +276,18 @@ public class ConvertUtil {
 				| (((long) a[6] & 0xFF) << 8) | (((long) a[7] & 0xFF) << 0));
 	}
 
-	public static long byte2Long2(byte[] value) {
+	public static long toLong(byte[] value) {
+		if (value.length < 8) {// 位数不够,前补0
+			byte[] target = new byte[8];
+			int fillZero = target.length - value.length;
+			Arrays.fill(target, 0, fillZero, (byte) 0);
+			System.arraycopy(value, 0, target, value.length, value.length);
+			return ByteBuffer.wrap(target).getLong();
+		}
+
 		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.put(value, 0, value.length);
-		buffer.flip();// need flip
+		buffer.put(value);
+		buffer.flip();
 		return buffer.getLong();
 	}
 
@@ -281,15 +295,39 @@ public class ConvertUtil {
 		return Float.intBitsToFloat(byte2Int(value));
 	}
 
+	public static float toFloat(byte[] value) {
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.put(value);
+		buffer.flip();
+		return buffer.getFloat();
+//		return ByteBuffer.wrap(value).getFloat();
+	}
+
 	public static double byte2Double(byte[] value) {
 		return Double.longBitsToDouble(byte2Long(value));
 	}
 
-	/**
-	 * 字节数组到double的转换.
-	 */
+	public static double toDouble(byte[] value) {
+		if (value.length < 8) {// 位数不够,前补0
+			byte[] target = new byte[8];
+			int fillZero = target.length - value.length;
+			Arrays.fill(target, 0, fillZero, (byte) 0);
+			System.arraycopy(value, 0, target, value.length, value.length);
+			return ByteBuffer.wrap(target).getDouble();
+		}
+
+		ByteBuffer buffer = ByteBuffer.allocate(8);
+		buffer.put(value, 0, value.length);
+		buffer.flip();
+		return buffer.getDouble();
+	}
+
 	public static String byte2String(byte[] value) {
 		return new String(value);
+	}
+
+	public static String toString(byte[] value) {
+		return getString(ByteBuffer.wrap(value), Charset.forName("UTF-8"));
 	}
 
 	/**
@@ -308,15 +346,19 @@ public class ConvertUtil {
 		return sb.toString();
 	}
 
-	public static byte[] ascii2Byte(char value) {
+	public static byte[] char2Byte(char value) {
 		return short2Byte((short) value);
 	}
 
-	public static int ascii2Int(char value) {
+	public static byte[] toByte(char value) {
+		return ByteBuffer.allocate(2).putChar(value).array();
+	}
+
+	public static int char2Int(char value) {
 		return value;
 	}
 
-	public static String ascii2Hex(char value) {
+	public static String char2Hex(char value) {
 		return Integer.toHexString(value);
 	}
 
@@ -326,6 +368,10 @@ public class ConvertUtil {
 		result[0] = (byte) ((value & 0xFF) >> 8);
 		result[1] = (byte) (value & 0xFF);
 		return result;
+	}
+
+	public static byte[] toByte(short value) {
+		return ByteBuffer.allocate(2).putShort(value).array();
 	}
 
 	public static char short2Ascii(short value) {
@@ -339,8 +385,7 @@ public class ConvertUtil {
 	/**
 	 * 转 字节
 	 * 
-	 * @param value
-	 *            58165-->16进制为E335
+	 * @param value 58165-->16进制为E335
 	 * @return
 	 */
 	public static byte[] int2Byte(int value) {
@@ -351,6 +396,10 @@ public class ConvertUtil {
 		result[2] = (byte) ((value & 0xFF) >> 8);
 		result[3] = (byte) (value & 0xFF);
 		return result;
+	}
+
+	public static byte[] toByte(int value) {
+		return ByteBuffer.allocate(4).putInt(value).array();
 	}
 
 	public static char int2Ascii(int value) {
@@ -387,11 +436,8 @@ public class ConvertUtil {
 		return byteNum;
 	}
 
-	public static byte[] long2Byte2(long value) {
-		// 或者
-		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.putLong(0, value);
-		return buffer.array();
+	public static byte[] toByte(long value) {
+		return ByteBuffer.allocate(8).putLong(value).array();
 	}
 
 	public static char long2Ascii(long value) {
@@ -414,6 +460,10 @@ public class ConvertUtil {
 
 	public static byte[] float2Byte(float value) {
 		return int2Byte(Float.floatToIntBits(value));
+	}
+
+	public static byte[] toByte(float value) {
+		return ByteBuffer.allocate(4).putFloat(value).array();
 	}
 
 	public static char float2Ascii(float value) {
@@ -442,6 +492,10 @@ public class ConvertUtil {
 
 	public static byte[] double2Byte(double value) {
 		return long2Byte(Double.doubleToLongBits(value));
+	}
+
+	public static byte[] toByte(double value) {
+		return ByteBuffer.allocate(8).putDouble(value).array();
 	}
 
 	public static char double2Ascii(double value) {
@@ -565,8 +619,7 @@ public class ConvertUtil {
 	/**
 	 * 含有unicode 的字符串转一般字符串
 	 * 
-	 * @param unicodeStr
-	 *            混有 Unicode 的字符串
+	 * @param unicodeStr 混有 Unicode 的字符串
 	 * @return
 	 */
 	public static String unicodeStr2String(String unicodeStr) {
@@ -593,8 +646,7 @@ public class ConvertUtil {
 	/**
 	 * unicode 转字符串
 	 * 
-	 * @param unicode
-	 *            全为 Unicode 的字符串
+	 * @param unicode 全为 Unicode 的字符串
 	 * @return
 	 */
 	public static String unicode2String(String unicode) {
@@ -610,8 +662,35 @@ public class ConvertUtil {
 		return string.toString();
 	}
 
-	public static void main(String[] args) {
-		System.out.println(unicode2String("\\u670D\\u52A1\\u7A97"));
+	/**
+	 * 字符串转ByteBuffer
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static ByteBuffer getByteBuffer(String str) {
+		return ByteBuffer.wrap(str.getBytes());
+	}
+
+	/**
+	 * ByteBuffer转字符串
+	 * 
+	 * @param buffer
+	 * @param charset
+	 * @return
+	 */
+	public static String getString(ByteBuffer buffer, Charset charset) {
+		CharsetDecoder decoder = null;
+		CharBuffer charBuffer = null;
+		try {
+			decoder = charset.newDecoder();
+			// charBuffer = decoder.decode(buffer);//用这个的话，只能输出来一次结果，第二次显示为空
+			charBuffer = decoder.decode(buffer.asReadOnlyBuffer());
+			return charBuffer.toString();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return "";
+		}
 	}
 
 }

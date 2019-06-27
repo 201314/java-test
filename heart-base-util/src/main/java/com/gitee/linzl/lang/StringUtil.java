@@ -7,34 +7,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import io.jsonwebtoken.lang.Collections;
+
 public class StringUtil {
-	// 开始字符，比如字符0
-	private static char startChar = '0';
-	// 结束字符，比如字符Z
-	private static char endChar = 'z';
+	private static String[] chars = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 
-	private static char[] exclusionFirList = null;
-	private static char[] exclusionSecList = null;
-	static {
-		// 除外列表，比如字符9和字符A之间的[:;<=>?]
-		exclusionFirList = new char['A' - '9' - 1];
-		exclusionSecList = new char['a' - 'Z' - 1];
-		for (char cc = '9' + 1; cc < 'A'; cc++) {
-			exclusionFirList[cc - '9' - 1] = cc;
-		}
-		for (char cc = 'Z' + 1; cc < 'a'; cc++) {
-			exclusionSecList[cc - 'Z' - 1] = cc;
-		}
-	}
+			"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+			"V", "W", "X", "Y", "Z",
 
-	public static boolean exclusionArray(char index) {
-		// 刚好在特殊字符范围内
-		if ((exclusionFirList[0] <= index && index <= exclusionFirList[exclusionFirList.length - 1])
-				|| (exclusionSecList[0] <= index && index <= exclusionSecList[exclusionSecList.length - 1])) {
-			return true;
-		}
-		return false;
-	}
+			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+			"v", "w", "x", "y", "z" };
+
+	@SuppressWarnings("unchecked")
+	private static List<String> includeList = Collections.arrayToList(chars);
+
+	private static String[] justNumbers = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+
+	@SuppressWarnings("unchecked")
+	private static List<String> includeNumbers = Collections.arrayToList(justNumbers);
 
 	/**
 	 * 判断source是否与传入参数中的其中一个相等
@@ -58,56 +48,60 @@ public class StringUtil {
 	}
 
 	/**
-	 * 递增字符串，特殊字符除外
+	 * 让一串字符串不断增加,只包含0~9数字
 	 * 
 	 * @param source
+	 * @param step   增长的步长
 	 * @return
 	 */
-	public static String autoIncrease(String source) {
-		return increaseByStep(source, 1);
+	public static String incrementNumeric(String source) {
+		char startChar = '0';
+		char endChar = '9';
+		char[] sourceArray = source.toCharArray();
+
+		for (int ii = sourceArray.length - 1; ii >= 0; ii--) {
+			if (!increment(sourceArray, ii, startChar, endChar, includeNumbers)) {
+				break;
+			}
+		}
+
+		String str = String.valueOf(sourceArray);
+		// if (0 == Long.valueOf(str)) {
+		// // 位数增加
+		// str = 1 + str;
+		// }
+		return str;
 	}
 
 	/**
-	 * 按步长递增字符串，特殊字符除外
+	 * 让一串字符串自增   
 	 * 
 	 * @param source
-	 * @param step
-	 *            增长步长
 	 * @return
 	 */
-	public static String increaseByStep(String source, int step) {
-		char[] inputCharArray = source.toCharArray();
-		boolean carryFlag = false;
-		int length = inputCharArray.length - 1;
-		for (int ii = length; ii >= 0; ii--) {
-			char tempChar = inputCharArray[ii];
-			// 处理第一位
-			if (ii == length) {
-				if (tempChar == endChar) {// 刚好+1要进一位
-					inputCharArray[ii] = startChar;
-					carryFlag = true;
-				} else {
-					do {
-						inputCharArray[ii] += step;
-					} while (exclusionArray(inputCharArray[ii]));
-				}
-			} else {
-				if (carryFlag) {
-					do {
-						inputCharArray[ii] += step;
-					} while (exclusionArray(inputCharArray[ii]));
+	public static String incrementAlphanumeric(String source) {
+		char startChar = '0';
+		char endChar = 'z';
+		char[] sourceArray = source.toCharArray();
 
-					tempChar = inputCharArray[ii];
-					if (tempChar > endChar) {
-						inputCharArray[ii] = startChar;
-						carryFlag = true;
-					} else {
-						carryFlag = false;
-					}
-				}
+		for (int ii = sourceArray.length - 1; ii >= 0; ii--) {
+			if (!increment(sourceArray, ii, startChar, endChar, includeList)) {
+				break;
 			}
 		}
-		return String.valueOf(inputCharArray);
+		return String.valueOf(sourceArray);
+	}
+
+	private static boolean increment(char[] inputCharArray, int ii, char start, char end, List<String> includeList) {
+		char tempChar = inputCharArray[ii];
+		if (tempChar == end) {
+			inputCharArray[ii] = start;
+			return true;
+		}
+		do {
+			tempChar = ++inputCharArray[ii];
+		} while (!includeList.contains(String.valueOf(tempChar)));
+		return false;
 	}
 
 	/**
@@ -231,10 +225,8 @@ public class StringUtil {
 	/**
 	 * 按字节截取字符串
 	 * 
-	 * @param str
-	 *            要截取的字符串 如输入：测试testing嘻嘻
-	 * @param length
-	 *            截取的字符串位数 :12 结果：测试testing...
+	 * @param str    要截取的字符串 如输入：测试testing嘻嘻
+	 * @param length 截取的字符串位数 :12 结果：测试testing...
 	 * @return
 	 */
 	public static String subStringByBytes(String str, int length) {
@@ -274,10 +266,8 @@ public class StringUtil {
 	/**
 	 * 使用StringTokenizer将字符串source以split分割成数组
 	 * 
-	 * @param source
-	 *            字符串
-	 * @param split
-	 *            以某个字符串做为分割规则
+	 * @param source 字符串
+	 * @param split  以某个字符串做为分割规则
 	 * @return
 	 */
 	public static String[] stringToArray(String source, String split) {
@@ -314,10 +304,8 @@ public class StringUtil {
 	/**
 	 * 使用String.split将字符串source以split分割成List集合
 	 * 
-	 * @param source
-	 *            字符串
-	 * @param split
-	 *            以某个字符串做为分割规则
+	 * @param source 字符串
+	 * @param split  以某个字符串做为分割规则
 	 * @return
 	 */
 	public static List<String> splitToList(String source, String split) {
@@ -392,12 +380,9 @@ public class StringUtil {
 	/**
 	 * 左填充
 	 * 
-	 * @param source
-	 *            源数据
-	 * @param fillLength
-	 *            需要填充的长度
-	 * @param pad
-	 *            填充内容
+	 * @param source     源数据
+	 * @param fillLength 需要填充的长度
+	 * @param pad        填充内容
 	 * @return
 	 */
 	public static String appendBefore(String source, int fillLength, String pad) {
@@ -411,12 +396,9 @@ public class StringUtil {
 	/**
 	 * 右填充
 	 * 
-	 * @param source
-	 *            源数据
-	 * @param fillLength
-	 *            需要填充的长度
-	 * @param pad
-	 *            填充内容
+	 * @param source     源数据
+	 * @param fillLength 需要填充的长度
+	 * @param pad        填充内容
 	 * @return
 	 */
 	public static String appendAfter(String source, int fillLength, String pad) {

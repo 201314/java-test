@@ -41,7 +41,7 @@ public class KeyGeneratorUtil {
 	 * @return
 	 */
 	public static String autoIncrease(String src) {
-		return StringUtil.autoIncrease(src);
+		return StringUtil.incrementAlphanumeric(src);
 	}
 
 	/**

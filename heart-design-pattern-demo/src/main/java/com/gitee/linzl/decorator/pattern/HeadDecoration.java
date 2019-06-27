@@ -1,10 +1,15 @@
 package com.gitee.linzl.decorator.pattern;
 
-public class HeadDecoration extends Decoration {
+public class HeadDecoration implements Person {
+	private Person person;
+
+	public HeadDecoration(Person person) {
+		this.person = person;
+	}
 
 	@Override
 	public void dressUp() {
-		monkey.dressUp();
+		person.dressUp();
 		System.out.println("戴头盔");
 	}
 

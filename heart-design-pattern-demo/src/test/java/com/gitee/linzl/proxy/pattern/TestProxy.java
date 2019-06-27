@@ -14,7 +14,8 @@ public class TestProxy {
 	 */
 	@Test
 	public void staticProxyTest() {
-		Subject subject = new StaticSubjectProxy(new RealSubject());
+		// 代理和真实对象的关系在编译时已经确定
+		Subject subject = new StaticSubjectProxy();
 		subject.request();
 	}
 
@@ -23,6 +24,8 @@ public class TestProxy {
 	 */
 	@Test
 	public void dynamicProxyTest() {
+		// 保存生成的代理类
+		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 		// 具体主题角色，也就是被代理类
 		Subject subject = new RealSubject();
 		// 代理实例的handler
@@ -43,5 +46,4 @@ public class TestProxy {
 		// 执行具体主题角色方法
 		subject.request();
 	}
-
 }

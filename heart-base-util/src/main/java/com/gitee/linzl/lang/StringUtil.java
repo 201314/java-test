@@ -2,6 +2,7 @@ package com.gitee.linzl.lang;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,21 +11,22 @@ import java.util.regex.PatternSyntaxException;
 import io.jsonwebtoken.lang.Collections;
 
 public class StringUtil {
-	private static String[] chars = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-
-			"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-			"V", "W", "X", "Y", "Z",
-
-			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
-			"v", "w", "x", "y", "z" };
+	@SuppressWarnings("unchecked")
+	private static List<Character> numerics = Collections
+			.arrayToList(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
 
 	@SuppressWarnings("unchecked")
-	private static List<String> includeList = Collections.arrayToList(chars);
+	private static List<Character> alphabetics = Collections.arrayToList(new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+			'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 
-	private static String[] justNumbers = new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+			'v', 'w', 'x', 'y', 'z' });
 
-	@SuppressWarnings("unchecked")
-	private static List<String> includeNumbers = Collections.arrayToList(justNumbers);
+	private static List<Character> alphanumerics = new ArrayList<>();
+	static {
+		alphanumerics.addAll(numerics);
+		alphanumerics.addAll(alphabetics);
+	}
 
 	/**
 	 * 判断source是否与传入参数中的其中一个相等
@@ -35,7 +37,7 @@ public class StringUtil {
 	 */
 	public static boolean orEquals(String source, String... targets) {
 		boolean flag = false;
-		if (targets == null || targets.length <= 0 || source == null) {
+		if (Objects.isNull(targets) || targets.length <= 0 || Objects.isNull(source)) {
 			return flag;
 		}
 		for (String string : targets) {
@@ -51,57 +53,49 @@ public class StringUtil {
 	 * 让一串字符串不断增加,只包含0~9数字
 	 * 
 	 * @param source
-	 * @param step   增长的步长
 	 * @return
 	 */
 	public static String incrementNumeric(String source) {
-		char startChar = '0';
-		char endChar = '9';
-		char[] sourceArray = source.toCharArray();
-
-		for (int ii = sourceArray.length - 1; ii >= 0; ii--) {
-			if (!increment(sourceArray, ii, startChar, endChar, includeNumbers)) {
-				break;
-			}
-		}
-
-		String str = String.valueOf(sourceArray);
-		// if (0 == Long.valueOf(str)) {
-		// // 位数增加
-		// str = 1 + str;
-		// }
-		return str;
+		return String.valueOf(increment(source.toCharArray(), numerics));
 	}
 
 	/**
-	 * 让一串字符串自增   
+	 * 让一串字符串不断增加,,仅含字母
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static String incrementAlphabetic(String source) {
+		return String.valueOf(increment(source.toCharArray(), alphabetics));
+	}
+
+	/**
+	 * 让一串字符串自增,含字母和数字
 	 * 
 	 * @param source
 	 * @return
 	 */
 	public static String incrementAlphanumeric(String source) {
-		char startChar = '0';
-		char endChar = 'z';
-		char[] sourceArray = source.toCharArray();
-
-		for (int ii = sourceArray.length - 1; ii >= 0; ii--) {
-			if (!increment(sourceArray, ii, startChar, endChar, includeList)) {
-				break;
-			}
-		}
-		return String.valueOf(sourceArray);
+		return String.valueOf(increment(source.toCharArray(), alphanumerics));
 	}
 
-	private static boolean increment(char[] inputCharArray, int ii, char start, char end, List<String> includeList) {
-		char tempChar = inputCharArray[ii];
-		if (tempChar == end) {
-			inputCharArray[ii] = start;
-			return true;
+	private static char[] increment(char[] charArr, List<Character> list) {
+		char start = list.get(0);
+		char end = list.get(list.size() - 1);
+
+		for (int ii = charArr.length - 1; ii >= 0; ii--) {
+			char tempChar = charArr[ii];
+			if (tempChar == end) {
+				charArr[ii] = start;
+				continue;
+			}
+			do {
+				tempChar = ++charArr[ii];
+			} while (!list.contains(tempChar));
+			break;
 		}
-		do {
-			tempChar = ++inputCharArray[ii];
-		} while (!includeList.contains(String.valueOf(tempChar)));
-		return false;
+
+		return charArr;
 	}
 
 	/**
@@ -112,7 +106,7 @@ public class StringUtil {
 	 */
 
 	public static boolean isEmpty(String param) {
-		return param == null ? true : (param.trim().length() > 0 ? false : true);
+		return Objects.isNull(param) ? true : (param.trim().length() > 0 ? false : true);
 	}
 
 	/**
@@ -122,7 +116,7 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String removeBlank(String param) {
-		return param == null ? "" : param.replaceAll("\\s*", "");
+		return Objects.isNull(param) ? "" : param.replaceAll("\\s*", "");
 	}
 
 	/**
@@ -132,8 +126,7 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String onlyOneBlank(String str) {
-		str = str.replaceAll(" +|\t|\r|\n", " ");
-		return str;
+		return str.replaceAll(" +|\t|\r|\n", " ");
 	}
 
 	/**
@@ -193,16 +186,6 @@ public class StringUtil {
 	}
 
 	/**
-	 * 第一个字母大写
-	 * 
-	 * @param param
-	 * @return
-	 */
-	public static String upperFirst(String param) {
-		return upperEnd(param, 1);
-	}
-
-	/**
 	 * 第一个字母小写,其余大写
 	 * 
 	 * @param param
@@ -210,6 +193,16 @@ public class StringUtil {
 	 */
 	public static String lowFirstOtherUpper(String param) {
 		return lowEndOtherUpper(param, 1);
+	}
+
+	/**
+	 * 第一个字母大写
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public static String upperFirst(String param) {
+		return upperEnd(param, 1);
 	}
 
 	/**
@@ -229,7 +222,7 @@ public class StringUtil {
 	 * @param length 截取的字符串位数 :12 结果：测试testing...
 	 * @return
 	 */
-	public static String subStringByBytes(String str, int length) {
+	public static String subByte(String str, int length) {
 		String result = "";
 		int i = 0;
 		int j = 0;
@@ -238,28 +231,28 @@ public class StringUtil {
 		String stmp = "";
 		int len = buff.length();
 		for (i = 0; i < len; i++) {
-			if (j < length) {
-				stmp = buff.substring(i, i + 1);
-				try {
-					stmp = new String(stmp.getBytes("utf-8"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if (stmp.getBytes().length > 1) {
-					j += 2;
-				} else {
-					j += 1;
-				}
-				result += stmp;
-			} else {
+			if (j >= length) {
 				break;
 			}
+
+			stmp = buff.substring(i, i + 1);
+			try {
+				stmp = new String(stmp.getBytes("utf-8"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (stmp.getBytes().length > 1) {
+				j += 2;
+			} else {
+				j += 1;
+			}
+			result += stmp;
 		}
+
 		if (j > length) {
 			result = result.substring(0, result.length() - 1);
 			result += "...";
 		}
-
 		return result;
 	}
 
@@ -273,7 +266,7 @@ public class StringUtil {
 	public static String[] stringToArray(String source, String split) {
 		List<String> tempList = new ArrayList<String>();
 		StringTokenizer stk = null;
-		if (split == null || split.trim().length() <= 0) {
+		if (Objects.isNull(split) || split.trim().length() <= 0) {
 			stk = new StringTokenizer(source);
 		} else {
 			stk = new StringTokenizer(source, split);
@@ -325,7 +318,7 @@ public class StringUtil {
 	 * @return
 	 */
 	public static String arrayToString(Object[] obj, String split) {
-		split = (split == null ? "" : split);
+		split = (Objects.isNull(split) ? "" : split);
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < obj.length; i++) {
 			sb.append(obj[i]).append(split);
@@ -423,10 +416,5 @@ public class StringUtil {
 		Pattern p = Pattern.compile(regEx);
 		Matcher m = p.matcher(str);
 		return m.replaceAll("").trim();
-	}
-
-	public static void main(String[] args) {
-		System.out.println(appendSpaceBefore("hello", 10));
-		System.out.println(appendZeroBefore("哈哈", 9));
 	}
 }

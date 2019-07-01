@@ -29,10 +29,8 @@ public class ToStringBuilder {
 	}
 
 	/**
-	 * @param object
-	 *            要转换成的对象,默认用|隔开
-	 * @param charset
-	 *            内容编码
+	 * @param object  要转换成的对象,默认用|隔开
+	 * @param charset 内容编码
 	 * @return
 	 */
 	public static String toString(Object object, Charset charset) {
@@ -40,12 +38,9 @@ public class ToStringBuilder {
 	}
 
 	/**
-	 * @param object
-	 *            要转换成的对象
-	 * @param charset
-	 *            内容编码
-	 * @param separator
-	 *            每个字段间的分隔符
+	 * @param object    要转换成的对象
+	 * @param charset   内容编码
+	 * @param separator 每个字段间的分隔符
 	 * @return
 	 */
 	public static String toString(Object object, Charset charset, String separator) {
@@ -53,14 +48,10 @@ public class ToStringBuilder {
 	}
 
 	/**
-	 * @param object
-	 *            要转换成的对象
-	 * @param charset
-	 *            内容编码
-	 * @param separator
-	 *            每个字段间的分隔符
-	 * @param end
-	 *            属性拼装完成后的结束符
+	 * @param object    要转换成的对象
+	 * @param charset   内容编码
+	 * @param separator 每个字段间的分隔符
+	 * @param end       属性拼装完成后的结束符
 	 * @return
 	 */
 	public static String toString(Object object, Charset charset, String separator, String end) {
@@ -72,14 +63,14 @@ public class ToStringBuilder {
 			List<Field> fieldList = new ArrayList<>();
 			Field[] fields = clazz.getDeclaredFields();
 			Collections.addAll(fieldList, fields);
-			
+
 			Class tmp = clazz;
 			while (tmp.getSuperclass() != null) {
 				tmp = clazz.getSuperclass();
 				Field[] superFields = tmp.getDeclaredFields();
 				Collections.addAll(fieldList, superFields);
 			}
-		 
+
 			AccessibleObject.setAccessible(fields, true);
 
 			List<Field> list = new ArrayList<>();
@@ -129,8 +120,10 @@ public class ToStringBuilder {
 				}
 
 				Class<? extends Encrypt> enCls = fileField.encrypt();
-				Encrypt encrypt = enCls.newInstance();
-				value = encrypt.encrypt(value);
+				if (enCls != NoneEncrypt.class) {
+					Encrypt encrypt = enCls.newInstance();
+					value = encrypt.encrypt(value);
+				}
 
 				sb.append(value).append(separator);
 			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
@@ -141,14 +134,10 @@ public class ToStringBuilder {
 	}
 
 	/**
-	 * @param source
-	 *            源数据
-	 * @param minusLength
-	 *            需要填充的长度
-	 * @param fill
-	 *            填充的内容
-	 * @param direct
-	 *            填充的位置
+	 * @param source      源数据
+	 * @param minusLength 需要填充的长度
+	 * @param fill        填充的内容
+	 * @param direct      填充的位置
 	 * @return
 	 */
 	public static String append(String source, int minusLength, String fill, PaddingDirection direct) {

@@ -20,12 +20,9 @@ public class ToObjectBuilder {
 
 	/**
 	 * @param content
-	 * @param charset
-	 *            编码
-	 * @param separator
-	 *            每个字段间的分隔符
-	 * @param end
-	 *            属性拼装完成后的结束符
+	 * @param charset   编码
+	 * @param separator 每个字段间的分隔符
+	 * @param end       属性拼装完成后的结束符
 	 * @return
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
@@ -79,9 +76,11 @@ public class ToObjectBuilder {
 
 			String value = columns[index];
 			try {
-				Class<? extends Encrypt> enCls = fileField.encrypt();
-				Encrypt encrypt = enCls.newInstance();
-				value = encrypt.encrypt(value);
+				Class<? extends Encrypt> deCls = fileField.encrypt();
+				if (deCls != NoneDecrypt.class) {
+					Encrypt encrypt = deCls.newInstance();
+					value = encrypt.encrypt(value);
+				}
 
 				String format = fileField.format();
 				if (field.getType().isAssignableFrom(LocalDateTime.class)) {

@@ -24,6 +24,8 @@ public class User {
 	 */
 	private boolean gender;
 
+	private String CPU;
+
 	public String getName() {
 		return name;
 	}
@@ -67,6 +69,14 @@ public class User {
 
 	public void setGender(boolean gender) {
 		this.gender = gender;
+	}
+
+	public String getCPU() {
+		return CPU;
+	}
+
+	public void setCPU(String cPU) {
+		CPU = cPU;
 	}
 
 }

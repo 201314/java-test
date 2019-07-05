@@ -21,7 +21,6 @@ public class MethodUtil {
 		Method assignMethod = demo.getDeclaredMethod("sayThreeParam", methodParam);
 		System.out.println("返回该类声明的指定类型的方法--->" + assignMethod.getName());
 
-
 		// 返回该类包括继承下来的指定名称的公共方法
 		Class[] assignPublicParam = new Class[] { String.class };
 		Method assignPublicMethod = demo.getMethod("FirstAbstractMethod", assignPublicParam);
@@ -31,5 +30,7 @@ public class MethodUtil {
 //		for (int i = 0; i < allPublicMethods.length; i++) {
 //			System.out.println("返回该类包括继承下来的所有公共方法-->" + allPublicMethods[i]);
 //		}
+
+		System.out.println(assignPublicMethod.getGenericReturnType().getTypeName());
 	}
 }

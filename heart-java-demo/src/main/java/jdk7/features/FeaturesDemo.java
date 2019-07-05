@@ -122,4 +122,13 @@ public class FeaturesDemo {
 		byte nybbles = 0b0010_0101;
 		long bytes = 0b11010010_01101001_10010100_10010010;
 	}
+
+	@Test
+	public void testIntern() {
+		String c = new String("中国人").intern();
+		String a = "中国人";
+		String b = a.intern();
+		System.out.println(a == b);
+		System.out.println(c == b);
+	}
 }

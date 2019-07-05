@@ -2,7 +2,7 @@ package day09.classloader;
 
 import org.junit.Test;
 
-import com.gitee.linzl.classloader.MyClassLoader;
+import com.gitee.linzl.classloader.hotload.MyClassLoader;
 
 /*
  * 对于任意一个类，由加载它的ClassLoader和它本身决定了在jvm虚拟机中的唯一性。
@@ -21,8 +21,8 @@ public class ClassLoaderTest {
 	@Test
 	public void diyClassLoader() throws Exception {
 		// 自定义ClassLoader
-		ClassLoader myLoader = new MyClassLoader();
-		Class<?> clazz = myLoader.loadClass("day09.classloader.ClassLoaderModel");
+		ClassLoader myLoader = new MyClassLoader(null);
+		Class<?> clazz = myLoader.loadClass("com.gitee.linzl.classloader.hotload.LoadInfo");
 		Object obj = clazz.newInstance();
 		// 打印自定义ClassLoader加载的Class对象
 		System.out.println(obj.getClass());
@@ -34,8 +34,8 @@ public class ClassLoaderTest {
 	@Test
 	public void changeClassLoader() throws Exception {
 		// 自定义ClassLoader
-		ClassLoader myLoader = new MyClassLoader();
-		Class<?> clazz = myLoader.loadClass("day09.classloader.ClassLoaderModel");
+		ClassLoader myLoader = new MyClassLoader(null);
+		Class<?> clazz = myLoader.loadClass("com.gitee.linzl.classloader.hotload.LoadInfo");
 		Object obj = clazz.newInstance();
 		// 打印自定义ClassLoader加载的Class对象
 		System.out.println(obj.getClass());
@@ -58,6 +58,5 @@ public class ClassLoaderTest {
 		});
 		t.start();
 		Thread.sleep(3000);
-
 	}
 }

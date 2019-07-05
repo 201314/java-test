@@ -2,10 +2,10 @@ package com.gitee.linzl.proxy.pattern;
 
 import org.junit.Test;
 
-import com.gitee.linzl.proxy.dynamic.pattern.DynamicProxyTest;
+import com.gitee.linzl.proxy.dynamic.pattern.DynamicProxy;
 import com.gitee.linzl.proxy.dynamic.pattern.TestAdvise;
-import com.gitee.linzl.proxy.statics.pattern.RealSubject;
 import com.gitee.linzl.proxy.statics.pattern.RealCglibProxySubject;
+import com.gitee.linzl.proxy.statics.pattern.RealSubject;
 import com.gitee.linzl.proxy.statics.pattern.StaticSubjectProxy;
 import com.gitee.linzl.proxy.statics.pattern.Subject;
 
@@ -24,13 +24,13 @@ public class TestProxy {
 	 * jdk动态代理测试，只能针对实现了接口的类进行代理
 	 */
 	@Test
-	public void dynamicProxyTest() {
+	public void DynamicProxy() {
 		// 保存生成的代理类
 		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 		// 具体主题角色，也就是被代理类
 		Subject subject = new RealSubject();
 
-		DynamicProxyTest test = new DynamicProxyTest();
+		DynamicProxy test = new DynamicProxy();
 		Subject proxy = (Subject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
 		proxy.request();
@@ -43,7 +43,7 @@ public class TestProxy {
 	public void cglibProxyTest() {
 		Subject subject = new RealCglibProxySubject();
 
-		DynamicProxyTest test = new DynamicProxyTest();
+		DynamicProxy test = new DynamicProxy();
 		Subject proxy = (Subject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
 		proxy.request();

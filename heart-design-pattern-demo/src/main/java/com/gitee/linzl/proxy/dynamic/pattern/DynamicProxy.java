@@ -23,9 +23,9 @@ import net.sf.cglib.proxy.MethodProxy;
  * 
  * @author linzl
  */
-public class DynamicProxyTest {
+public class DynamicProxy {
 	public Object process(Object obj, Advise adv) {
-		if (obj.getClass().isInterface()) {
+		if (obj.getClass().isInterface() || Proxy.class.isAssignableFrom(obj.getClass())) {
 			return javaProxy(obj, adv);
 		}
 		return cglibProxy(obj, adv);
@@ -95,7 +95,7 @@ public class DynamicProxyTest {
 		// 保存生成的代理类 ,直接搜索名字 $Proxy开头的class
 		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 
-		DynamicProxyTest test = new DynamicProxyTest();
+		DynamicProxy test = new DynamicProxy();
 		Subject proxy = (Subject) test.process(new RealSubject(), new TestAdvise());
 		proxy.request();
 	}

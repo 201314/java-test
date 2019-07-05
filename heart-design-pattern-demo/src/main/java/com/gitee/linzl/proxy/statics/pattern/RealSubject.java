@@ -8,7 +8,8 @@ package com.gitee.linzl.proxy.statics.pattern;
  */
 public class RealSubject implements Subject {
 	@Override
-	public void request() {
-		System.out.println("RealSubject具体处理业务");
+	public String request() {
+		System.out.println("javaProxy具体处理业务");
+		return "我是javaProxy返回值";
 	}
 }

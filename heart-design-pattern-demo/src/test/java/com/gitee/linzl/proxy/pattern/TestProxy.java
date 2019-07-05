@@ -2,9 +2,10 @@ package com.gitee.linzl.proxy.pattern;
 
 import org.junit.Test;
 
-import com.gitee.linzl.proxy.dynamic.pattern.CglibProxy;
-import com.gitee.linzl.proxy.dynamic.pattern.JDKDynamicProxy;
+import com.gitee.linzl.proxy.dynamic.pattern.DynamicProxyTest;
+import com.gitee.linzl.proxy.dynamic.pattern.TestAdvise;
 import com.gitee.linzl.proxy.statics.pattern.RealSubject;
+import com.gitee.linzl.proxy.statics.pattern.RealCglibProxySubject;
 import com.gitee.linzl.proxy.statics.pattern.StaticSubjectProxy;
 import com.gitee.linzl.proxy.statics.pattern.Subject;
 
@@ -28,22 +29,23 @@ public class TestProxy {
 		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 		// 具体主题角色，也就是被代理类
 		Subject subject = new RealSubject();
-		// 代理实例的handler
-		JDKDynamicProxy handler = new JDKDynamicProxy();
-		Subject proxy = (Subject) handler.getInstance(subject);
+
+		DynamicProxyTest test = new DynamicProxyTest();
+		Subject proxy = (Subject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
 		proxy.request();
 	}
 
 	/**
-	 * cglib动态代理测试，针对类进行动态代理，不能针对final 类
+	 * cglib动态代理测试，针对类进行动态代理，不能针对final类
 	 */
 	@Test
 	public void cglibProxyTest() {
-		RealSubject realSubject = new RealSubject();
-		CglibProxy proxy = new CglibProxy();
-		Subject subject = (Subject) proxy.getInstance(realSubject);
+		Subject subject = new RealCglibProxySubject();
+
+		DynamicProxyTest test = new DynamicProxyTest();
+		Subject proxy = (Subject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
-		subject.request();
+		proxy.request();
 	}
 }

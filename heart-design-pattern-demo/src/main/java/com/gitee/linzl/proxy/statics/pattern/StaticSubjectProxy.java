@@ -21,10 +21,11 @@ public class StaticSubjectProxy implements Subject {
 	}
 
 	@Override
-	public void request() {
+	public String request() {
 		before();
-		subject.request();
+		String result = subject.request();
 		after();
+		return result;
 	}
 
 	private void before() {

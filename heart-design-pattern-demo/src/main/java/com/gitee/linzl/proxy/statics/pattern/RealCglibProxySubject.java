@@ -6,8 +6,7 @@ package com.gitee.linzl.proxy.statics.pattern;
  * @author linzl
  * 
  */
-public class RealCglibProxySubject implements Subject {
-	@Override
+public class RealCglibProxySubject {
 	public String request() {
 		System.out.println("cglibProxy具体处理业务");
 		return "我是cglibProxy返回值";

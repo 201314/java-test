@@ -24,7 +24,7 @@ public class TestProxy {
 	 * jdk动态代理测试，只能针对实现了接口的类进行代理
 	 */
 	@Test
-	public void DynamicProxy() {
+	public void jdkProxyTest() {
 		// 保存生成的代理类
 		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
 		// 具体主题角色，也就是被代理类
@@ -41,10 +41,10 @@ public class TestProxy {
 	 */
 	@Test
 	public void cglibProxyTest() {
-		Subject subject = new RealCglibProxySubject();
+		RealCglibProxySubject subject = new RealCglibProxySubject();
 
 		DynamicProxy test = new DynamicProxy();
-		Subject proxy = (Subject) test.process(subject, new TestAdvise());
+		RealCglibProxySubject proxy = (RealCglibProxySubject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
 		proxy.request();
 	}

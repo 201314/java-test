@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -16,23 +17,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ToObjectBuilder {
 	// 类名，对应的字段
-	public static final Map<String, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
+	public static final Map<Class<?>, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
 
 	/**
-	 * @param content
-	 * @param charset   编码
+	 * @param content   内容
+	 * @param clazz     转换成对应的类
 	 * @param separator 每个字段间的分隔符
 	 * @param end       属性拼装完成后的结束符
 	 * @return
-	 * @throws SecurityException
 	 * @throws NoSuchFieldException
-	 * @throws IllegalAccessException
+	 * @throws SecurityException
 	 * @throws InstantiationException
+	 * @throws IllegalAccessException
 	 */
-	public static <T> T toObject(int start, String content, Class<T> clazz, String separator, String end)
+	public static <T> T toObject(String content, Class<T> clazz, String separator, String end)
 			throws NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
-		String fullPath = clazz.getName();
-		Field[] cacheFields = declaredFieldsCache.get(fullPath);
+//		String fullPath = clazz.getName();
+		Field[] cacheFields = declaredFieldsCache.get(clazz);
 		if (cacheFields == null) {// 未缓存
 			System.out.println("未缓存");
 			List<Field> fieldList = new ArrayList<>();
@@ -60,7 +61,7 @@ public class ToObjectBuilder {
 						second.getAnnotation(FileField.class).order());
 			});
 			cacheFields = list.toArray(new Field[0]);
-			declaredFieldsCache.put(fullPath, cacheFields);
+			declaredFieldsCache.put(clazz, cacheFields);
 		} else {
 			System.out.println("已经缓存");
 		}
@@ -116,5 +117,16 @@ public class ToObjectBuilder {
 			}
 		}
 		return obj;
+	}
+
+	public static void main(String[] args) {
+		int[] a = new int[] { 1, 3, 4 };
+		System.out.println(a.getClass());
+		System.out.println("a:" + Arrays.asList(a));
+		String[] b = new String[] { "aa", "bb" };
+		System.out.println("b:" + Arrays.asList(b));
+		Integer[] c = new Integer[] { 1, 3, 4 };
+		System.out.println(c.getClass());
+		System.out.println("c:" + Arrays.asList(c));
 	}
 }

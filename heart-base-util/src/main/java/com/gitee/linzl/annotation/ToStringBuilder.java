@@ -16,7 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ToStringBuilder {
 	// 类名，对应的字段
-	public static final Map<String, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
+	public static final Map<Class<?>, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
+//			Collections
+//			.synchronizedMap(new IdentityHashMap<Class<?>, Field[]>(256));
 
 	/**
 	 * 默认采用gb2312
@@ -56,8 +58,7 @@ public class ToStringBuilder {
 	 */
 	public static String toString(Object object, Charset charset, String separator, String end) {
 		Class<?> clazz = object.getClass();
-		String fullPath = clazz.getName();
-		Field[] cacheFields = declaredFieldsCache.get(fullPath);
+		Field[] cacheFields = declaredFieldsCache.get(clazz);
 		if (cacheFields == null) {// 未缓存
 			System.out.println("未缓存");
 			List<Field> fieldList = new ArrayList<>();
@@ -86,7 +87,7 @@ public class ToStringBuilder {
 						second.getAnnotation(FileField.class).order());
 			});
 			cacheFields = list.toArray(new Field[0]);
-			declaredFieldsCache.put(fullPath, cacheFields);
+			declaredFieldsCache.put(clazz, cacheFields);
 		} else {
 			System.out.println("已经缓存");
 		}

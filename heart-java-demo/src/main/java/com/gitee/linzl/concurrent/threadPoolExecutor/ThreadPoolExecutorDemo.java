@@ -102,10 +102,8 @@ public class ThreadPoolExecutorDemo {
 		System.out.println(tp.getPoolSize());
 
 		for (int i = 0; i < 20; i++) {
-			tp.execute(new Runnable() {
-				public void run() {
-					vector.add(random.nextInt());
-				}
+			tp.execute(() -> {
+				vector.add(random.nextInt());
 			});
 		}
 
@@ -120,5 +118,4 @@ public class ThreadPoolExecutorDemo {
 		System.out.println("活动的线程数：" + tp.getActiveCount());
 		System.out.println("list大小：" + vector.size());
 	}
-
 }

@@ -9,13 +9,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPoolTest {
-
+	/**
+	 * 在使用有界队列时，若有新的任务需要执行，如果线程池实际线程数小于corePoolSize，则优先创建线程，
+	 * 若大于corePoolSize则会将任务加入队列， 若队列已满，则在总线程数不大于maximumPoolSize的前提下，创建新的线程，
+	 * 若线程数大于maximumPoolSize，则执行拒绝策略或其他自定义方式。
+	 * 
+	 */
 	private ThreadPoolExecutor pool = new ThreadPoolExecutor(1, // 非频繁执行，核心线程数就1个。
-			17, // 最大线程数，一般为服务器核心数*2+1
+			3, // 最大线程数，一般为服务器核心数*2+1
 			60, // 线程池中超过核心线程数的线程存活时间
 			TimeUnit.MINUTES, // 存活时间单位，秒
-			new ArrayBlockingQueue<Runnable>(10), // 10容量的阻塞队列，视具体情况而定
-			new MatCapitalApplyTransferThreadFactory(), // 线程工厂
+			new ArrayBlockingQueue<Runnable>(4), // 4容量的阻塞队列，视具体情况而定
+			new MatCapitalApplyTransferThreadFactory(), // 线程工厂,统一设置参数
 			new MatCapitalApplyTransferExecutionHandler());// 超过最大线程数时，线程池将会把线程交给RejectedExecutionHandler处理
 
 	public void destory() {
@@ -35,7 +40,6 @@ public class ThreadPoolTest {
 		public Thread newThread(Runnable r) {
 			Thread t = new Thread(r);
 			String threadName = ThreadPoolTest.class.getSimpleName() + count.addAndGet(1);
-			System.out.println(threadName);
 			t.setName(threadName);
 			return t;
 		}
@@ -47,8 +51,8 @@ public class ThreadPoolTest {
 			try {
 				// 当发生运行线程数超出最大线程数时，线程池将会交给RejectedExecutionHandler处理，
 				// 此时我们应该继续将该线程重新放入阻塞队列，从而保证每一个任务都得到处理。
-				System.out.println("最大核心线程数：" + executor.getCorePoolSize() + " 最大系统线程数：" + executor.getMaximumPoolSize()
-						+ "  当前系统线程数" + executor.getPoolSize());
+				System.out.println("当前线程:" + r.toString() + ",最大核心线程数：" + executor.getCorePoolSize() + ",最大系统线程数："
+						+ executor.getMaximumPoolSize() + ",当前系统线程数" + executor.getPoolSize());
 				executor.getQueue().put(r);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -62,16 +66,13 @@ public class ThreadPoolTest {
 
 		ExecutorService pool = exec.getPool();
 		for (int i = 1; i < 100; i++) {
-			System.out.println("提交第" + i + "个任务!");
-			pool.execute(new Runnable() {
-				@Override
-				public void run() {
-					System.out.println(">>>task is running=====");
-					try {
-						TimeUnit.SECONDS.sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+			final int taskId = i;
+			pool.execute(() -> {
+				System.out.println("第" + taskId + "个task is running=====");
+				try {
+					TimeUnit.SECONDS.sleep(2);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			});
 		}

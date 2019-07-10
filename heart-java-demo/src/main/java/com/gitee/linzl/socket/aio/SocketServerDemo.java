@@ -13,6 +13,12 @@ import java.util.concurrent.ExecutionException;
 
 public class SocketServerDemo {
 	public static void main(String[] args) throws IOException {
+		// 创建一个缓存池
+//		executorService = Executors.newCachedThreadPool();
+		// 创建线程组
+//		threadGroup = AsynchronousChannelGroup.withCachedThreadPool(executorService, 1);
+//		AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open(threadGroup);
+
 		try (
 				// 1.初始化socket server端，并绑定端口
 				AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open()

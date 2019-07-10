@@ -3,6 +3,8 @@ package com.gitee.linzl.concurrent.locks;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  * @description 解决synchronized读读之间互斥的性能问题，做到读和读互不影响，读和写互斥，写和写互斥
@@ -12,50 +14,44 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ReadAndWriteLock {
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	private ReadLock readLock = lock.readLock();
+	private WriteLock writeLock = lock.writeLock();
 
 	// 读操作
-	public void readFile(Thread thread) {
-		lock.readLock().lock();
-		boolean readLock = lock.isWriteLocked();
-		if (!readLock) {
+	public void readFile(String name) {
+		readLock.lock();
+		boolean writeLocked = lock.isWriteLocked();
+		if (!writeLocked) {
 			System.out.println("当前为读锁！");
 		}
 		try {
-			for (int i = 0; i < 5; i++) {
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println(thread.getName() + ":正在进行读操作……");
-			}
-			System.out.println(thread.getName() + ":读操作完毕！");
+			System.out.println(name + ":正在进行读操作……");
+			Thread.sleep(3000);
+			System.out.println(name + ":读操作完毕！");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			System.out.println("释放读锁！");
-			lock.readLock().unlock();
+			readLock.unlock();
 		}
 	}
 
 	// 写操作
-	public void writeFile(Thread thread) {
-		lock.writeLock().lock();
-		boolean writeLock = lock.isWriteLocked();
-		if (writeLock) {
+	public void writeFile(String name) {
+		writeLock.lock();
+		boolean writeLocked = lock.isWriteLocked();
+		if (writeLocked) {
 			System.out.println("当前为写锁！");
 		}
 		try {
-			for (int i = 0; i < 5; i++) {
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println(thread.getName() + ":正在进行写操作……");
-			}
-			System.out.println(thread.getName() + ":写操作完毕！");
+			System.out.println(name + ":正在进行写操作……");
+			Thread.sleep(3000);
+			System.out.println(name + ":写操作完毕！");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			System.out.println("释放写锁！");
-			lock.writeLock().unlock();
+			writeLock.unlock();
 		}
 	}
 
@@ -63,31 +59,24 @@ public class ReadAndWriteLock {
 		final ReadAndWriteLock lock = new ReadAndWriteLock();
 		// 建N个线程，同时读
 		ExecutorService excute = Executors.newCachedThreadPool();
-		excute.execute(new Runnable() {// 两个读锁，不互斥
-			@Override
-			public void run() {
-				lock.readFile(Thread.currentThread());
-			}
+		Thread t1 = new Thread(() -> {
+			lock.readFile("我是读T111");
 		});
-		excute.execute(new Runnable() {// 两个读锁，不互斥
-			@Override
-			public void run() {
-				lock.readFile(Thread.currentThread());
-			}
+		Thread t2 = new Thread(() -> {
+			lock.readFile("我是读T222");
 		});
-
-		excute.execute(new Runnable() {// 写锁与读锁、写锁互斥
-			@Override
-			public void run() {
-				lock.writeFile(Thread.currentThread());
-			}
+		Thread t3 = new Thread(() -> {
+			lock.writeFile("我是写T333");
 		});
-		excute.execute(new Runnable() {// 写锁与读锁、写锁互斥
-			@Override
-			public void run() {
-				lock.writeFile(Thread.currentThread());
-			}
+		Thread t4 = new Thread(() -> {
+			lock.writeFile("我是写T444");
 		});
+		// 两个读锁，不互斥
+		excute.execute(t1);
+		// 两个读锁，不互斥
+		excute.execute(t2);
+		// 只要出现写就互斥
+		excute.execute(t3);
+		excute.execute(t4);
 	}
-
 }

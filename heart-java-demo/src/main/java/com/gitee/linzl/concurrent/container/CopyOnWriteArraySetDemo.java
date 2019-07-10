@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.abstractCollection;
+package com.gitee.linzl.concurrent.container;
 
 /**
  * 底层是使用CopyOnWriteArrayList来完成的

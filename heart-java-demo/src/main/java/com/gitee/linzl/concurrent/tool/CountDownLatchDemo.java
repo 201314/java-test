@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.countDownLatch;
+package com.gitee.linzl.concurrent.tool;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -19,7 +19,14 @@ public class CountDownLatchDemo {
 
 		for (int i = 0; i < N; ++i) {
 			// create and start threads
-			Thread thread = new Thread(new Worker(startSignal, doneSignal));
+			Thread thread = new Thread(() -> {
+				try {
+					startSignal.await();// 因为此处设置了等待，所以只有startSignal执行了countDown才会往下走
+					System.out.println("当前线程=" + Thread.currentThread().getName());
+					doneSignal.countDown();
+				} catch (InterruptedException ex) {
+				}
+			});
 			thread.setName("线程-" + i);
 			thread.start();
 		}
@@ -33,29 +40,5 @@ public class CountDownLatchDemo {
 
 	public static void doSomethingElse(String message) {
 		System.out.println(message);
-	}
-
-}
-
-class Worker implements Runnable {
-	private final CountDownLatch startSignal;
-	private final CountDownLatch doneSignal;
-
-	Worker(CountDownLatch startSignal, CountDownLatch doneSignal) {
-		this.startSignal = startSignal;
-		this.doneSignal = doneSignal;
-	}
-
-	public void run() {
-		try {
-			startSignal.await();// 因为此处设置了等待，所以只有startSignal执行了countDown才会往下走
-			doWork();
-			doneSignal.countDown();
-		} catch (InterruptedException ex) {
-		}
-	}
-
-	void doWork() {
-		System.out.println("当前线程=" + Thread.currentThread().getName());
 	}
 }

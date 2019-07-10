@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.abstractCollection;
+package com.gitee.linzl.concurrent.container;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,14 +52,14 @@ public class CopyOnWriteArrayListDemo {
 		a.add("a");
 		a.add("b");
 		a.add("c");
-		final CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<String>(a);
+		CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<String>(a);
 		Thread t = new Thread(new Runnable() {
 			int count = -1;
 
 			@Override
 			public void run() {
-				while (true) {
-					list.add(count++ + "");
+				while (count < 10) {
+					list.add(String.valueOf(count++));
 				}
 			}
 		});

@@ -22,7 +22,7 @@ public class RecursiveTaskDemo2 extends RecursiveTask<Integer> {
 	final int end;
 	final List<Integer> list;
 
-	RecursiveTaskDemo2(int start, int end, List<Integer> list) {
+	public RecursiveTaskDemo2(int start, int end, List<Integer> list) {
 		this.start = start;
 		this.end = end;
 		this.list = list;

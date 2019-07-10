@@ -6,9 +6,9 @@ import java.util.concurrent.RecursiveTask;
 
 public class RecursiveTaskDemo extends RecursiveTask<Integer> {
 	private static final long serialVersionUID = 9129602819316319630L;
-	final int n;
+	private final int n;
 
-	RecursiveTaskDemo(int n) {
+	public RecursiveTaskDemo(int n) {
 		this.n = n;
 	}
 

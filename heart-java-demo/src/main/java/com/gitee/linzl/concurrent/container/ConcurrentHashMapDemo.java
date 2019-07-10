@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.abstractMap;
+package com.gitee.linzl.concurrent.container;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,20 +20,17 @@ public class ConcurrentHashMapDemo {
 		Map<String, Integer> count = new ConcurrentHashMap<>();
 		CountDownLatch endLatch = new CountDownLatch(2);
 
-		Runnable task = new Runnable() {
-			@Override
-			public void run() {
-				for (int i = 0; i < 5; i++) {
-					Integer value = count.get("a");
-					// 以下复合操作，在并发情况下，会出现意外
-					if (null == value) {
-						count.put("a", 1);
-					} else {
-						count.put("a", value + 1);
-					}
+		Runnable task = () -> {
+			for (int i = 0; i < 5; i++) {
+				Integer value = count.get("a");
+				// 以下复合操作，在并发情况下，会出现意外
+				if (null == value) {
+					count.put("a", 1);
+				} else {
+					count.put("a", value + 1);
 				}
-				endLatch.countDown();
 			}
+			endLatch.countDown();
 		};
 		new Thread(task).start();
 		new Thread(task).start();
@@ -50,23 +47,20 @@ public class ConcurrentHashMapDemo {
 		Map<String, AtomicInteger> count = new ConcurrentHashMap<>();
 		CountDownLatch endLatch = new CountDownLatch(2);
 
-		Runnable task = new Runnable() {
-			@Override
-			public void run() {
-				for (int i = 0; i < 5; i++) {
-					AtomicInteger value = count.get("a");
-					System.out.println("value:" + value);
-					if (null == value) {
-						AtomicInteger atomic = new AtomicInteger(1);
-						AtomicInteger now = count.putIfAbsent("a", atomic);
-						System.out.println("now:" + now);
-					} else {
-						value.incrementAndGet();
-						System.out.println("putIfAbsent:" + count);
-					}
+		Runnable task = () -> {
+			for (int i = 0; i < 5; i++) {
+				AtomicInteger value = count.get("a");
+				System.out.println("value:" + value);
+				if (null == value) {
+					AtomicInteger atomic = new AtomicInteger(1);
+					AtomicInteger now = count.putIfAbsent("a", atomic);
+					System.out.println("now:" + now);
+				} else {
+					value.incrementAndGet();
+					System.out.println("putIfAbsent:" + count);
 				}
-				endLatch.countDown();
 			}
+			endLatch.countDown();
 		};
 		new Thread(task).start();
 		new Thread(task).start();

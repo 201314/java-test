@@ -46,6 +46,7 @@ public class SocketServerChannelDemo {
 			int selectNum = selector.select();
 			Set<SelectionKey> set = selector.selectedKeys();
 			Iterator<SelectionKey> iter = set.iterator();
+			// 如果此值永远为false,将会出现空轮询BUG
 			while (iter.hasNext()) {
 				SelectionKey key = iter.next();
 				iter.remove();// 确保不重复

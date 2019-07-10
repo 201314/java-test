@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.semaphore;
+package com.gitee.linzl.concurrent.tool;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,25 +22,21 @@ public class SemaphoreDemo {
 		ExecutorService pool = Executors.newCachedThreadPool();
 		Runnable r = () -> {
 			try {
-				avialable.acquire(); // 此方法阻塞
+				avialable.acquire(); // 此方法阻塞,直到获取许可
 				Thread.sleep(10 * 1000);
-				System.out.println(getNow() + "--" + Thread.currentThread().getName() + "--执行完毕");
-				avialable.release();
+				System.out.println(new SimpleDateFormat("mm:ss").format(new Date()) + "--"
+						+ Thread.currentThread().getName() + "--执行完毕");
+				avialable.release();// 访问完后，释放
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		};
 
-		System.out.println(avialable.availablePermits());
+		System.out.println("前：" + avialable.availablePermits());
 		for (int i = 0; i < 10; i++) {
 			pool.execute(r);
 		}
-		System.out.println(avialable.availablePermits());
+		System.out.println("后：" + avialable.availablePermits());
 		pool.shutdown();
-	}
-
-	public static String getNow() {
-		SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-		return sdf.format(new Date());
 	}
 }

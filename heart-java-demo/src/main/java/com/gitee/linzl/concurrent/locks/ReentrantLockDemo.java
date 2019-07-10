@@ -44,13 +44,9 @@ public class ReentrantLockDemo {
 		ReentrantLockDemo test = new ReentrantLockDemo();
 		// 开启30个线程进行累加操作
 		for (int i = 0; i < 30; i++) {
-			new Thread() {
-				public void run() {
-					// for (int j = 0; j < 5; j++) {
-					test.add();
-					// }
-				}
-			}.start();
+			new Thread(() -> {
+				test.add();
+			}).start();
 		}
 	}
 }

@@ -27,6 +27,8 @@ public class SocketClientDemo {
 //				socketChannel.read(dst, attachment, handler);//可使用回调方式
 				if (readCnt > 0) {
 					readBuf.flip();
+//					byte[] respByte = new byte[readBuf.remaining()];
+//					readBuf.get(respByte);
 					System.out.println("【AIO客户端】收到服务端响应的数据:" + getString(readBuf));
 				}
 			}

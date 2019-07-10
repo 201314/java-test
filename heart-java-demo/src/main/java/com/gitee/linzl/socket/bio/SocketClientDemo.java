@@ -18,7 +18,7 @@ public class SocketClientDemo {
 	 */
 	public static void baseString() throws UnknownHostException, IOException {
 		// 1.初始化socket客户端
-		Socket socket = new Socket("127.0.0.1", 8088);
+		Socket socket = new Socket("127.0.0.1", 8765);
 		// 2.获取输出流
 		OutputStream os = socket.getOutputStream();
 		os.write("我是中国人".getBytes());
@@ -72,5 +72,6 @@ public class SocketClientDemo {
 	}
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
+		baseString();
 	}
 }

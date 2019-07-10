@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 /**
  * 增加日志和计时功能的线程池
  * 
+ * 实际应用中对ThreadPoolExecutor进行扩展，可以实现对线程池运行状态的跟踪，输出一些有用的调试，帮助系统故障诊断
+ * 
  * @description
  * @author linzl
  * @email 2225010489@qq.com

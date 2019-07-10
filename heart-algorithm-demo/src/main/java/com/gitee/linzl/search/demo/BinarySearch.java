@@ -6,8 +6,7 @@ import java.util.Arrays;
  * 分析：折半查找算法要求元素有序（通常是升序）并使用顺序存储。 其核心思想是:将查找区域分成两部分，每次与中间码进行比较，如果等于则直接返回;
  * 如果大于则查找右半部分;如果小于则查找左半部分。依次重复这个过程，直到查找成功或失败。
  * 
- * @param args
- *            折半查找
+ * @param args 折半查找
  */
 public class BinarySearch {
 	public static int findNum(int a[], int key) {
@@ -15,12 +14,13 @@ public class BinarySearch {
 		int high = a.length - 1;
 		while (low <= high) {
 			int mid = (low + high) / 2;
-			if (key > a[mid])
+			if (key > a[mid]) {
 				low = mid++; // 后半部分，下标最小为mid++
-			else if (mid < a[mid])
+			} else if (mid < a[mid]) {
 				high = mid--;// 后半部分，下标最大为mid--
-			else
+			} else {
 				return mid;
+			}
 		}
 		return -1;// Not found
 	}

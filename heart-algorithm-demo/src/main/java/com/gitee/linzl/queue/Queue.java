@@ -27,11 +27,10 @@ public class Queue {
 
 	/** * 初期化一个指定大小的数组 * * @param int */
 	public Queue(int number) {
-		if (number > 0) {
-			this.objs = new Object[number];
-		} else {
-			this.objs = new Object[DEFUALT_LENGTH];
+		if (number <= 0) {
+			number = DEFUALT_LENGTH;
 		}
+		this.objs = new Object[number];
 	}
 
 	/**
@@ -58,7 +57,8 @@ public class Queue {
 	public Object deQueue() {
 		if (isEmpty()) {
 			return null;
-		} else if (isAQuarter()) {
+		}
+		if (isAQuarter()) {
 			reduce();
 		}
 		Object tempObj = this.objs[this.head];

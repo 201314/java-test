@@ -1,27 +1,24 @@
 package com.gitee.linzl.demo;
 
+import java.util.Comparator;
+
 public class ComparatorDemo {
-	public static <AnyType> AnyType findMax(AnyType[] arr, Comparator<? super AnyType> cmp) {
+	public static <T> T findMax(T[] arr, Comparator<? super T> cmp) {
 		int maxIndex = 0;
 
-		for (int i = 1; i < arr.length; i++)
-			if (cmp.compare(arr[i], arr[maxIndex]) > 0)
+		for (int i = 1; i < arr.length; i++) {
+			if (cmp.compare(arr[i], arr[maxIndex]) > 0) {
 				maxIndex = i;
+			}
+		}
 		return arr[maxIndex];
 	}
 
 	public static void main(String[] args) {
 		String[] arr = { "ZEBRA", "alligator", "crocodile" };
-		System.out.println(findMax(arr, new CasseInsensitiveCompare()));
-	}
-}
-
-interface Comparator<AnyType> {
-	int compare(AnyType lhs, AnyType rhs);
-}
-
-class CasseInsensitiveCompare implements Comparator<String> {
-	public int compare(String lhs, String rhs) {
-		return lhs.compareToIgnoreCase(rhs);
+		String max = findMax(arr, (String lhs, String rhs) -> {
+			return lhs.compareToIgnoreCase(rhs);
+		});
+		System.out.println(max);
 	}
 }

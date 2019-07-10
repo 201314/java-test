@@ -550,8 +550,9 @@ public class ConvertUtil {
 		}
 
 		byte[] result = new byte[hex.length() / 2];
-		for (int n = 0; n < hex.length(); n += 2) {
-			String item = new String(hex.getBytes(), n, 2);
+		String item = null;
+		for (int n = 0, length = hex.length(); n < length; n += 2) {
+			item = new String(hex.getBytes(), n, 2);
 			result[n / 2] = (byte) Integer.parseInt(item, 16);
 		}
 		return result;
@@ -693,4 +694,14 @@ public class ConvertUtil {
 		}
 	}
 
+	public static byte[] getLimitByte(ByteBuffer buffer) {
+		int len = buffer.limit() - buffer.position();
+		byte[] bytes = new byte[len];
+		buffer.get(bytes);
+		return bytes;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(string2Hex("100"));
+	}
 }

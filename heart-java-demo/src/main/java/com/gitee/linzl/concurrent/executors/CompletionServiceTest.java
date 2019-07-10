@@ -25,7 +25,7 @@ public class CompletionServiceTest {
 				return true;
 			};
 		};
-		System.out.println(getNow() + "--开始插入数据");
+		System.out.println(new SimpleDateFormat("mm:ss").format(new Date()) + "--开始插入数据");
 		for (int i = 0; i < 10; i++) {
 			cs.submit(task);
 		}
@@ -38,12 +38,7 @@ public class CompletionServiceTest {
 				e.printStackTrace();
 			}
 		}
-		System.out.println(getNow() + "--插入数据完成");
+		System.out.println(new SimpleDateFormat("mm:ss").format(new Date()) + "--插入数据完成");
 		pool.shutdown();
-	}
-
-	public static String getNow() {
-		SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-		return sdf.format(new Date());
 	}
 }

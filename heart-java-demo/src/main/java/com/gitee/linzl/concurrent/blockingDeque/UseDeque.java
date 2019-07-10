@@ -1,4 +1,4 @@
-package com.bjsxt.base.coll013;
+package com.gitee.linzl.concurrent.blockingDeque;
 
 import java.util.concurrent.LinkedBlockingDeque;
 

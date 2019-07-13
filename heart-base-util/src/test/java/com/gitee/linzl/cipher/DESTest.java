@@ -1,10 +1,7 @@
 package com.gitee.linzl.cipher;
 
-import java.util.Base64;
-
 import javax.crypto.spec.IvParameterSpec;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,7 +39,7 @@ public class DESTest {
 
 	@Test
 	public void DES_ECB_PKCS5PADDING_56() throws Exception {
-		excute(DESCipherAlgorithms.DES_ECB_PKCS5PADDING_56);
+		excute(DESCipherAlgorithms.DES_ECB_PKCS5PADDING_56_DEFAULT);
 	}
 
 	@Test
@@ -92,35 +89,27 @@ public class DESTest {
 	// CBC 要使用IV 密钥
 	private void excuteCBC(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
-		System.out.println("密钥base64：" + Base64.getEncoder().encodeToString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8 };// 长度必须是8
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes, ips);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes, ips);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 
 	private void excute(IAlgorithm aes) throws Exception {
-		System.out.println("text16进制:" + Hex.toHexString(text.getBytes()));
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
-		System.out.println("密钥base64：" + Base64.getEncoder().encodeToString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
-		System.out.println("加密base64：" + Base64.getEncoder().encodeToString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 }

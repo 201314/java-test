@@ -2,7 +2,6 @@ package com.gitee.linzl.cipher;
 
 import javax.crypto.spec.IvParameterSpec;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,9 +69,9 @@ public class AESTest {
 		excute(AESCipherAlgorithms.AES_ECB_NOPADDING_256);
 	}
 
-	@Test
+	@Test // TODO TEST
 	public void AES_ECB_PKCS5PADDING_128() throws Exception {
-		excute(AESCipherAlgorithms.AES_ECB_PKCS5PADDING_128);
+		excute(AESCipherAlgorithms.AES_ECB_PKCS5PADDING_128_DEFAULT);
 	}
 
 	@Test
@@ -108,19 +107,17 @@ public class AESTest {
 	 */
 	private void excuteCBC(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };// 长度必须是16
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes, ips);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes, ips);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 
 	/**
@@ -131,44 +128,38 @@ public class AESTest {
 	 */
 	private void excute(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 
 	private void bcExcute(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.bcDecrypt(encryptData, key, aes);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 
 	private void bcExcuteCBC(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };// 长度必须是16
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
 		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes, ips);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.bcDecrypt(encryptData, key, aes, ips);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 }

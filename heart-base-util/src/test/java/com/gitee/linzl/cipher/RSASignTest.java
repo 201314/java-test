@@ -8,7 +8,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.gitee.linzl.cipher.KeyPairPathUtil;
 import com.gitee.linzl.cipher.asymmetrical.AsymmetricalCipherUtil;
 import com.gitee.linzl.cipher.asymmetrical.SignatureAlgorithms;
 
@@ -59,38 +58,39 @@ public class RSASignTest {
 		rsaSign(SignatureAlgorithms.SHA512withRSA);
 	}
 
-	private void rsaSign(SignatureAlgorithms algorithm) throws Exception {
-		System.out.println("start===========指定密钥===========start");
-		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
-		System.out.println("私钥长度:" + privateKey.length);
-
-		byte[] encryptData = AsymmetricalCipherUtil.sign(text.getBytes(), priKey, algorithm);
-		System.out.println("加密：" + encryptData);
-
-		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
-		System.out.println("公钥长度:" + publicKey.length);
-
-		boolean verifyResult = AsymmetricalCipherUtil.verifySign(text.getBytes(), pubKey, encryptData, algorithm);
-		System.out.println("解密: " + verifyResult);
-		System.out.println("end===========指定密钥===========end");
-	}
-
 	private void rsaSignRandom(SignatureAlgorithms algorithm) throws Exception {
 		System.out.println("start===========JDK随机密钥===========start");
 		KeyPair keyPair = AsymmetricalCipherUtil.generateKeyPair(algorithm);
 		PrivateKey priKey = keyPair.getPrivate();
-		System.out.println("私钥长度:" + priKey.getEncoded().length);
+		BasePrint.printPrivateKey(priKey.getEncoded());
 
 		byte[] encryptData = AsymmetricalCipherUtil.sign(text.getBytes(), priKey, algorithm);
-		System.out.println("加密：" + encryptData);
+		BasePrint.printEncryptData(encryptData);
 
 		PublicKey pubKey = keyPair.getPublic();
-		System.out.println("公钥长度:" + pubKey.getEncoded().length);
+		BasePrint.printPublicKey(pubKey.getEncoded());
 
 		boolean verifyResult = AsymmetricalCipherUtil.verifySign(text.getBytes(), pubKey, encryptData, algorithm);
-		System.out.println("解密: " + verifyResult);
+		System.out.println("验签结果: " + verifyResult);
 		System.out.println("end===========JDK随机密钥===========end");
 	}
+
+	private void rsaSign(SignatureAlgorithms algorithm) throws Exception {
+		System.out.println("start===========指定密钥===========start");
+		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
+		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
+		BasePrint.printPrivateKey(priKey.getEncoded());
+
+		byte[] encryptData = AsymmetricalCipherUtil.sign(text.getBytes(), priKey, algorithm);
+		BasePrint.printEncryptData(encryptData);
+
+		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
+		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
+		BasePrint.printPublicKey(pubKey.getEncoded());
+
+		boolean verifyResult = AsymmetricalCipherUtil.verifySign(text.getBytes(), pubKey, encryptData, algorithm);
+		System.out.println("验签结果: " + verifyResult);
+		System.out.println("end===========指定密钥===========end");
+	}
+
 }

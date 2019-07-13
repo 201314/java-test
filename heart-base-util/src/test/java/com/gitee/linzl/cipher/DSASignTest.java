@@ -4,7 +4,6 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,15 +46,16 @@ public class DSASignTest {
 		System.out.println("start===========JDK随机密钥===========start");
 		KeyPair keyPair = AsymmetricalCipherUtil.generateKeyPair(algorithm);
 		PrivateKey privateKey = keyPair.getPrivate();
-		System.out.println("私钥长度：" + privateKey.getEncoded().length);
+		BasePrint.printPrivateKey(privateKey.getEncoded());
 
 		byte[] encryptData = AsymmetricalCipherUtil.sign(text.getBytes(), privateKey, algorithm);
-		System.out.println("加密：" + encryptData);
+		BasePrint.printEncryptData(encryptData);
 
 		PublicKey publicKey = keyPair.getPublic();
-		System.out.println("公钥长度：" + Hex.toHexString(publicKey.getEncoded()));
+		BasePrint.printPublicKey(publicKey.getEncoded());
+
 		boolean verifyResult = AsymmetricalCipherUtil.verifySign(text.getBytes(), publicKey, encryptData, algorithm);
-		System.out.println("解密: " + verifyResult);
+		System.out.println("验签结果: " + verifyResult);
 		System.out.println("end===========JDK随机密钥===========end");
 	}
 

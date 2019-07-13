@@ -5,7 +5,7 @@ import com.gitee.linzl.cipher.IAlgorithm;
 /**
  * JDK默认支持
  * 
- * 签名算法：私钥签名，公钥验签
+ * 签名算法：私钥签名，公钥验签 ，用于身份认证
  * 
  * @description
  * @author linzl

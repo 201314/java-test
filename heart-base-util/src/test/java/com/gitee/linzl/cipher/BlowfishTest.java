@@ -1,6 +1,5 @@
 package com.gitee.linzl.cipher;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,15 +23,13 @@ public class BlowfishTest {
 
 	private void excute(IAlgorithm aes) throws Exception {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		System.out.println("密钥长度:" + key.length);
-		System.out.println("密钥16进制：" + Hex.toHexString(key));
+		BasePrint.printSecretKey(key);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
-		System.out.println("加密后：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 	}
 
 }

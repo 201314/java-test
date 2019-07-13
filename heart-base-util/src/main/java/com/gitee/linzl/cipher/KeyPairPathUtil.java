@@ -2,6 +2,7 @@ package com.gitee.linzl.cipher;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -47,18 +48,17 @@ public class KeyPairPathUtil {
 	private static byte[] private_key_byte;
 
 	public static byte[] getPublicKeyFile() {
-		if (null == public_key_byte || public_key_byte.length <= 0) {
-			InputStream publicKey = null;
-			try {
-				publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/rsa_public_key.pem");
+		if (Objects.nonNull(public_key_byte) && public_key_byte.length > 0) {
+			return public_key_byte;
+		}
 
-				if (logger.isDebugEnabled()) {
-					logger.debug("加载公钥路径成功");
-				}
-				public_key_byte = IOUtils.toByteArray(publicKey);
-			} catch (IOException e) {
-				e.printStackTrace();
+		try (InputStream publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/rsa_public_key.pem");) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("加载公钥路径成功");
 			}
+			public_key_byte = IOUtils.toByteArray(publicKey);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return public_key_byte;
 	}
@@ -69,18 +69,18 @@ public class KeyPairPathUtil {
 	 * @return
 	 */
 	public static byte[] getPrivateKeyFile() {
-		if (null == private_key_byte || private_key_byte.length <= 0) {
-			InputStream privateKey = null;
-			try {
-				privateKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/pkcs8_rsa_private_key.pem");
-				if (logger.isDebugEnabled()) {
-					logger.debug("加载私钥路径成功");
-				}
-				private_key_byte = IOUtils.toByteArray(privateKey);
-				return private_key_byte;
-			} catch (IOException e) {
-				e.printStackTrace();
+		if (Objects.nonNull(private_key_byte) && private_key_byte.length > 0) {
+			return private_key_byte;
+		}
+
+		try (InputStream privateKey = ReadResourceUtil
+				.getInputStream("com/gitee/linzl/codec/rsa/pkcs8_rsa_private_key.pem");) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("加载私钥路径成功");
 			}
+			private_key_byte = IOUtils.toByteArray(privateKey);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return private_key_byte;
 	}

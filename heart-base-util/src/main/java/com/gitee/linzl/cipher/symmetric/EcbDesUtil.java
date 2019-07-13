@@ -24,10 +24,10 @@ public class EcbDesUtil {
 		// 将字节数组转换为十六进制字符串
 		String data = Hex.encodeHexString(srcStr.getBytes());
 
-		String eninfo = encode3DEA(key2, data);
+		String eninfo = encode3DES(key2, data);
 		System.out.println("3des加密后：" + eninfo);
 
-		String data2 = decode3DEA(key2, eninfo);
+		String data2 = decode3DES(key2, eninfo);
 		System.out.println("3des解密后hex：" + data2);
 		// 将十六进制字符数组转换为字节数组,再转换成字符串
 		String decodeStr = new String(Hex.decodeHex(data2));
@@ -66,7 +66,7 @@ public class EcbDesUtil {
 	 * @param hexData
 	 *            16进制的明文数据
 	 */
-	public static String encodeDEA(String hexKey, String hexData) {
+	public static String encodeDES(String hexKey, String hexData) {
 		if (hexKey.length() != 16) {
 			throw new RuntimeException("单倍长密钥DEA加密算法密钥必须为16位十六进制数,此密钥长度为：" + hexKey.length());
 		}
@@ -116,7 +116,7 @@ public class EcbDesUtil {
 	 * @param hexData
 	 *            十六进制密文(长度为8字节倍数)
 	 */
-	public static String decodeDEA(String hexKey, String hexData) {
+	public static String decodeDES(String hexKey, String hexData) {
 		if (hexKey.length() != 16) {
 			throw new RuntimeException("单倍长密钥DEA解密算法密钥必须为16位十六进制数,此密钥长度为：" + hexKey.length());
 		}
@@ -149,7 +149,7 @@ public class EcbDesUtil {
 	 * @param hexData
 	 *            16进制的明文数据
 	 */
-	public static String encode3DEA(String hexKey, String hexData) {
+	public static String encode3DES(String hexKey, String hexData) {
 		if (hexKey.length() != 32) {
 			throw new RuntimeException("双倍长密钥（16字节长）3DEA加密算法密钥必须为32位十六进制数,当前密钥长度为：" + hexKey.length());
 		}
@@ -205,7 +205,7 @@ public class EcbDesUtil {
 	 * @param hexData
 	 *            十六进制密文(长度为8字节倍数)
 	 */
-	public static String decode3DEA(String hexKey, String hexData) {
+	public static String decode3DES(String hexKey, String hexData) {
 		if (hexKey.length() != 32) {
 			throw new RuntimeException("双倍长密钥（16字节长）3DEA解密算法密钥必须为32位十六进制数");
 		}

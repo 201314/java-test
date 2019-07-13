@@ -3,6 +3,12 @@ package com.gitee.linzl.cipher.symmetric;
 import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
+ * JCE(Java Cryptography
+ * Extension)即Java密码扩展，是JDK1.4的一个重要部分。它是一组包，它们提供用于加密、密钥生成算法和协商以及 Message
+ * Authentication Code（MAC）算法的框架和实现
+ * 
+ * java 自带的DES/3DES/AES 三种对称加密算法
+ * 
  * JDK默认支持
  * 
  * SupportedPaddings=NOPADDING|PKCS5PADDING|ISO10126PADDING,
@@ -16,13 +22,14 @@ import com.gitee.linzl.cipher.IAlgorithm;
  */
 public enum DESCipherAlgorithms implements IAlgorithm {
 	// ============DES 单倍长============,密钥长度必须是8字节
+	// 算法/工作模式/填充方式
 	DES_CBC_NOPADDING_56("DES", "DES/CBC/NoPadding", 56),
 
 	DES_CBC_PKCS5PADDING_56("DES", "DES/CBC/PKCS5Padding", 56),
-	// 默认使用该模式
-	DES_ECB_NOPADDING_56("DES", "DES/ECB/NoPadding", 56),
 
-	DES_ECB_PKCS5PADDING_56("DES", "DES/ECB/PKCS5Padding", 56),
+	DES_ECB_NOPADDING_56("DES", "DES/ECB/NoPadding", 56),
+	// 默认使用该模式
+	DES_ECB_PKCS5PADDING_56_DEFAULT("DES", "DES/ECB/PKCS5Padding", 56),
 
 	// ============DESede ============
 	// 3DES，也称为3DESede或TripleDES,(3倍长)密钥长度必须是24字节

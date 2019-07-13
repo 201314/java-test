@@ -70,7 +70,7 @@ public class Base62Util {
 			// 把加密字符按照8位一组16进制与0x3FFFFFFF进行位与运算
 			String sTempSubString = hex.substring(i * 8, i * 8 + 8);
 
-			// 这里需要使用 long 型来转换，因为 Inteter.parseInt() 只能处理 31 位 , 首位为符号位 , 如果不用 long ，则会越界
+			// 这里需要使用long转换，因为Inteter.parseInt()只能处理 31 位 , 首位为符号位 , 如果不用 long则会越界
 			long lHexLong = Long.parseLong(sTempSubString, 16) & 0x3FFFFFFF;
 			String outChars = "";
 			for (int j = 0; j < 6; j++) {

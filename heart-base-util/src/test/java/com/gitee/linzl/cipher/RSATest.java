@@ -5,7 +5,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,38 +42,34 @@ public class RSATest {
 		System.out.println("start===========指定密钥===========start");
 		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
 		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
-		System.out.println("公钥长度:" + publicKey.length);
+		BasePrint.printPublicKey(pubKey.getEncoded());
 
 		byte[] encryptData = AsymmetricalCipherUtil.bcEncrypt(text.getBytes(), pubKey, algorithm);
-		System.out.println("加密：" + encryptData);
-		System.out.println("base64:"+Base64.encodeBase64String(encryptData));
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
 		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
-		System.out.println("私钥长度:" + privateKey.length);
+		BasePrint.printPrivateKey(priKey.getEncoded());
 
 		byte[] decryptData = AsymmetricalCipherUtil.bcDecrypt(encryptData, priKey, algorithm);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 		System.out.println("end===========指定密钥===========end");
 	}
 
 	private void executeRandom(IAlgorithm algorithm) throws Exception {
 		System.out.println("start===========JDK随机密钥===========start");
 		KeyPair keyPair = AsymmetricalCipherUtil.generateKeyPair(algorithm);
-
 		PublicKey pubKey = keyPair.getPublic();
-		System.out.println("公钥长度:" + pubKey.getEncoded().length);
+		BasePrint.printPublicKey(pubKey.getEncoded());
 
 		byte[] encryptData = AsymmetricalCipherUtil.encrypt(text.getBytes(), pubKey, algorithm);
-		System.out.println("加密：" + encryptData);
-		System.out.println("加密16进制：" + Hex.toHexString(encryptData));
+		BasePrint.printEncryptData(encryptData);
 
 		PrivateKey priKey = keyPair.getPrivate();
-		System.out.println("私钥长度:" + priKey.getEncoded().length);
+		BasePrint.printPrivateKey(priKey.getEncoded());
 
 		byte[] decryptData = AsymmetricalCipherUtil.decrypt(encryptData, priKey, algorithm);
-		System.out.println("解密: " + new String(decryptData));
+		BasePrint.printDecryptData(decryptData);
 		System.out.println("end===========JDK随机密钥===========end");
 	}
 }

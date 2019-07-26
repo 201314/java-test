@@ -77,34 +77,40 @@ public class NumberOperation {
 	}
 
 	/**
-	 * 找出最大子序列
+	 * 找出最大子序列,不考虑全是负数的情况,
+	 * 
+	 * int a[] = { 12, -19, 5, 3, -6, 11, 10, -20 };
+	 * 
+	 * 如果都为负数时呢？？？
 	 */
 	public static int findMaxSequence(int a[]) {
-		int thisSum = 0;
-		int thatSum = 0;
-		int index[] = new int[2];// 记录最大子序列的起始位置和终点位置
+		boolean startPositive = true;
+		int curSum = 0;
+		int positiveIndex = -1;
+
+		int preSum = 0;
+		int start = -1;// 记录当前最大子序列的起始位置和终点位置
+		int end = -1;
+
 		for (int i = 0, length = a.length; i < length; i++) {
-			thisSum += a[i];
-			if (thisSum > 0) {
-				if (index[0] == 0) {
-					index[0] = i;
-				}
-				if (thisSum > thatSum) {// 不断和之前的大序列比较得出最大的
-					thatSum = thisSum;
-					index[1] = i;
-				}
-			} else {
-				thisSum = 0;
-				// 如果子序列为负，则不理会
-				index[0] = 0;
+			if (startPositive && a[i] > 0) {// 记录第一个不为负数的位置,只有一开始不为负数，后面的数相加才会尽可能大
+				positiveIndex = i;
+				startPositive = false;
+			}
+
+			curSum += a[i];
+			if (curSum > preSum) {// 和上次之和比较，大则赋值位置信息
+				preSum = curSum;
+				start = positiveIndex;
+				end = i;
+			} else if (curSum <= 0) {// 和为负数不考虑，reset重置
+				curSum = 0;
+				startPositive = true;
 			}
 		}
+		System.out.println("最大子序列距离 起始位置start:" + start + "终点位置长度end：" + end);
+		return preSum;
 
-		System.out.println("最大子序列距离 起始位置长度--终点位置长度：");
-		for (int i : index) {
-			System.out.print("--" + i + "--");
-		}
-		return thatSum;
 	}
 
 	/**

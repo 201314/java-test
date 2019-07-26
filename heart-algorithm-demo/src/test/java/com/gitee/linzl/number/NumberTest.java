@@ -27,8 +27,10 @@ public class NumberTest {
 
 	@Test
 	public void maxChildSequence() {
-		int a[] = { 12, -19, 5, 3, -6, 11, 10, -20 };
-		// int b[] = { -2, 11, -4, 13, -5, -2 };
+//		int a[] = { 12, -19, 99, 5, 3, -600, 10, 200, 11, 120, -120, 200, 0 };
+//		int a[] = { 10, -1, 90, 1, -100, 7, 83, 30, -90, -30, 30, 91 };
+//		int a[] = { 111, -11111, -22222, -1113, -1, 4 };
+		int a[] = { -19, 9, 10, -4, -1, -5 };
 
 		System.out.println("\n最大子序列和：" + NumberOperation.findMaxSequence(a));// 最大的子序列
 	}

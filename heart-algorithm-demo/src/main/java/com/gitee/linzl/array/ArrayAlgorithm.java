@@ -1,6 +1,6 @@
 package com.gitee.linzl.array;
 
-public class ArrayAlgorithmDemo {
+public class ArrayAlgorithm {
 	/**
 	 * 把一个数组里的所有数的组合全部列出，比如 1 2列出来为1,2,12,21，要求打印出来的不能有重复数
 	 * 
@@ -28,7 +28,7 @@ public class ArrayAlgorithmDemo {
 	/**
 	 * 两个线性表，按顺序合并，并将重复的数据去除
 	 */
-	public static int[] combine(int first[], int second[]) {
+	public static int[] merge(int first[], int second[]) {
 		int[] temp = new int[first.length + second.length];
 		int i = 0, j = 0, k = 0;
 		while (j < first.length && i < second.length) {
@@ -91,26 +91,42 @@ public class ArrayAlgorithmDemo {
 	}
 
 	/**
-	 * 对于两个整形数组，编写算法实现交集运算。
+	 * 对于两个有序整形数组，编写算法实现交集运算。
 	 * 
 	 * 分析：就是将两个数组中的公共元素复制到第三个数组中。
 	 * 
 	 * 可以从头遍历第一个数组， 如果在第二个数组中遇到了相同的元素，将其复制到第三个数组中即可。
 	 */
 	public static int[] same(int[] array1, int[] array2) {
+		int array1T = 0;
 		int array1Length = array1.length;
+
+		int array2T = 0;
 		int array2Length = array2.length;
 		// 定义新数组
 		int[] array = new int[Math.max(array1Length, array2Length)];
+
 		int size = 0;
-		for (int i = 0; i < array1Length; i++) {
-			for (int j = 0; j < array2Length; j++) {
-				if (array1[i] == array2[j]) {
-					array[size++] = array1[i];// 如果遇到相同的元素则保存
-					break;
-				}
+		while (array1T < array1Length && array2T < array2Length) {
+			if (array1[array1T] < array2[array2T]) {
+				array1T++;
+			} else if (array1[array1T] > array2[array2T]) {
+				array2T++;
+			} else {
+				array[size++] = array1[array1T];
+				array1T++;
+				array2T++;
 			}
 		}
+
+//		for (int i = 0; i < array1Length; i++) {
+//			for (int j = 0; j < array2Length; j++) {
+//				if (array1[i] == array2[j]) {
+//					array[size++] = array1[i];// 如果遇到相同的元素则保存
+//					break;
+//				}
+//			}
+//		}
 		int[] newArray = new int[size];
 		System.arraycopy(array, 0, newArray, 0, size);// 复制元素
 		return newArray;

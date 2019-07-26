@@ -6,6 +6,8 @@ import java.text.DecimalFormat;
 /**
  * 支持int , long , double ,String
  * 
+ * 涉及金钱，要转换为"分"来计算存储
+ * 
  * @author linzl
  *
  */
@@ -13,8 +15,7 @@ public class BigDecimalUtil {
 	/**
 	 * 分转成元
 	 * 
-	 * @param points
-	 *            多少分钱
+	 * @param points 多少分钱
 	 * @return
 	 */
 	public static String pointsToYuan(int points) {
@@ -25,8 +26,7 @@ public class BigDecimalUtil {
 	/**
 	 * 元转成分
 	 * 
-	 * @param yuan
-	 *            多少元
+	 * @param yuan 多少元
 	 * @return
 	 */
 	public static BigDecimal yuanTopoints(String yuan) {
@@ -63,6 +63,10 @@ public class BigDecimalUtil {
 		return bdFirst.add(bdSecond);
 	}
 
+	public static BigDecimal add(String first, String second, int scale) {
+		return add(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+	}
+
 	/**
 	 * 减法
 	 * 
@@ -79,14 +83,11 @@ public class BigDecimalUtil {
 	 * 
 	 * @param first
 	 * @param second
-	 * @param scale
-	 *            保存几位小数
+	 * @param scale  保存几位小数
 	 * @return
 	 */
 	public static BigDecimal subtract(String first, String second, int scale) {
-		BigDecimal bdFirst = new BigDecimal(first);
-		BigDecimal bdSecond = new BigDecimal(second);
-		return bdFirst.subtract(bdSecond).setScale(scale, BigDecimal.ROUND_HALF_UP);
+		return subtract(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
 	}
 
 	/**
@@ -100,6 +101,10 @@ public class BigDecimalUtil {
 		return bdFirst.multiply(bdSecond);
 	}
 
+	public static BigDecimal multiply(String first, String second, int scale) {
+		return multiply(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+	}
+
 	/**
 	 * 除法
 	 * 
@@ -108,7 +113,11 @@ public class BigDecimalUtil {
 	public static BigDecimal divide(String first, String second) {
 		BigDecimal bdFirst = new BigDecimal(first);
 		BigDecimal bdSecond = new BigDecimal(second);
-		return bdFirst.divide(bdSecond, BigDecimal.ROUND_CEILING);
+		return bdFirst.divide(bdSecond);
+	}
+
+	public static BigDecimal divide(String first, String second, int scale) {
+		return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
 	}
 
 	public static void main(String[] args) {
@@ -119,5 +128,6 @@ public class BigDecimalUtil {
 		DecimalFormat df = new DecimalFormat("#0.00");
 		System.out.println(df.format(201 / 100.00));
 		System.out.println(divide("201", "100"));
+		System.out.println(multiply("201", "100"));
 	}
 }

@@ -331,7 +331,7 @@ public class ConvertUtil {
 	}
 
 	/**
-	 * 将二进制转换成16进制
+	 * 将字节转换成16进制
 	 * 
 	 * @param buf
 	 * @return

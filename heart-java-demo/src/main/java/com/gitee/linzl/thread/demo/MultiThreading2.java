@@ -13,23 +13,23 @@ package com.gitee.linzl.thread.demo;
  * @date 2018年3月1日
  */
 public class MultiThreading2 {
-	private int x = 0;
+	private static int x = 0;
 
 	public synchronized void add() {// 不能大于1,也不能小于0
 		if (x < 1) {
-			System.out.print(x);
 			x++;
+			System.out.println(Thread.currentThread().getName() + "-inc:" + x);
 		}
 	}
 
 	public synchronized void sub() {// 不能大于1,也不能小于0
 		if (x > 0) {
-			System.out.print(x);
 			x--;
+			System.out.println(Thread.currentThread().getName() + "-sub:" + x);
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		MultiThreading2 test = new MultiThreading2();
 
 		Thread thread1 = new Thread(() -> {
@@ -37,6 +37,7 @@ public class MultiThreading2 {
 				test.add();
 			}
 		});
+
 		Thread thread2 = new Thread(() -> {
 			while (true) {
 				test.sub();
@@ -45,5 +46,10 @@ public class MultiThreading2 {
 
 		thread1.start();
 		thread2.start();
+
+		// join表示main主线程要等2个线程结束才可结束,由于是死循环，所以永远不会输出“最后结果”
+		thread1.join();
+		thread2.join();
+		System.out.println("最后结果:" + x);
 	}
 }

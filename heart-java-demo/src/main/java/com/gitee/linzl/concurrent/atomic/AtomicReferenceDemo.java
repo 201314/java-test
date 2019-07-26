@@ -3,53 +3,34 @@ package com.gitee.linzl.concurrent.atomic;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AtomicReferenceDemo {
-	private AtomicReference<Thread> owner = new AtomicReference<>();
-	private int count = 0;
+	private String name;
+	private int age;
 
-	public void lock() {
-		Thread current = Thread.currentThread();
-		if (current == owner.get()) {
-			count++;
-			return;
-		}
-		while (!owner.compareAndSet(null, current)) {
-			System.out.println("当前线程==" + Thread.currentThread().getName());
-		}
+	public AtomicReferenceDemo(String name, int age) {
+		this.name = name;
+		this.age = age;
 	}
 
-	public void unlock() {
-		Thread current = Thread.currentThread();
-		if (current == owner.get()) {
-			if (count != 0) {
-				count--;
-			} else {
-				owner.compareAndSet(current, null);
-			}
-		}
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
 	}
 
 	public static void main(String[] args) {
-		AtomicReferenceDemo ss = new AtomicReferenceDemo();
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ss.lock();
-			}
-		}).start();
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ss.lock();
-			}
-		}).start();
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ss.lock();
-			}
-		}).start();
+		AtomicReference<AtomicReferenceDemo> atomic = new AtomicReference<>(new AtomicReferenceDemo("xiaodao", 23));
+		System.out.println(atomic.get());
+		boolean result = atomic.compareAndSet(atomic.get(), new AtomicReferenceDemo("bbb", 90));
+		System.out.println(result);
 	}
-
 }

@@ -1,9 +1,30 @@
 
 package com.gitee.linzl.util;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
+import java.util.Random;
 
+/**
+ * 适用场景：整数，无重复
+ * 
+ * 常见的应用是那些需要对海量数据进行一些统计工作的时候，比如日志分析等。
+ * 
+ * 面试题中也常出现，比如：统计40亿个数据中没有出现的数据，将40亿个不同数据进行排序等。
+ * 
+ * 
+ * BitSet是位操作的对象，值只有0或1即false和true，内部维护了一个long数组，初始只有一个long，所以BitSet最小的size是64，当随着存储的元素越来越多，BitSet内部会动态扩充，最终内部是由N个long来存储，这些针对操作都是透明的。
+ * 
+ * 用1位来表示一个数据是否出现过，0为没有出现过，1表示出现过。使用用的时候既可根据某一个是否为0表示，此数是否出现过。
+ * 
+ * 一个1G的空间，有 8*1024*1024*1024=8.58*10^9bit，也就是可以表示85亿个不同的数
+ * 
+ * @description
+ * @author linzl
+ * @email 2225010489@qq.com
+ * @date 2019年7月12日
+ */
 public class BitSetDemo {
 	/**
 	 * 求一个字符串包含的char
@@ -156,32 +177,70 @@ public class BitSetDemo {
 		System.out.println(bites);
 	}
 
+	// 有1千万个随机数，随机数的范围在1到1亿之间。现在要求写出一种算法，将1到1亿之间没有在随机数中的数求出来
+	public void notFound() {
+		Random random = new Random();
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i < 10000000; i++) {
+			int randomResult = random.nextInt(100000000);
+			list.add(randomResult);
+		}
+		System.out.println("产生的随机数有");
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
+		BitSet bitSet = new BitSet(100000000);
+		for (int i = 0; i < 10000000; i++) {
+			bitSet.set(list.get(i));
+		}
+
+		System.out.println("0~1亿不在上述随机数中有" + bitSet.size());
+		for (int i = 0; i < 100000000; i++) {
+			if (!bitSet.get(i)) {
+				System.out.println(i);
+			}
+		}
+	}
+
 	public static void main(String args[]) {
-		// BitSet使用示例
+		String s1 = new String("kvill");
+		s1.intern();
+		String s2 = "kvill";
+		System.out.println(s1 == s2);
+
+		String s3 = new String("1") + new String("1");
+		s3.intern();
+		String s4 = "11";
+		System.out.println(s3 == s4);
+		// BitSet使用示例,从左向右数
 //		BitSetDemo.containChars("How do you do? 你好呀");
 //		BitSetDemo.computePrime();
 //		BitSetDemo.sortArray();
 //		BitSetDemo.simpleExample();
+		System.out.println(2 >> 6);
 
-		// BitSet与Byte数组互转示例
+		// 使用long[]存储，默认是64位。如果指定的长度不等于(2^6)*N,则程序会自动进行补齐，使长度等于最接近的值，如127，最终是128位长度
 		BitSet bitSet = new BitSet();
-		bitSet.set(0);
-		bitSet.set(3, true);
-		bitSet.set(98, true);
-		bitSet.set(127, true);
-		bitSet.set(128);
+		System.out.println("bitSet.size()==>" + bitSet.size());
+		bitSet.set(9);
+		bitSet.set(10, false);
 		System.out.println(bitSet.size() + "," + bitSet.cardinality());
 		// 将BitSet对象转成byte数组
-		byte[] bytes = BitSetDemo.bitSet2ByteArray(bitSet);
-		System.out.println(Arrays.toString(bytes));
-
-		// 在将byte数组转回来
-		bitSet = BitSetDemo.byteArray2BitSet(bytes);
-		System.out.println(bitSet.size() + "," + bitSet.cardinality());
-		System.out.println(bitSet.get(3));
-		System.out.println(bitSet.get(98));
+//		byte[] bytes = BitSetDemo.bitSet2ByteArray(bitSet);
+//		System.out.println(Arrays.toString(bytes));
+//
+//		// 在将byte数组转回来
+//		bitSet = BitSetDemo.byteArray2BitSet(bytes);
+//		System.out.println(bitSet.size() + "," + bitSet.cardinality());
+//		System.out.println(bitSet.get(3));
+//		System.out.println(bitSet.get(98));
+		// 打印位置是true的值
 		for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i + 1)) {
 			System.out.print(i + ",");
+		}
+
+		for (int i = 0, size = bitSet.size() - 1; i <= size; i++) {
+			System.out.print(bitSet.get(i) + "\t");
 		}
 	}
 }

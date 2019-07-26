@@ -7,24 +7,24 @@ public class SynchronizedDemo {
 	 * 直接锁普通方法，就是this对象锁
 	 */
 	public synchronized void print() {
-		//print4();
+		// print4();
 		for (int i = 0; i < 100; i++) {
 			System.out.println(Thread.currentThread().getName() + "=print打印当前：" + i);
 		}
-		
+
 	}
 
 	/**
-	 * 
+	 * 可重入锁
 	 */
 	public synchronized void print1() {
 		print4();
 		for (int i = 0; i < 100; i++) {
 			System.out.println(Thread.currentThread().getName() + "=print打印当前：" + i);
 		}
-		
+
 	}
-	
+
 	public synchronized static void print2() {
 		for (int i = 0; i < 100; i++) {
 			System.out.println(Thread.currentThread().getName() + "=print222222打印当前：" + i);

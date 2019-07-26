@@ -217,4 +217,18 @@ public class StreamGrammarDemo {
 		Stream<String> stream2 = Stream.of(arr2);
 		Stream.concat(stream1, stream2).distinct().forEach(System.out::println);
 	}
+
+	/**
+	 * 用于组合流中的元素，如求和，求积，求最大值等
+	 */
+	@Test
+	public void testReduce() {
+		Integer[] pers = new Integer[] { 10, 20, 35, 30 };
+		Stream.of(pers).reduce(Integer::sum);
+		// 等价
+		Stream.of(pers).mapToInt(Integer::intValue).sum();
+		Stream.of(pers).mapToInt((val) -> {
+			return val.intValue();
+		}).sum();
+	}
 }

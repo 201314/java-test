@@ -24,8 +24,8 @@ public class LuckDrawThread {
 			int index = (int) (Math.random() * arr.length);
 			int get = arr[index];
 
-			// 代表这张抽奖券抽过了
-			if (flag[index] != true) {
+			if (!flag[index]) {
+				// 代表这张抽奖券抽过了
 				flag[index] = true;
 				System.out.println(Thread.currentThread().getName() + " 又产生了一个" + get + "元大奖");
 				num--;

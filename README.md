@@ -1,2 +1,2 @@
 # java-test
-Java一些特性的练习
+JAVA一些特性的练习

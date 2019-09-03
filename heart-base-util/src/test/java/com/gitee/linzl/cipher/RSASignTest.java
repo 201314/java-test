@@ -78,14 +78,14 @@ public class RSASignTest {
 	private void rsaSign(SignatureAlgorithms algorithm) throws Exception {
 		System.out.println("start===========指定密钥===========start");
 		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
+		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivate(Base64.decodeBase64(privateKey), algorithm);
 		BasePrint.printPrivateKey(priKey.getEncoded());
 
 		byte[] encryptData = AsymmetricalCipherUtil.sign(text.getBytes(), priKey, algorithm);
 		BasePrint.printEncryptData(encryptData);
 
 		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
+		PublicKey pubKey = AsymmetricalCipherUtil.generatePublic(Base64.decodeBase64(publicKey), algorithm);
 		BasePrint.printPublicKey(pubKey.getEncoded());
 
 		boolean verifyResult = AsymmetricalCipherUtil.verifySign(text.getBytes(), pubKey, encryptData, algorithm);

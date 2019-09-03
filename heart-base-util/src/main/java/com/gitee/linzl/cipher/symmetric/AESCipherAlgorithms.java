@@ -15,21 +15,15 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * <p>
  * 目前,AES算法通常用于移动通信系统以及一些软件的安全外壳,还有一些无线路由器中也是用AES算法构建加密协议
  * <p>
- * 由于Java6.0支持大部分的算法,但受到出口限制,其密钥长度不能满足需求
- * <p>
- * 所以特别注意:如果使用256位的密钥,则需要无政策限制文件(Unlimited Strength Jurisdiction Policy Files)
- * <p>
- * jdk是通过权限文件local_poblicy.jar和US_export_policy.jar做相应限制,可以搜索java 8 Unlimited
- * Strength Jurisdiction Policy Files下载替换文件,减少相关限制
- * <p>
- * 然后覆盖本地JDK目录和JRE目录下的security目录下的文件即可
+ * 由于JAVA支持大部分的算法,但受到出口限制,其密钥长度不能满足需求
  * <p>
  * 关于AES的更多详细介绍,可以参考此爷的博客http://blog.csdn.net/kongqz/article/category/800296
  * 
- * @author linzl 2016年11月21日
- */
-/**
- * JDK默认支持
+ * 如果需要支持192、256位，则需要无政策限制文件(Unlimited Strength Jurisdiction Policy Files)
+ * <p>
+ * JDK是通过权限文件local_poblicy.jar和US_export_policy.jar做相应限制,可以搜索java 8 Unlimited
+ * Strength Jurisdiction Policy Files下载覆盖本地JDK和JRE目录下的security目录下的文件即可
+ * <p>
  * 
  * SupportedPaddings=NOPADDING|PKCS5PADDING|ISO10126PADDING,
  * SupportedKeyFormats=RAW,
@@ -66,8 +60,7 @@ public enum AESCipherAlgorithms implements IAlgorithm {
 	// 超过JDK默认长度,扩展的JCE
 	AES_ECB_PKCS5PADDING_256("AES", "AES/ECB/PKCS5Padding", 256),
 
-	// 支持BouncyCastleProvider TODO 测试
-	// AES/CBC/PKCS7Padding
+	// 支持BouncyCastleProvider
 	BC_AES_CBC_PKCS7PADDING_128("AES", "AES/CBC/PKCS7Padding", 128),
 
 	BC_AES_CBC_PKCS7PADDING_192("AES", "AES/CBC/PKCS7Padding", 192),

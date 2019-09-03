@@ -257,7 +257,12 @@ public class FilesDemo {
 	public static void lines() {
 		Path path = Paths.get("D:\\trawe_store\\第2个接口.txt");
 		try {
-			Files.lines(path).forEach((str) -> {
+			Files.lines(path).map((string) -> string.trim()).forEach((str) -> {
+				System.out.println("行内容:" + str);
+			});
+
+			// 等价于
+			Files.lines(path).map(String::trim).forEach((str) -> {
 				System.out.println("行内容:" + str);
 			});
 		} catch (IOException e) {

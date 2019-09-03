@@ -69,7 +69,7 @@ public class AESTest {
 		excute(AESCipherAlgorithms.AES_ECB_NOPADDING_256);
 	}
 
-	@Test // TODO TEST
+	@Test
 	public void AES_ECB_PKCS5PADDING_128() throws Exception {
 		excute(AESCipherAlgorithms.AES_ECB_PKCS5PADDING_128_DEFAULT);
 	}
@@ -86,17 +86,32 @@ public class AESTest {
 
 	@Test
 	public void BC_AES_CBC_PKCS7PADDING_128() throws Exception {
-		bcExcute(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_128);
+		excuteCBC(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_128);
 	}
 
 	@Test
 	public void BC_AES_CBC_PKCS7PADDING_192() throws Exception {
-		bcExcuteCBC(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_192);
+		excuteCBC(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_192);
 	}
 
 	@Test
 	public void BC_AES_CBC_PKCS7PADDING_256() throws Exception {
-		bcExcuteCBC(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_256);
+		excuteCBC(AESCipherAlgorithms.BC_AES_CBC_PKCS7PADDING_256);
+	}
+	
+	@Test
+	public void BC_AES_ECB_PKCS7PADDING_128() throws Exception {
+		excute(AESCipherAlgorithms.BC_AES_ECB_PKCS7PADDING_128);
+	}
+
+	@Test
+	public void BC_AES_ECB_PKCS7PADDING_192() throws Exception {
+		excute(AESCipherAlgorithms.BC_AES_ECB_PKCS7PADDING_192);
+	}
+
+	@Test
+	public void BC_AES_ECB_PKCS7PADDING_256() throws Exception {
+		excute(AESCipherAlgorithms.BC_AES_ECB_PKCS7PADDING_256);
 	}
 
 	/**
@@ -109,7 +124,7 @@ public class AESTest {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
 		BasePrint.printSecretKey(key);
 
-		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };// 长度必须是16
+		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6 };// 长度必须是16
 		// 用密钥初始化Cipher对象
 		IvParameterSpec ips = new IvParameterSpec(keyiv);
 
@@ -137,29 +152,4 @@ public class AESTest {
 		BasePrint.printDecryptData(decryptData);
 	}
 
-	private void bcExcute(IAlgorithm aes) throws Exception {
-		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		BasePrint.printSecretKey(key);
-
-		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes);
-		BasePrint.printEncryptData(encryptData);
-
-		byte[] decryptData = SymmetricCipherUtil.bcDecrypt(encryptData, key, aes);
-		BasePrint.printDecryptData(decryptData);
-	}
-
-	private void bcExcuteCBC(IAlgorithm aes) throws Exception {
-		byte[] key = SymmetricCipherUtil.generateKey(aes);
-		BasePrint.printSecretKey(key);
-
-		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };// 长度必须是16
-		// 用密钥初始化Cipher对象
-		IvParameterSpec ips = new IvParameterSpec(keyiv);
-
-		byte[] encryptData = SymmetricCipherUtil.bcEncrypt(text.getBytes(), key, aes, ips);
-		BasePrint.printEncryptData(encryptData);
-
-		byte[] decryptData = SymmetricCipherUtil.bcDecrypt(encryptData, key, aes, ips);
-		BasePrint.printDecryptData(decryptData);
-	}
 }

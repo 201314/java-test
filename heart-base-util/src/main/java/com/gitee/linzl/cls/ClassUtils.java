@@ -17,7 +17,7 @@ import java.util.Set;
 import com.gitee.linzl.required.Assert;
 
 /**
- * 参照spring 的 ClassUtil
+ * 参照spring 的 ClassUtils
  * 
  * @description
  * 
@@ -25,7 +25,7 @@ import com.gitee.linzl.required.Assert;
  * @email 2225010489@qq.com
  * @date 2018年6月27日
  */
-public class ClassUtil {
+public class ClassUtils {
 	/** Suffix for array class names: "[]" */
 	public static final String ARRAY_SUFFIX = "[]";
 
@@ -142,16 +142,12 @@ public class ClassUtil {
 	 * it is also capable of resolving inner class names in Java source style (e.g.
 	 * "java.lang.Thread.State" instead of "java.lang.Thread$State").
 	 * 
-	 * @param name
-	 *            the name of the Class
-	 * @param classLoader
-	 *            the class loader to use (may be {@code null}, which indicates the
-	 *            default class loader)
+	 * @param name        the name of the Class
+	 * @param classLoader the class loader to use (may be {@code null}, which
+	 *                    indicates the default class loader)
 	 * @return Class instance for the supplied name
-	 * @throws ClassNotFoundException
-	 *             if the class was not found
-	 * @throws LinkageError
-	 *             if the class file could not be loaded
+	 * @throws ClassNotFoundException if the class was not found
+	 * @throws LinkageError           if the class file could not be loaded
 	 * @see Class#forName(String, boolean, ClassLoader)
 	 */
 	public static Class<?> forName(String name, ClassLoader classLoader) throws ClassNotFoundException, LinkageError {
@@ -214,8 +210,7 @@ public class ClassUtil {
 	 * <i>not</i> support the "[]" suffix notation for primitive arrays; this is
 	 * only supported by {@link #forName(String, ClassLoader)}.
 	 * 
-	 * @param name
-	 *            the name of the potentially primitive class
+	 * @param name the name of the potentially primitive class
 	 * @return the primitive class, or {@code null} if the name does not denote a
 	 *         primitive class or primitive array class
 	 */
@@ -235,11 +230,9 @@ public class ClassUtil {
 	 * present and can be loaded. Will return {@code false} if either the class or
 	 * one of its dependencies is not present or cannot be loaded.
 	 * 
-	 * @param className
-	 *            the name of the class to check
-	 * @param classLoader
-	 *            the class loader to use (may be {@code null}, which indicates the
-	 *            default class loader)
+	 * @param className   the name of the class to check
+	 * @param classLoader the class loader to use (may be {@code null}, which
+	 *                    indicates the default class loader)
 	 * @return whether the specified class is present
 	 */
 	public static boolean isPresent(String className, ClassLoader classLoader) {

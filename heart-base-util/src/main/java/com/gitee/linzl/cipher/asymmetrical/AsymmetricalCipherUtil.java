@@ -7,6 +7,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -19,6 +20,7 @@ import javax.crypto.spec.IvParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import com.gitee.linzl.cipher.IAlgorithm;
+import com.gitee.linzl.cls.ClassUtils;
 
 /**
  * 非对称加解密
@@ -37,13 +39,13 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * 
  * @description
  * 
- * 				数据加密传输:
+ *              数据加密传输:
  * 
  *              非对称加解密：如果密钥是自己生成的话,
  *              <p>
  *              在网页端，使用公钥加密传数据给自己，自己再用私钥解密。
  *              </p>
- *              在服务端，使用私钥加密数据传给其他人，其他人再用公钥解密。
+ *              在服务端，使用私钥加密数据传给其他人，其他人再用公钥解密(一般不会这么做，普遍做法还是公钥加密私钥解密，只是双方交换各自生成的公钥)。
  * 
  *              签名：只能加签验签，无法解签
  * @author linzl
@@ -51,6 +53,16 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * @date 2018年11月6日
  */
 public class AsymmetricalCipherUtil {
+	private static final boolean bcPresent;
+	static {
+		ClassLoader classLoader = AsymmetricalCipherUtil.class.getClassLoader();
+		bcPresent = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
+
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+			Security.addProvider(new BouncyCastleProvider());
+		}
+	}
+
 	/**
 	 * 随机生成密钥对,非对称加解密，一般情况下不使用，只用于测试
 	 * 
@@ -60,8 +72,6 @@ public class AsymmetricalCipherUtil {
 	public static KeyPair generateKeyPair(IAlgorithm algorithm) {
 		// 实例化密钥生成器
 		String algorithmName = algorithm.getKeyAlgorithm();
-		// Security.addProvider(new BouncyCastleProvider());
-
 		KeyPairGenerator keyPairGen = null;
 		try {
 			keyPairGen = KeyPairGenerator.getInstance(algorithmName);
@@ -78,10 +88,8 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 非对称加密，加载私钥字节
 	 * 
-	 * @param privateKeyByte
-	 *            私钥字节
-	 * @throws Exception
-	 *             加载私钥时产生的异常
+	 * @param privateKeyByte 私钥字节
+	 * @throws Exception 加载私钥时产生的异常
 	 */
 	public static PrivateKey generatePrivateKey(byte[] privateKeyByte, IAlgorithm algorithm) throws Exception {
 		// 实例化密钥生成器
@@ -100,15 +108,12 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 非对称加密，加载公钥字节
 	 * 
-	 * @param pubicKeyByte
-	 *            公钥字节
-	 * @throws Exception
-	 *             加载公钥时产生的异常
+	 * @param pubicKeyByte 公钥字节
+	 * @throws Exception 加载公钥时产生的异常
 	 */
 	public static PublicKey generatePublicKey(byte[] pubicKeyByte, IAlgorithm algorithm) throws Exception {
 		// 实例化密钥生成器
-		String algorithmName = null;
-		algorithmName = algorithm.getKeyAlgorithm();
+		String algorithmName = algorithm.getKeyAlgorithm();
 		try {
 			KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
 			EncodedKeySpec keySpec = new X509EncodedKeySpec(pubicKeyByte);
@@ -125,61 +130,37 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 非对称加密
 	 * 
-	 * @param data
-	 *            待加密数据
-	 * @param key
-	 *            公钥
+	 * @param data      待加密数据
+	 * @param key       公钥
 	 * @param algorithm
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(byte[] data, PublicKey key, IAlgorithm algorithm) throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
-		// 实例化Cipher对象，它用于完成实际的加密操作
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data);
-		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-		return output;
+	public static byte[] encrypt(byte[] data, Key publicKey, IAlgorithm algorithm) throws Exception {
+		return encrypt(data, publicKey, algorithm, null);
 	}
 
 	/**
 	 * 非对称加密时，key为公钥
 	 * 
 	 * @param data
-	 * @param key
+	 * @param publicKey
 	 * @param algorithm
-	 * @param iv
-	 *            IV密钥
+	 * @param iv        IV密钥
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] encrypt(byte[] data, PublicKey key, IAlgorithm algorithm, IvParameterSpec iv)
+	public static byte[] encrypt(byte[] data, Key publicKey, IAlgorithm algorithm, IvParameterSpec iv)
 			throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
-		// 实例化Cipher对象，它用于完成实际的加密操作
-		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data);
-		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-		return output;
-	}
+		Cipher cipher;
+		if (bcPresent) {
+			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
+		} else {
+			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
+		}
 
-	public static byte[] bcEncrypt(byte[] data, PublicKey secretKey, IAlgorithm algorithm) throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
 		// 实例化Cipher对象，它用于完成实际的加密操作
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-		// 初始化Cipher对象，设置为加密模式
-		byte[] output = cipher.doFinal(data);
-		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-		return output;
-	}
-
-	public static byte[] bcEncrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
-			throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
-		// 实例化Cipher对象，它用于完成实际的加密操作
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
+		cipher.init(Cipher.ENCRYPT_MODE, publicKey, iv);
 		// 初始化Cipher对象，设置为加密模式
 		byte[] output = cipher.doFinal(data);
 		// 执行加密操作,加密后的结果通常都会用Base64编码进行传输
@@ -189,35 +170,27 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 非对称加密时，key为私钥
 	 * 
-	 * @param data
-	 *            待解密数据
-	 * @param secretKey
-	 *            密钥
+	 * @param data       待解密数据
+	 * @param privateKey 密钥
 	 * @param algorithm
 	 * @return
 	 * @throws Exception
 	 */
-	public static byte[] decrypt(byte[] data, PrivateKey secretKey, IAlgorithm algorithm) throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
-		// 初始化Cipher对象，设置为解密模式
-		cipher.init(Cipher.DECRYPT_MODE, secretKey);
-		// 执行解密操作
-		return cipher.doFinal(data);
+	public static byte[] decrypt(byte[] data, Key privateKey, IAlgorithm algorithm) throws Exception {
+		return decrypt(data, privateKey, algorithm, null);
 	}
 
-	public static byte[] decrypt(byte[] data, PrivateKey secretKey, IAlgorithm algorithm, IvParameterSpec iv)
+	public static byte[] decrypt(byte[] data, Key secretKey, IAlgorithm algorithm, IvParameterSpec iv)
 			throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
+		Cipher cipher;
+		if (bcPresent) {
+			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
+		} else {
+			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
+		}
+
 		// 初始化Cipher对象，设置为解密模式
 		cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
-		// 执行解密操作
-		return cipher.doFinal(data);
-	}
-
-	public static byte[] bcDecrypt(byte[] data, PrivateKey secretKey, IAlgorithm algorithm) throws Exception {
-		Cipher cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), new BouncyCastleProvider());
-		// 初始化Cipher对象，设置为解密模式
-		cipher.init(Cipher.DECRYPT_MODE, secretKey);
 		// 执行解密操作
 		return cipher.doFinal(data);
 	}
@@ -225,12 +198,9 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 对数据进行签名
 	 * 
-	 * @param data
-	 *            需要签名的数据
-	 * @param privateKey
-	 *            私钥
-	 * @param algorithm
-	 *            签名算法
+	 * @param data       需要签名的数据
+	 * @param privateKey 私钥
+	 * @param algorithm  签名算法
 	 * @return
 	 * @throws Exception
 	 */
@@ -246,12 +216,9 @@ public class AsymmetricalCipherUtil {
 	/**
 	 * 验证签名
 	 * 
-	 * @param data
-	 *            签名前的数据
-	 * @param publicKey
-	 *            公钥
-	 * @param sign
-	 *            签名后的数据
+	 * @param data      签名前的数据
+	 * @param publicKey 公钥
+	 * @param sign      签名后的数据
 	 * @return
 	 * @throws Exception
 	 */

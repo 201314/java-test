@@ -4,7 +4,9 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 
 import com.gitee.linzl.properties.ReadResourceUtil;
@@ -72,7 +74,7 @@ public class TokenUtil {
 				// 定义额外的属性
 				.claim("user_id", "用户ID")
 
-				.compressWith(CompressionCodecs.DEFLATE)
+				//.compressWith(CompressionCodecs.DEFLATE)
 				// 签名算法，及key
 				.signWith(SignatureAlgorithm.HS512, key);
 		return builder.compact();
@@ -110,21 +112,46 @@ public class TokenUtil {
 	}
 
 	/**
+	 * 生成Token
+	 * 
+	 * @return
+	 */
+	public static String createToken2(String base64PriKey) throws Exception {
+		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PriKey));
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		Key key = kf.generatePrivate(spec);
+		
+		JwtBuilder builder = Jwts.builder()
+				// 该JWT的发行机构
+				.setIssuer("http://trustyapp.com/")
+				// 发行时间
+				.setIssuedAt(new Date())
+				// 该JWT所面向的用户
+				.setSubject("users/1300819380")
+				// 失效时间 6分钟*60*1000
+				.setExpiration(new Date(System.currentTimeMillis() + 360000))
+				// 接收该JWT的一方
+				.setAudience("hello")
+				// 如果当前时间在nbf里的时间之前，则Token不被接受；一般都会留一些余地，比如几分钟；，是否使用是可选的
+				.setNotBefore(new Date())
+				// 定义额外的属性
+				.claim("user_id", "用户ID")
+
+				//.compressWith(CompressionCodecs.DEFLATE)
+				// 签名算法，及key
+				.signWith(SignatureAlgorithm.RS256, key);
+		return builder.compact();
+	}
+	
+	/**
 	 * 解析Token
 	 * 
 	 * @param compactJws
 	 * @return
 	 * @throws Exception
 	 */
-	public String parseToken2(String compactJws) throws Exception {
-		byte[] keyBytes = null;
-		try (InputStream input = ReadResourceUtil.getInputStream("jwt/pub.key");
-				DataInputStream dis = new DataInputStream(input);) {
-
-			keyBytes = new byte[input.available()];
-			dis.readFully(keyBytes);
-		}
-		X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+	public String parseToken2(String base64PubKey,String compactJws) throws Exception {
+		X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PubKey));
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		Key key = kf.generatePublic(spec);
 		try {
@@ -149,8 +176,10 @@ public class TokenUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// String token = TokenUtil.createToken();
-		String token = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInVzZXJJZCI6IjEiLCJuYW1lIjoiTXIuQUciLCJleHAiOjE1NDA4OTYxOTR9.g03LB_WDyBwvO1BPMlpxTQFgGrUQ9HPqSvC79uLl-bH0AkVEZaF9TFNzppF1o-IoNpZX4ZuN_zlQDtS7xiMxWrPQKQk3asZsHh5u807ffy2gZT_Gg9YMUha0vKH5oi6lyYGQe9ktrHWAo-pZtaqRAOf9mN5OA_CadeGy7fVuWLI";
-		new TokenUtil().parseToken2(token);
+		String priKey = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOZN7Oujeg9AHWexwq1VjI1LmP8bcG+HglGLsnhTykZbH9S8HRq6d6PtIcWNyAuMETYf4jctcVraTTQ3gb8+xqUzT2cSffzvixIr6Ayy6DRNoPuUe8BO4eFGogrK+vgoE8ymvQop7qNyvodnJwMhDTyRvrkuL/KMG4PIBDYEDF5rAgMBAAECgYEAnu+wTX5oQhYRNPqsS0r60JgXYhbhpVZzTSuHYxsQQTWp5fpca5G791kzMU8De1SSnDOsvj+SNwzostyLohwEobZiykZ+1/YXHrKoZSSrKxDkjC9nSUM6CaEOUFiGETuThcR6qcnYUJZKxALFJBpzFViXQtbYDb+89Pc6z3RVGaECQQD5IFe/Fl/EE0h2BQSttLfXNQOv5XBt6tYLMwb6W+QNxG2VmtXX8KoO0p+YE6Mv8v561VaEgFYLr8ObwFPEWibvAkEA7KijL5Sh9uDh27PCJQhJ+SEoKdk2Qfwn5o2vcGgkU7NHHOeHdF8iiV+E7XnO7fXE8LDDjcDiCGi8RxK86z4gRQJBAN+xGNjt4CORJPlD3EWVBZXpdlwUanVn7bW0pclbhVSPUc6JbwYshKY2nTLSPy8owzPMJ5lmGtz3f250rUKbqGUCQF7060VUJgihAv7cibHCOaw0maDw/sxLGNdxUkuP/cN307jNTZRr97eXFAcVMOpaCsNoqY5fLlKhc6ow4oyhSOECQQCo7kaKrDxJbQV9+RAVXzn9lKBX1708r5MZnoAaD4/2lXk0ZatfZV3/lp3JdzBrWBDc3RhSfwx9nP+0adTxNgJG";
+		String pubKey ="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDmTezro3oPQB1nscKtVYyNS5j/G3Bvh4JRi7J4U8pGWx/UvB0aunej7SHFjcgLjBE2H+I3LXFa2k00N4G/PsalM09nEn3874sSK+gMsug0TaD7lHvATuHhRqIKyvr4KBPMpr0KKe6jcr6HZycDIQ08kb65Li/yjBuDyAQ2BAxeawIDAQAB";
+		System.out.println(createToken2(priKey));
+		
+		 
 	}
 }

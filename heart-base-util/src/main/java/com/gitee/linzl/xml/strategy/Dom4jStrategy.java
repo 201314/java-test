@@ -28,7 +28,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLResult;
 import org.dom4j.io.XMLWriter;
 
-import com.gitee.linzl.cls.ClassUtil;
+import com.gitee.linzl.cls.ClassUtils;
 import com.gitee.linzl.xml.NodeVo;
 
 /**
@@ -119,7 +119,7 @@ public class Dom4jStrategy implements AbstractDom4jStrategy {
 
 	public boolean supports(String xmlParseType) {
 		return "dom4j".equalsIgnoreCase(xmlParseType)
-				&& ClassUtil.isPresent("org.dom4j.Document", Dom4jStrategy.class.getClassLoader());
+				&& ClassUtils.isPresent("org.dom4j.Document", Dom4jStrategy.class.getClassLoader());
 	}
 
 	public String readAsText() {

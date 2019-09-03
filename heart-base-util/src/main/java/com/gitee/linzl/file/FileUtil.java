@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
@@ -16,6 +15,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,11 +23,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import com.gitee.linzl.file.event.ProgressListener;
 import com.gitee.linzl.file.model.SplitFileRequest;
@@ -51,21 +53,21 @@ public class FileUtil {
 	 * @return
 	 */
 	public static List<File> getAllFiles(File dir) {
-		List<File> filesList = new ArrayList<>();
+		List<File> files = new ArrayList<>();
 
 		if (dir.isDirectory()) {
 			File[] fileArr = dir.listFiles();
-			if (fileArr != null) {
-				for (File file : fileArr) {
+			if (Objects.nonNull(fileArr)) {
+				Arrays.stream(fileArr).forEach((file) -> {
 					if (file.isFile()) {
-						filesList.add(file);
+						files.add(file);
 					} else {
-						filesList.addAll(getAllFiles(file));
+						files.addAll(getAllFiles(file));
 					}
-				}
+				});
 			}
 		}
-		return filesList;
+		return Optional.ofNullable(files).orElseGet(ArrayList::new);
 	}
 
 	/**
@@ -75,16 +77,14 @@ public class FileUtil {
 	 * @return
 	 */
 	public static List<File> getDirFiles(File dir) {
-		List<File> files = new ArrayList<>();
+		List<File> files = null;
 		if (dir.isDirectory()) {
 			File[] fileArr = dir.listFiles();
-			for (File file : fileArr) {
-				if (file.isFile()) {
-					files.add(file);
-				}
+			if (Objects.nonNull(fileArr)) {
+				files = Arrays.stream(fileArr).filter(file -> file.isFile()).collect(Collectors.toList());
 			}
 		}
-		return files;
+		return Optional.ofNullable(files).orElseGet(ArrayList::new);
 	}
 
 	/**
@@ -94,27 +94,22 @@ public class FileUtil {
 	 * @param suffix  文件后缀
 	 * @return
 	 */
-	public static ArrayList<File> getDirFiles(String dirPath, final String suffix) {
+	public static List<File> getDirFiles(String dirPath, final String suffix) {
 		File path = new File(dirPath);
-		File[] fileArr = path.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				String lowerName = name.toLowerCase();
-				String lowerSuffix = suffix.toLowerCase();
-				if (lowerName.endsWith(lowerSuffix)) {
-					return true;
-				}
-				return false;
+		File[] fileArr = path.listFiles((File dir, String name) -> {
+			String lowerName = name.toLowerCase();
+			String lowerSuffix = suffix.toLowerCase();
+			if (lowerName.endsWith(lowerSuffix)) {
+				return true;
 			}
-
+			return false;
 		});
 
-		ArrayList<File> files = new ArrayList<>();
-		for (File f : fileArr) {
-			if (f.isFile()) {
-				files.add(f);
-			}
+		List<File> files = null;
+		if (Objects.nonNull(fileArr)) {
+			files = Arrays.stream(fileArr).filter(file -> file.isFile()).collect(Collectors.toList());
 		}
-		return files;
+		return Optional.ofNullable(files).orElseGet(ArrayList::new);
 	}
 
 	/**
@@ -192,7 +187,7 @@ public class FileUtil {
 			byte[] bytes = new byte[(int) (len - 1 - pos)];// 文本的最后一位为结束符，所以要减去1
 			raf.read(bytes);
 
-			if (charset == null) {
+			if (Objects.isNull(charset)) {
 				return new String(bytes);
 			}
 			return new String(bytes, charset);
@@ -262,10 +257,10 @@ public class FileUtil {
 	 * @param byteSize 分片大小
 	 * @throws IOException
 	 */
-	public void asynSplitFile(File file, int byteSize, ProgressListener listener) throws IOException {
+	public static void asynSplitFile(File file, int byteSize, ProgressListener listener) throws IOException {
 		long fileSize = file.length();
 		int number = (int) (fileSize / byteSize);
-		number = fileSize % byteSize == 0 ? number : number + 1;// 分割后文件的数目
+		number = (fileSize % byteSize == 0 ? number : number + 1);// 分割后文件的数目
 
 		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 		SplitFileRequest request = null;
@@ -308,9 +303,9 @@ public class FileUtil {
 	 * @param mergeFileName  合并后的文件名
 	 * @throws IOException
 	 */
-	public void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, File mergeFile)
+	public static void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, File mergeFile)
 			throws IOException {
-		ArrayList<File> partFiles = getDirFiles(dirPath, partFileSuffix);
+		List<File> partFiles = getDirFiles(dirPath, partFileSuffix);
 		Collections.sort(partFiles, new FileComparator());
 		ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 
@@ -348,7 +343,7 @@ public class FileUtil {
 	 * @email 2225010489@qq.com
 	 * @date 2018年6月26日
 	 */
-	class FileComparator implements Comparator<File> {
+	private static class FileComparator implements Comparator<File> {
 		public int compare(File o1, File o2) {
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}

@@ -24,6 +24,7 @@ public class RSATest {
 	@Test
 	public void RSA_None_PKCS1PADDING_1024() throws Exception {
 		execute(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024);
+		execute22(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024);
 	}
 
 	@Test
@@ -44,14 +45,31 @@ public class RSATest {
 		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
 		BasePrint.printPublicKey(pubKey.getEncoded());
 
-		byte[] encryptData = AsymmetricalCipherUtil.bcEncrypt(text.getBytes(), pubKey, algorithm);
+		byte[] encryptData = AsymmetricalCipherUtil.encrypt(text.getBytes(), pubKey, algorithm);
 		BasePrint.printEncryptData(encryptData);
 
 		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
 		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
 		BasePrint.printPrivateKey(priKey.getEncoded());
 
-		byte[] decryptData = AsymmetricalCipherUtil.bcDecrypt(encryptData, priKey, algorithm);
+		byte[] decryptData = AsymmetricalCipherUtil.decrypt(encryptData, priKey, algorithm);
+		BasePrint.printDecryptData(decryptData);
+		System.out.println("end===========指定密钥===========end");
+	}
+
+	private void execute22(IAlgorithm algorithm) throws Exception {
+		byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
+		PrivateKey priKey = AsymmetricalCipherUtil.generatePrivateKey(Base64.decodeBase64(privateKey), algorithm);
+		BasePrint.printPrivateKey(priKey.getEncoded());
+
+		byte[] encryptData = AsymmetricalCipherUtil.encrypt(text.getBytes(), priKey, algorithm);
+		BasePrint.printEncryptData(encryptData);
+
+		byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
+		PublicKey pubKey = AsymmetricalCipherUtil.generatePublicKey(Base64.decodeBase64(publicKey), algorithm);
+		BasePrint.printPublicKey(pubKey.getEncoded());
+
+		byte[] decryptData = AsymmetricalCipherUtil.decrypt(encryptData, pubKey, algorithm);
 		BasePrint.printDecryptData(decryptData);
 		System.out.println("end===========指定密钥===========end");
 	}

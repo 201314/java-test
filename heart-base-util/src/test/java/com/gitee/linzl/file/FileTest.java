@@ -13,11 +13,13 @@ import com.gitee.linzl.file.event.ProgressListener;
 import com.gitee.linzl.file.model.FileProgressPart;
 
 public class FileTest {
+	@Test
+	public void getDirFiles() {
+		System.out.println(FileUtil.getDirFiles(new File("D:\\test")));
+	}
 
 	@Test
 	public void splitFile() {
-		FileUtil fileUtil = new FileUtil();
-
 		ProgressListener listener = (progressEvent) -> {
 			FileProgressPart part = progressEvent.getPart();
 			try {
@@ -30,7 +32,7 @@ public class FileTest {
 		};
 		try {
 			File file = new File("D:\\trawe_store\\trawe_store1.zip");
-			fileUtil.asynSplitFile(file, 40 * 1024, listener);
+			FileUtil.asynSplitFile(file, 40 * 1024, listener);
 			System.out.println("文件MD5：" + DigestUtilsExt.md5Hex(file));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -39,10 +41,8 @@ public class FileTest {
 
 	@Test
 	public void mergeFile() throws IOException, InterruptedException {
-		FileUtil fileUtil = new FileUtil();
-
 		// 合并成新文件
-		fileUtil.asynMergeFiles("D:\\trawe_store\\split", ".txt", 40 * 1024,
+		FileUtil.asynMergeFiles("D:\\trawe_store\\split", ".txt", 40 * 1024,
 				new File("D:\\\\trawe_store\\\\split\\new.zip"));
 		Thread.sleep(10000);// 稍等10秒，等前面的小文件全都写完
 	}

@@ -1,10 +1,13 @@
 package com.gitee.linzl.cipher;
 
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.util.Objects;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -12,7 +15,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import com.gitee.linzl.cls.ClassUtils;
 
 public abstract class AbstractCipher {
-	public static final boolean bcPresent;
+	private static final String aesIvParameterSpec = "0102030405060708";
+	private static final String desIvParameterSpec = "12345678";
+	private static final boolean bcPresent;
 	static {
 		ClassLoader classLoader = AbstractCipher.class.getClassLoader();
 		bcPresent = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
@@ -21,7 +26,6 @@ public abstract class AbstractCipher {
 			Security.addProvider(new BouncyCastleProvider());
 		}
 	}
-	private static final String ivParameterSpec = "0102030405060708";
 
 	/**
 	 * @param data      待加密数据
@@ -43,21 +47,12 @@ public abstract class AbstractCipher {
 	 * @throws Exception
 	 */
 	public static byte[] encrypt(byte[] data, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-		Cipher cipher;
-		if (bcPresent) {
-			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
-		} else {
-			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
-		}
+		Cipher cipher = getCipher(algorithm);
+		IvParameterSpec ivParameterSpec = getIvParameterSpec(algorithm, iv);
 
-		if (algorithm.getCipherAlgorithm().equals("AES/CBC/NoPadding") && Objects.isNull(iv)) {
-			iv = new IvParameterSpec(ivParameterSpec.getBytes());
-		}
-
-		if (Objects.nonNull(iv)) {
+		if (Objects.nonNull(ivParameterSpec)) {
 			// 实例化Cipher对象，它用于完成实际的加密操作
-			System.out.println("key.getEncoded().length:" + key.getEncoded().length);
-			cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+			cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
 		} else {
 			cipher.init(Cipher.ENCRYPT_MODE, key);
 		}
@@ -81,24 +76,39 @@ public abstract class AbstractCipher {
 	}
 
 	public static byte[] decrypt(byte[] data, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
+		Cipher cipher = getCipher(algorithm);
+		IvParameterSpec ivParameterSpec = getIvParameterSpec(algorithm, iv);
+
+		if (Objects.nonNull(ivParameterSpec)) {
+			// 初始化Cipher对象，设置为解密模式
+			cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
+		} else {
+			cipher.init(Cipher.DECRYPT_MODE, key);
+		}
+		// 执行解密操作
+		return cipher.doFinal(data);
+	}
+
+	private static Cipher getCipher(IAlgorithm algorithm)
+			throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
 		Cipher cipher;
 		if (bcPresent) {
 			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
 		} else {
 			cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
 		}
+		return cipher;
+	}
 
-		if (algorithm.getCipherAlgorithm().equals("AES/CBC/NoPadding") && Objects.isNull(iv)) {
-			iv = new IvParameterSpec(ivParameterSpec.getBytes());
+	private static IvParameterSpec getIvParameterSpec(IAlgorithm algorithm, IvParameterSpec iv) {
+		IvParameterSpec spec = iv;
+		if (algorithm.getCipherAlgorithm().contains("CBC") && Objects.isNull(spec)) {
+			if (algorithm.getKeyAlgorithm().equalsIgnoreCase("AES")) {
+				spec = new IvParameterSpec(aesIvParameterSpec.getBytes());
+			} else if (algorithm.getKeyAlgorithm().equalsIgnoreCase("DES")) {
+				spec = new IvParameterSpec(desIvParameterSpec.getBytes());
+			}
 		}
-
-		if (Objects.nonNull(iv)) {
-			// 初始化Cipher对象，设置为解密模式
-			cipher.init(Cipher.DECRYPT_MODE, key, iv);
-		} else {
-			cipher.init(Cipher.DECRYPT_MODE, key);
-		}
-		// 执行解密操作
-		return cipher.doFinal(data);
+		return spec;
 	}
 }

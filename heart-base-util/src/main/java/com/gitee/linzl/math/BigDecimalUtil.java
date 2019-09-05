@@ -121,6 +121,10 @@ public class BigDecimalUtil {
     }
 
     public static BigDecimal multiply(Double first, Double second) {
+        /**
+         * 浮点型的计算，不建议直接使用BigDecimal(double val)
+         * 因为如果传入0.1,打印的结果会是0.1000000000000000055511151231257827021181583404541015625
+         */
         BigDecimal bdFirst = BigDecimal.valueOf(first);
         BigDecimal bdSecond = BigDecimal.valueOf(second);
         return bdFirst.multiply(bdSecond);
@@ -159,7 +163,6 @@ public class BigDecimalUtil {
         return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
     }
 
-
     public static void main(String[] args) {
         System.out.println(pointsToYuan(1101));
         System.out.println(percent(1.092));
@@ -170,4 +173,5 @@ public class BigDecimalUtil {
         System.out.println(divide("201", "100"));
         System.out.println(multiply("201", "100"));
     }
+
 }

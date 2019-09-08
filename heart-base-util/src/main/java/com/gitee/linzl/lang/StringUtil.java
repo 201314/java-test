@@ -105,8 +105,16 @@ public class StringUtil {
 	 * @return
 	 */
 
-	public static boolean isEmpty(String param) {
-		return Objects.isNull(param) ? true : (param.trim().length() > 0 ? false : true);
+	public static boolean isEmpty(String... param) {
+		boolean result = true;
+		if (Objects.isNull(param) || param.length == 0) {
+			result = false;
+		} else {
+			for (String value : param) {
+				result &= !isEmpty(value);
+			}
+		}
+		return result;
 	}
 
 	/**

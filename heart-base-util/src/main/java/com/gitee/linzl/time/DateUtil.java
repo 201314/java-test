@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
@@ -264,16 +265,16 @@ public class DateUtil {
     /**
      * 当前年份增加
      *
-     * @param years
+     * @param year
      */
-    public static LocalDateTime plusYears(int years) {
-        return LocalDateTime.now().plusYears(years);
+    public static LocalDateTime plusYears(int year) {
+        return LocalDateTime.now().plusYears(year);
     }
 
     /**
      * 当前月份增加
      *
-     * @param months
+     * @param month
      */
     public static LocalDateTime plusMonths(int month) {
         return LocalDateTime.now().plusMonths(month);
@@ -282,71 +283,71 @@ public class DateUtil {
     /**
      * 当前天增加
      *
-     * @param days
+     * @param day
      */
-    public static LocalDateTime plusDays(int days) {
-        return LocalDateTime.now().plusDays(days);
+    public static LocalDateTime plusDays(int day) {
+        return LocalDateTime.now().plusDays(day);
     }
 
     /**
      * 当前小时增加
      *
-     * @param hours
+     * @param hour
      */
-    public static LocalDateTime plusHours(int hours) {
-        return LocalDateTime.now().plusHours(hours);
+    public static LocalDateTime plusHours(int hour) {
+        return LocalDateTime.now().plusHours(hour);
     }
 
     /**
      * 当前时间加多少分钟
      *
-     * @param minutes
+     * @param minute
      */
-    public static LocalDateTime plusMinutes(int minutes) {
-        return LocalDateTime.now().plusMinutes(minutes);
+    public static LocalDateTime plusMinutes(int minute) {
+        return LocalDateTime.now().plusMinutes(minute);
     }
 
     /**
      * 当前时间加多少秒数
      *
-     * @param seconds
+     * @param second
      */
-    public static LocalDateTime plusSeconds(int seconds) {
-        return LocalDateTime.now().plusSeconds(seconds);
+    public static LocalDateTime plusSeconds(int second) {
+        return LocalDateTime.now().plusSeconds(second);
     }
 
-    public static LocalDateTime minusYears(int years) {
-        return LocalDateTime.now().minusYears(years);
+    public static LocalDateTime minusYears(int year) {
+        return LocalDateTime.now().minusYears(year);
     }
 
     public static LocalDateTime minusMonths(int month) {
         return LocalDateTime.now().minusMonths(month);
     }
 
-    public static LocalDateTime minusDays(int days) {
-        return LocalDateTime.now().minusDays(days);
+    public static LocalDateTime minusDays(int day) {
+        return LocalDateTime.now().minusDays(day);
     }
 
-    public static LocalDateTime minusHours(int hours) {
-        return LocalDateTime.now().minusHours(hours);
+    public static LocalDateTime minusHours(int hour) {
+        return LocalDateTime.now().minusHours(hour);
     }
 
     /**
      * 当前时间减多少分钟
      *
-     * @param minutes
+     * @param minute
      */
-    public static LocalDateTime minusMinutes(int minutes) {
-        return LocalDateTime.now().minusMinutes(minutes);
+    public static LocalDateTime minusMinutes(int minute) {
+        return LocalDateTime.now().minusMinutes(minute);
     }
 
     /**
      * 当前时间减多少秒数
      *
-     * @param seconds
+     * @param second
      */
-    public static LocalDateTime minusSeconds(int seconds) {
-        return LocalDateTime.now().minusSeconds(seconds);
+    public static LocalDateTime minusSeconds(int second) {
+        return LocalDateTime.now().minusSeconds(second);
     }
 
     /**
@@ -369,7 +370,8 @@ public class DateUtil {
      * @return
      */
     public static long days(LocalDateTime startTime, LocalDateTime endTime) {
-        return compare(startTime, endTime).toDays();
+        //return compare(startTime, endTime).toDays();
+        return startTime.until(endTime, ChronoUnit.DAYS);
     }
 
     /**
@@ -385,7 +387,8 @@ public class DateUtil {
     }
 
     public static long hours(LocalDateTime startTime, LocalDateTime endTime) {
-        return compare(startTime, endTime).toHours();
+        //return compare(startTime, endTime).toHours();
+        return startTime.until(endTime, ChronoUnit.HOURS);
     }
 
     /**
@@ -401,7 +404,8 @@ public class DateUtil {
     }
 
     public static long minutes(LocalDateTime startTime, LocalDateTime endTime) {
-        return compare(startTime, endTime).toMinutes();
+        //return compare(startTime, endTime).toMinutes();
+        return startTime.until(endTime, ChronoUnit.MINUTES);
     }
 
     /**
@@ -424,7 +428,8 @@ public class DateUtil {
      * @return
      */
     public static long seconds(LocalDateTime startTime, LocalDateTime endTime) {
-        return compare(startTime, endTime).getSeconds();
+        //return compare(startTime, endTime).getSeconds();
+        return startTime.until(endTime, ChronoUnit.SECONDS);
     }
 
     /**
@@ -442,7 +447,8 @@ public class DateUtil {
     }
 
     public static long milliSeconds(LocalDateTime startTime, LocalDateTime endTime) {
-        return compare(startTime, endTime).toMillis();
+        //return compare(startTime, endTime).toMillis();
+        return startTime.until(endTime, ChronoUnit.MILLIS);
     }
 
     /**
@@ -471,7 +477,7 @@ public class DateUtil {
         return Duration.between(startTime, endTime);
     }
 
-    public static Date parse2Date(String text, String pattern) {
+    public static Date toDate(String text, String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
             return sdf.parse(text);
@@ -479,14 +485,6 @@ public class DateUtil {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static LocalDate parse2LocalDate(String text, String pattern) {
-        return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern));
-    }
-
-    public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
-        return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
     }
 
     public static Date toDate(LocalDateTime localDateTime) {
@@ -500,6 +498,15 @@ public class DateUtil {
         ZonedDateTime zdt = localDate.atStartOfDay(zoneId);
         return Date.from(zdt.toInstant());
     }
+
+    public static LocalDate toLocalDateTime(String text, String pattern) {
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
+        return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
+    }
+
 
     public static LocalDateTime toLocalDateTime(Date date) {
         Instant instant = date.toInstant();

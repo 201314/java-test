@@ -1,5 +1,9 @@
-package day08.spi;
+package com.gitee.linzl.spi;
 
+import org.apache.poi.ss.formula.functions.T;
+
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.ServiceLoader;
 
 /**
@@ -17,28 +21,24 @@ import java.util.ServiceLoader;
  * ，如果没有提供SPI这种实现标准，那就只有修改JAVA的源代码了，那这个弊端也是显而易见的，也就是不能够随着JDK的升级而升级现在的应用了
  * ，而有了SPI标准，SUN公司只需要提供一个播放接口，在实现播放的功能上通过ServiceLoad的方式加载服务，那么第三方只需要实现这个播放接口，
  * 再按SPI标准进行打包成jar，再放到classpath下面就OK了，没有一点代码的侵入性。
- * 
- * @author linzl
- * 
+ *
+ * @author linzhenlie
+ * @date 2019/9/16
  */
-public class SpiTest2 {
+public class SpiFactory {
 
-	/**
-	 * @param args
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws ClassNotFoundException
-	 */
-	public static void main(String[] args)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		ServiceLoader<SpiService> loader = ServiceLoader.load(SpiService.class);
-		if (loader == null) {
-			return;
-		}
+    public static <T> ServiceLoader<T> loadAll(Class<T> cls) {
+        return ServiceLoader.load(cls);
+    }
 
-		for (SpiService service : loader) {
-			System.out.println("哪个类--》" + service.getClass().getSimpleName());
-			service.test();
-		}
-	}
+    public static <T> T loadFirst(Class<T> cls) {
+        ServiceLoader<T> load = loadAll(cls);
+        Iterator<T> iterator = load.iterator();
+        if (!iterator.hasNext()) {
+            throw new IllegalStateException(String.format(
+                    "No implementation defined in /META-INF/services/%s, please check whether the file exists and has the right implementation class!",
+                    cls.getName()));
+        }
+        return iterator.next();
+    }
 }

@@ -1,7 +1,7 @@
 package com.gitee.linzl.concurrent.threadPoolExecutor;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 /**
- * 直接使用Executors
+ * 比较简单的多线程可以直接使用Executor，一般建议使用ThreadPoolExecutor
  * 
  * @description
  * @author linzl
@@ -38,16 +38,16 @@ public class ThreadPoolExecutorDemo {
 
 	@Test
 	public void testDelayQueue() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
 		System.out.println("延迟队列线程池");
 		for (int i = 0; i < 5; i++) {
 			final int index = i;
 			executor.schedule(() -> {
-				System.out.println("延迟顺序执行:" + index + ",时间：" + simpleDateFormat.format(new Date()));
+				System.out.println("延迟顺序执行:" + index + ",时间：" + format.format(LocalDateTime.now()));
 			}, 10, TimeUnit.SECONDS);
 		}
-		System.out.println("end main时间:" + simpleDateFormat.format(new Date()));
+		System.out.println("end main时间:" + format.format(LocalDateTime.now()));
 	}
 
 	@Test

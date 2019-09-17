@@ -1,6 +1,8 @@
 package com.gitee.linzl.concurrent.threadPoolExecutor;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,6 +27,21 @@ public class TimingThreadPool extends ThreadPoolExecutor {
 	public TimingThreadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+	}
+
+	public TimingThreadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+			BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
+		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+	}
+
+	public TimingThreadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+			BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
+		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
+	}
+
+	public TimingThreadPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+			BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
+		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
 	}
 
 	protected void beforeExecute(Thread t, Runnable r) {

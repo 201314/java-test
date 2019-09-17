@@ -1,7 +1,7 @@
 package com.gitee.linzl.concurrent.tool;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -24,7 +24,7 @@ public class SemaphoreDemo {
 			try {
 				avialable.acquire(); // 此方法阻塞,直到获取许可
 				Thread.sleep(10 * 1000);
-				System.out.println(new SimpleDateFormat("mm:ss").format(new Date()) + "--"
+				System.out.println(LocalTime.now().format(DateTimeFormatter.ofPattern("mm:ss")) + "--"
 						+ Thread.currentThread().getName() + "--执行完毕");
 				avialable.release();// 访问完后，释放
 			} catch (InterruptedException e) {

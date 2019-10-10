@@ -37,15 +37,16 @@ public class Sequence {
 
 	/** workerId占用的位数5（表示只允许workId的范围为：0-1023） **/
 	private final long workerIdBits = 5L;
-	/** dataCenterId占用的位数：5 **/
-	private final long dataCenterIdBits = 5L;
-	/** 序列号占用的位数：12（表示只允许workId的范围为：0-4095） **/
-	private final long sequenceBits = 12L;
-
 	/** workerId可以使用的最大数值：31 **/
 	private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+
+	/** dataCenterId占用的位数：5 **/
+	private final long dataCenterIdBits = 5L;
 	/** dataCenterId可以使用的最大数值：31 **/
 	private final long maxDataCenterId = -1L ^ (-1L << dataCenterIdBits);
+
+	/** 序列号占用的位数：12（表示只允许workId的范围为：0-4095） **/
+	private final long sequenceBits = 12L;
 
 	private final long workerIdShift = sequenceBits;
 	private final long dataCenterIdShift = sequenceBits + workerIdBits;

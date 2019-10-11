@@ -5,17 +5,18 @@ import com.gitee.linzl.file.model.SplitFileRequest;
 import com.gitee.linzl.file.progress.MergeRunnable;
 import com.gitee.linzl.file.progress.SplitRunnable;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 文件处理辅助类
@@ -39,7 +40,7 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static String readFileByChars(File file, String charset) throws Exception {
+    public static String read(File file, String charset) throws Exception {
         if (!file.exists()) {
             throw new Exception(file.getPath() + "不存在该文件");
         }
@@ -75,28 +76,18 @@ public class FileUtil {
         return Files.readAllLines(file.toPath(), Charset.forName(realCharset));
     }
 
-    /***
-     * 递归获取指定目录下的所有的文件(不包括文件夹)
+    /**
+     * 读取文件内容
      *
-     * @param dir
-     * @return
+     * @param file 待读取的文件
+     * @return 文件内容
+     * @throws IOException
      */
-    public static List<File> getFiles(File dir) {
-        List<File> files = new ArrayList<>();
-
-        if (dir.isDirectory()) {
-            File[] fileArr = dir.listFiles();
-            if (Objects.nonNull(fileArr)) {
-                Arrays.stream(fileArr).forEach((file) -> {
-                    if (file.isFile()) {
-                        files.add(file);
-                    } else {
-                        files.addAll(getFiles(file));
-                    }
-                });
-            }
+    public static byte[] read(File file) throws Exception {
+        if (!file.isFile()) {
+            throw new Exception("file不是文件");
         }
-        return Optional.ofNullable(files).orElseGet(ArrayList::new);
+        return Files.readAllBytes(file.toPath());
     }
 
     /**
@@ -105,61 +96,69 @@ public class FileUtil {
      * @param dir
      * @return
      */
-    public static List<File> getDirFiles(File dir) {
+    public static List<File> list(File dir) {
         List<File> files = null;
-        if (dir.isDirectory()) {
-            File[] fileArr = dir.listFiles();
-            if (Objects.nonNull(fileArr)) {
-                files = Arrays.stream(fileArr).filter(file -> file.isFile()).collect(Collectors.toList());
-            }
+        Stream<Path> stream;
+        try {
+            stream = Files.list(dir.toPath());
+            files = stream.filter(path -> path.toFile().isFile())
+
+                    .map(Path::toFile).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return Optional.ofNullable(files).orElseGet(ArrayList::new);
     }
+
 
     /**
      * 获取指定目录下特定文件后缀名的文件列表(不包括子文件夹)
      *
-     * @param dirPath 目录路径
-     * @param suffix  文件后缀
+     * @param dir    目录路径
+     * @param suffix 文件后缀
      * @return
      */
-    public static List<File> getDirFiles(String dirPath, final String suffix) {
-        File path = new File(dirPath);
-        File[] fileArr = path.listFiles((File dir, String name) -> {
-            String lowerName = name.toLowerCase();
-            String lowerSuffix = suffix.toLowerCase();
-            if (lowerName.endsWith(lowerSuffix)) {
-                return true;
-            }
-            return false;
-        });
-
+    public static List<File> list(File dir, String suffix) {
         List<File> files = null;
-        if (Objects.nonNull(fileArr)) {
-            files = Arrays.stream(fileArr).filter(file -> file.isFile()).collect(Collectors.toList());
+        try {
+            Stream<Path> stream = Files.list(dir.toPath());
+            files = stream.filter(path -> path.toFile().isFile() && path.toFile().getName().endsWith(suffix))
+
+                    .map(Path::toFile).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return Optional.ofNullable(files).orElseGet(ArrayList::new);
     }
 
-    /**
-     * 读取文件内容
+    /***
+     * 递归获取指定目录下的所有的文件(不包括文件夹)
      *
-     * @param file 待读取的文件
-     * @return 文件内容
-     * @throws IOException
+     * @param dir
+     * @return
      */
-    public byte[] read(File file) throws Exception {
-        if (!file.isFile()) {
-            throw new Exception("file不是文件");
-        }
+    public static List<File> recursiveList(File dir) {
+        return recursiveList(dir, null);
+    }
 
-        /*byte[] bytes;
-        try (InputStream fs = new BufferedInputStream(new FileInputStream(file))) {
-            bytes = new byte[fs.available()];
-            fs.read(bytes);
+    public static List<File> recursiveList(File dir, String suffix) {
+        List<File> files = new ArrayList<>();
+
+        try {
+            Stream<Path> stream = Files.list(dir.toPath());
+            stream.forEach((path) -> {
+                if (path.toFile().isFile()) {
+                    if (Objects.isNull(suffix) || path.toFile().getName().endsWith(suffix)) {
+                        files.add(path.toFile());
+                    }
+                } else {
+                    files.addAll(recursiveList(path.toFile()));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return bytes;*/
-        return Files.readAllBytes(file.toPath());
+        return Optional.ofNullable(files).orElseGet(ArrayList::new);
     }
 
     /**
@@ -168,13 +167,11 @@ public class FileUtil {
      * @param file
      * @return
      */
-    public static int readLineNumber(File file) {
+    public static int lineNumber(File file) {
         try (LineNumberReader reader = new LineNumberReader(new FileReader(file))) {
-            if (Objects.nonNull(file) && file.exists()) {
-                long fileLength = file.length();
-                reader.skip(fileLength);
-                return reader.getLineNumber();
-            }
+            long fileLength = file.length();
+            reader.skip(fileLength);
+            return reader.getLineNumber() + 1;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -205,8 +202,7 @@ public class FileUtil {
             while (count > 0 && pos > 0) {
                 pos--;
                 raf.seek(pos);
-                // 得到 count 行数据
-                if (raf.read() == '\n' || raf.read() == '\r') {
+                if (raf.read() == '\n') { // \r的是否也需要判断，操作系统不同换行不同
                     count--;
                 }
             }
@@ -216,11 +212,7 @@ public class FileUtil {
             // 文本的最后一位为结束符，所以要减去1
             byte[] bytes = new byte[(int) (len - 1 - pos)];
             raf.read(bytes);
-
-            if (Objects.isNull(charset)) {
-                return new String(bytes);
-            }
-            return new String(bytes, charset);
+            return Objects.isNull(charset) ? new String(bytes) : new String(bytes, charset);
         }
     }
 
@@ -249,13 +241,13 @@ public class FileUtil {
         if (!file.exists() || !file.isFile()) {
             throw new Exception("file不是文件");
         }
-
-        boolean result = false;
-        try (OutputStream fs = new BufferedOutputStream(new FileOutputStream(file, append))) {
-            fs.write(fileContent);
-            result = true;
+        Path path;
+        if (append) {
+            path = Files.write(file.toPath(), fileContent, StandardOpenOption.APPEND);
+        } else {
+            path = Files.write(file.toPath(), fileContent);
         }
-        return result;
+        return Objects.nonNull(path);
     }
 
     /**
@@ -289,8 +281,8 @@ public class FileUtil {
      */
     public static void asynSplitFile(File file, int byteSize, ProgressListener listener) throws IOException {
         long fileSize = file.length();
-        int number = (int) (fileSize / byteSize);
-        number = (fileSize % byteSize == 0 ? number : number + 1);// 分割后文件的数目
+        // 分割后文件的数目
+        int number = (int) ((fileSize + byteSize - 1) / byteSize);
 
         ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
         SplitFileRequest request;
@@ -327,31 +319,37 @@ public class FileUtil {
     /**
      * 异步合并文件,合并完成会删除分片文件
      *
-     * @param dirPath        拆分文件所在目录名
-     * @param partFileSuffix 拆分文件后缀名
-     * @param partFileSize   拆分文件的字节数大小
+     * @param dir            需要合并的文件所在目录名
+     * @param partFileSuffix 需要合并的文件后缀名
+     * @param partFileSize   需要合并文件的字节数大小,必须每个分片固定大小，除了最后一个分片
      * @param mergeFile      合并后的文件
      * @throws IOException
      */
-    public static void asynMergeFiles(String dirPath, String partFileSuffix, int partFileSize, File mergeFile)
+    public static void asynMergeFiles(File dir, String partFileSuffix, int partFileSize, File mergeFile)
             throws IOException {
-        List<File> partFiles = getDirFiles(dirPath, partFileSuffix);
+        List<File> partFiles = list(dir, partFileSuffix);
+        /**
+         * 需要合并的分片进行排序
+         */
         Collections.sort(partFiles, new FileComparator());
+
         ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
 
-        Map<Integer, Future<Boolean>> completeMap = new HashMap<>();
+        Map<Integer, Future<Boolean>> completeMap = new HashMap<>(partFiles.size());
         for (int index = 0, length = partFiles.size(); index < length; index++) {
             Future<Boolean> future = executor
                     .submit(new MergeRunnable(index * partFileSize, mergeFile, partFiles.get(index)));
             completeMap.put(index, future);
         }
+
         Set<Integer> set = completeMap.keySet();
         Iterator<Integer> iter = set.iterator();
-        Integer index = 0;
+        Integer index;
         try {
             while (iter.hasNext()) {
                 index = iter.next();
-                if (completeMap.get(index).get()) {// 表示已经合并成功，即可删除
+                // 表示已经合并成功，即可删除
+                if (completeMap.get(index).get()) {
                     partFiles.get(index).deleteOnExit();
                 }
             }
@@ -378,18 +376,19 @@ public class FileUtil {
         public int compare(File o1, File o2) {
             return o1.getName().compareToIgnoreCase(o2.getName());
         }
+
     }
 
-    public static long fileSize(File file) {
+    public static long size(File file) {
         try {
-            return fileSize(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
+            return Files.size(file.toPath());
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return 0;
     }
 
-    public static long fileSize(FileInputStream file) {
+    public static long size(FileInputStream file) {
         try {
             FileChannel fc = file.getChannel();
             return fc.size();
@@ -401,76 +400,39 @@ public class FileUtil {
         return 0;
     }
 
-
     /**
      * 删除目录下所有直接子文件
      *
      * @param dir
      */
-    public static void deleteDoc(File dir) {
-        if (dir == null || !dir.isDirectory()) {
-            return;
-        }
-        File[] childFiles = dir.listFiles();
-        for (int i = 0; i < childFiles.length; i++) {
-            childFiles[i].delete();
-        }
-    }
-
-    /**
-     * 删除目录下的文件及其子目录的文件
-     */
-    public static void recursionDeleteDoc(File dir) {
-        if (dir == null || !dir.isDirectory()) {
-            return;
-        }
-        // 列出目录下所有文件夹和文件的名称
-        File[] files = dir.listFiles();
-        if (files == null) {
-            return;
-        }
-        for (File param : files) {
-            if (param.isDirectory()) {
-                recursionDeleteDoc(param);
-            }
-            param.delete();
-        }
-    }
-
-    /**
-     * 删除目录下所有文件,包括该目录
-     */
-    public static void recursionDeleteFile(File file) {
-        // 列出目录下所有文件夹和文件的名称
-        File[] files = file.listFiles();
-        if (files == null) {
-            return;
-        }
-        for (File param : files) {
-            if (param.isDirectory()) {
-                recursionDeleteFile(param);
-            }
-            param.delete();
-        }
-        file.delete();
+    public static void delete(File dir) {
+        List<File> fileList = list(dir);
+        fileList.stream().forEach(file -> file.deleteOnExit());
     }
 
     /**
      * 删除该路径下所有名称匹配的文件，包括路径下文件夹中的文件
      *
-     * @param dir     删除路径
-     * @param pattern 匹配文件名的正则表达式
+     * @param dir    删除路径
+     * @param suffix 匹配文件名的正则表达式
      * @throws Exception
      */
-    public void deleteDoc(File dir, String pattern) throws Exception {
-        if (dir.exists()) {
-            List<File> list = findMatchFileName(dir, pattern);
-            for (File dest : list) {
-                deleteDoc(dest);
-            }
-        } else {
-            throw new Exception(dir + "路径不存在");
-        }
+    public static void delete(File dir, String suffix) {
+        List<File> fileList = list(dir, suffix);
+        fileList.stream().forEach(file -> file.deleteOnExit());
+    }
+
+    /**
+     * 删除目录下的文件及其子目录的文件,不删除目录
+     */
+    public static void recursionDelete(File dir) {
+        List<File> fileList = recursiveList(dir);
+        fileList.stream().forEach(file -> file.deleteOnExit());
+    }
+
+    public static void recursionDelete(File dir, String suffix) {
+        List<File> fileList = recursiveList(dir, suffix);
+        fileList.stream().forEach(file -> file.deleteOnExit());
     }
 
     /**
@@ -491,37 +453,6 @@ public class FileUtil {
         }
     }
 
-
-    /**
-     * 递归搜索目录下文件名与pattern匹配的所有文件
-     *
-     * @param dir     搜索路径
-     * @param pattern 匹配文件名的正则表达式
-     * @return
-     * @throws Exception
-     */
-    public List<File> findMatchFileName(File dir, String pattern) {
-        List<File> docList = getFiles(dir);
-//		for (File file : new ArrayList<File>(docList)) {// 复制一份，List不能安全删除，除非使用Iterator
-//			if (file.getName().indexOf(pattern) < 0) {
-//				docList.remove(file);
-//			}
-//		}
-
-        // 或者
-        Iterator<File> iter = docList.iterator();
-        if (iter != null) {
-            while (iter.hasNext()) {
-                File file = iter.next();
-                if (file.getName().indexOf(pattern) < 0) {
-                    iter.remove();
-                }
-            }
-        }
-        return docList;
-    }
-
-
     /**
      * 复制文件
      *
@@ -529,21 +460,33 @@ public class FileUtil {
      * @param target 复制文件
      * @throws IOException
      */
-    public static void copyFile(File source, File target) throws IOException {
-        byte[] sourceB = new byte[1024 * 5];
-        int length;
+    public static void copy(File source, File target) throws IOException {
+        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
 
-        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(source));
-             BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(target))) {
-            while ((length = is.read(sourceB)) > -1) {
-                fos.write(sourceB, 0, length);
-            }
+    public String getContentType(File file) {
+        //利用nio提供的类判断文件ContentType
+        Path path = file.toPath();
+        String contentType = null;
+        try {
+            contentType = Files.probeContentType(path);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        //若失败则调用另一个方法进行判断
+        if (Objects.isNull(contentType)) {
+            contentType = new MimetypesFileTypeMap().getContentType(file);
+        }
+        return contentType;
     }
 
     public static void main(String[] args) throws IOException {
         //writeHead(new File("D://CZ9700000630000020190117103159.txt"), "我是中国人" .getBytes());
         List<String> list = Files.readAllLines(Paths.get("D:\\333.txt"));
         System.out.println(list);
+        Stream<Path> stream = Files.list(Paths.get("D:\\入职文件"));
+        stream.forEach((path) -> {
+            System.out.println(path.toFile());
+        });
     }
 }

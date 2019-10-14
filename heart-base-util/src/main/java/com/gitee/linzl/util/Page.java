@@ -5,6 +5,12 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * 分页
+ *
+ * @author linzhenlie
+ * @date 2019/10/14
+ */
 @Setter
 @Getter
 public class Page<T> {
@@ -13,21 +19,21 @@ public class Page<T> {
      */
     private List<T> data;
     /**
+     * 当前页
+     */
+    private int page;
+    /**
      * 每页行数,默认每页10行
      */
     private int pageSize = 15;
     /**
      * 总页数
      */
-    private int totalPages;
+    private int pages;
     /**
      * 总行数
      */
-    private int totalRecords;
-    /**
-     * 当前页
-     */
-    private int currentPage;
+    private int total;
     /**
      * 第一页
      */
@@ -41,57 +47,60 @@ public class Page<T> {
      */
     private int nextPage;
     /**
-     * 最后一页,就是总页数
-     */
-    private int endPage;
-
-    /**
-     * 当前页，起始记录行号
+     * 当前页，起始记录行号,用于mysql的limit查询
      */
     private int startRecord;
-    /**
-     * 终点记录行
-     */
-    private int endRecord;
 
     /**
      * 当点击了上一页或者下一页或者其他点击页数操作后，再点击条件查询，要将当前页currentPage=1传入
      *
-     * @param data        需要分页的结果集
-     * @param pageSize    每页行数
-     * @param currentPage 当前页 表示点击上一页的页码，下一页的页码，或者是点击某一页的页码
-     * @param total       总页数
+     * @param data     需要分页的结果集
+     * @param pageSize 每页行数
+     * @param page     当前页 表示点击上一页的页码，下一页的页码，或者是点击某一页的页码
+     * @param total    总页数
      */
-    public Page(List<T> data, int pageSize, int currentPage, int total) {
+    public Page(List<T> data, int pageSize, int page, int total) {
         this.data = data;
         this.pageSize = pageSize > 0 ? pageSize : this.pageSize;
 
         // 计算总行数
-        this.totalRecords = total;
+        this.total = total;
 
         // 计算当前页,当前页小于1,则显示第1页;当前页大于totalPage,则显示totalPage
-        this.currentPage = currentPage < this.firstPage ? this.firstPage
-                : (currentPage > this.totalPages ? this.totalPages : currentPage);
+        this.page = page < this.firstPage ? this.firstPage
+                : (page > this.pages ? this.pages : page);
 
         // 计算起始记录行
-        this.startRecord = (this.currentPage - 1) * this.pageSize;
+        this.startRecord = (this.page - 1) * this.pageSize;
     }
 
-    public int getTotalPages() {
-        // 计算总页数
-        this.totalPages = (this.totalRecords + this.pageSize - 1) / this.pageSize;
-        return this.totalPages;
+    /**
+     * 总页数
+     *
+     * @return
+     */
+    public int getPages() {
+        this.pages = (this.total + this.pageSize - 1) / this.pageSize;
+        return this.pages;
     }
 
+    /**
+     * 上一页
+     *
+     * @return
+     */
     public int getPrePage() {
-        // 计算上一页
-        this.prePage = this.currentPage <= this.firstPage ? this.firstPage : (this.currentPage - 1);
+        this.prePage = this.page <= this.firstPage ? this.firstPage : (this.page - 1);
         return this.prePage;
     }
 
+    /**
+     * 下一页
+     *
+     * @return
+     */
     public int getNextPage() {
-        // 计算下一页
-        this.nextPage = this.currentPage >= this.totalPages ? this.totalPages : (this.currentPage + 1);
+        this.nextPage = this.page >= this.pages ? this.pages : (this.page + 1);
         return this.nextPage;
     }
 }

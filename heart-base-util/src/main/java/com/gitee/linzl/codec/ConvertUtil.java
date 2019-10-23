@@ -11,6 +11,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -701,7 +703,135 @@ public class ConvertUtil {
 		return bytes;
 	}
 
+	static Map<Long, String> map = new HashMap<>(12);
+	static Map<Long, String> unitMap = new HashMap<>();
+	static Map<Long, String> sectionMap = new HashMap<>(3);
+
+	static {
+		map.put(0L, "零");
+		map.put(1L, "壹");
+		map.put(2L, "贰");
+		map.put(3L, "叁");
+		map.put(4L, "肆");
+		map.put(5L, "伍");
+		map.put(6L, "陆");
+		map.put(7L, "柒");
+		map.put(8L, "捌");
+		map.put(9L, "玖");
+
+		unitMap.put(1L, "拾");
+		unitMap.put(2L, "佰");
+		unitMap.put(3L, "仟");
+
+		sectionMap.put(1L, "元");
+		// 第2位开始用万
+		sectionMap.put(2L, "万");
+		// 第3位开始用亿
+		sectionMap.put(3L, "亿");
+
+	}
+
+//分、角、元、拾、佰、仟、万、亿、兆
+
+	/**
+	 * 金额转中文大写
+	 *
+	 * @param number
+	 * @return
+	 */
+	public static String numberConvertCapital(long number) {
+		String str = String.valueOf(number);
+		int numLength = str.length();
+		int section = (numLength + (4 - 1)) / 4;
+
+		StringBuffer sb = new StringBuffer();
+
+		int count = 1;
+		while (count <= section) {
+			int startIdx = numLength - 4 * count;
+			startIdx = startIdx > 0 ? startIdx : 0;
+
+			int ednInx = numLength - 4 * (count - 1);
+
+			String subStr = str.substring(startIdx, ednInx);
+			String result = capital2(Long.parseLong(subStr), count);
+			sb.insert(0, result);
+			count++;
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 每4位转大写，所有数字和单位都显示出来，完整版
+	 * 
+	 * @param number
+	 * @param section 从右数起第几个4位
+	 * @return
+	 */
+	public static String capital(long number, long section) {
+		StringBuffer sb = new StringBuffer(sectionMap.get(section));
+		long remainder = number % 10;
+		sb.insert(0, map.get(remainder));
+		number = number / 10;
+
+		long tIdx = 0;
+		while (number > 0) {
+			tIdx++;
+			remainder = number % 10;
+			sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
+			number = number / 10;
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 每4位转大写,可简写
+	 * 
+	 * @param number
+	 * @param section 从右数起第几个4位
+	 * @return
+	 */
+	public static String capital2(long number, long section) {
+		StringBuffer sb = new StringBuffer(sectionMap.get(section));
+		long remainder = number % 10;
+		sb.insert(0, map.get(remainder));
+		number = number / 10;
+
+		long tIdx = 0;
+		while (number > 0) {
+			tIdx++;
+			remainder = number % 10;
+			if (remainder == 0L) {
+				sb.insert(0, map.get(remainder));
+			} else {
+				sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
+			}
+			number = number / 10;
+		}
+
+		String str = sb.toString();
+		String[] arr = str.split("");
+		int lianxuZero = 0;
+		StringBuffer rSb = new StringBuffer();
+		for (String string : arr) {
+			if ("零".endsWith(string)) {
+				lianxuZero++;
+			} else {
+				lianxuZero = 0;
+			}
+			if (lianxuZero <= 1) {
+				rSb.append(string);
+			}
+		}
+
+		return rSb.toString();
+	}
+
 	public static void main(String[] args) {
-		System.out.println(string2Hex("100"));
+		long number = 6895;
+		System.out.println("number6895:" + capital(number, 1));
+		number = 235_6895;
+		System.out.println("number1235_6895:" + numberConvertCapital(number));
+		System.out.println("107,000:" + numberConvertCapital(107000));
 	}
 }

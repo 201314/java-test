@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,289 +20,285 @@ import java.util.zip.CRC32;
 
 /**
  * byte 1字节
- * 
+ * <p>
  * char 2字节（C语言中是1字节）可以存储一个汉字
- * 
+ * <p>
  * short 2字节
- * 
+ * <p>
  * int 4字节
- * 
+ * <p>
  * long 8字节
- * 
+ * <p>
  * float 4字节
- * 
+ * <p>
  * double 8字节
- * 
- * @description
+ *
  * @author linzl
+ * @description
  * @email 2225010489@qq.com
  * @date 2018年4月24日
  */
 public class ConvertUtil {
-	/**
-	 * 合并两个byte数组
-	 * 
-	 * @param firstByte
-	 * @param secondByte
-	 * @return
-	 */
-	public static byte[] mergeBytes(byte[] firstByte, byte[] secondByte) {
-		byte[] mergeByte = new byte[firstByte.length + secondByte.length];
-		System.arraycopy(firstByte, 0, mergeByte, 0, firstByte.length);
-		System.arraycopy(secondByte, 0, mergeByte, firstByte.length, secondByte.length);
-		return mergeByte;
-	}
+    /**
+     * 合并两个byte数组
+     *
+     * @param firstByte
+     * @param secondByte
+     * @return
+     */
+    public static byte[] mergeBytes(byte[] firstByte, byte[] secondByte) {
+        byte[] mergeByte = new byte[firstByte.length + secondByte.length];
+        System.arraycopy(firstByte, 0, mergeByte, 0, firstByte.length);
+        System.arraycopy(secondByte, 0, mergeByte, firstByte.length, secondByte.length);
+        return mergeByte;
+    }
 
-	public static byte[] mergeByte(byte[] firstByte, byte[] secondByte) {
-		ByteBuffer target = ByteBuffer.allocate(firstByte.length + secondByte.length);
-		target.put(firstByte);
-		target.put(secondByte);
-		return target.array();
-	}
+    public static byte[] mergeByte(byte[] firstByte, byte[] secondByte) {
+        ByteBuffer target = ByteBuffer.allocate(firstByte.length + secondByte.length);
+        target.put(firstByte);
+        target.put(secondByte);
+        return target.array();
+    }
 
-	/**
-	 * 
-	 * 计算CRC16校验码
-	 *
-	 * @param data 字节数组
-	 * @return 校验码
-	 */
-	public static long crc16(byte[] data) {
-		long CRC = 0xFFFF;
-		for (int i = 0; i < data.length; i++) {
-			CRC ^= (data[i] & 0x00FF);// 遇到负数，转为正数
-			for (int j = 0; j < 8; j++) {
-				if ((CRC & 0x0001) != 0) {
-					CRC >>= 1;
-					CRC ^= 0xA001;
-				} else {
-					CRC >>= 1;
-				}
-			}
-		}
-		return CRC;
-	}
+    /**
+     * 计算CRC16校验码
+     *
+     * @param data 字节数组
+     * @return 校验码
+     */
+    public static long crc16(byte[] data) {
+        long CRC = 0xFFFF;
+        for (int i = 0; i < data.length; i++) {
+            CRC ^= (data[i] & 0x00FF);// 遇到负数，转为正数
+            for (int j = 0; j < 8; j++) {
+                if ((CRC & 0x0001) != 0) {
+                    CRC >>= 1;
+                    CRC ^= 0xA001;
+                } else {
+                    CRC >>= 1;
+                }
+            }
+        }
+        return CRC;
+    }
 
-	/**
-	 * 
-	 * 计算CRC16校验码 (Modbus)
-	 *
-	 * @param data 字节数组
-	 * @return 校验码
-	 */
-	public static String crc16ToHex(byte[] data) {
-		return Long.toHexString(crc16(data)).toUpperCase();
-	}
+    /**
+     * 计算CRC16校验码 (Modbus)
+     *
+     * @param data 字节数组
+     * @return 校验码
+     */
+    public static String crc16ToHex(byte[] data) {
+        return Long.toHexString(crc16(data)).toUpperCase();
+    }
 
-	/**
-	 * 计算CRC32校验码
-	 * 
-	 * @param data
-	 * @return
-	 */
-	public static long crc32(byte[] data) {
-		CRC32 crc = new CRC32();
-		crc.update(data);
-		return crc.getValue();
-	}
+    /**
+     * 计算CRC32校验码
+     *
+     * @param data
+     * @return
+     */
+    public static long crc32(byte[] data) {
+        CRC32 crc = new CRC32();
+        crc.update(data);
+        return crc.getValue();
+    }
 
-	public static long crc32(File file) {
-		try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file));) {
-			return crc32(inputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return 0;
-	}
+    public static long crc32(File file) {
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file));) {
+            return crc32(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
-	public static long crc32(InputStream inputStream) {
-		CRC32 crc = new CRC32();
-		try {
-			byte[] bytes = new byte[1024];
-			int cnt;
-			while ((cnt = inputStream.read(bytes)) != -1) {
-				// 读到最后，可能没有1024字节
-				crc.update(bytes, 0, cnt);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return crc.getValue();
-	}
+    public static long crc32(InputStream inputStream) {
+        CRC32 crc = new CRC32();
+        try {
+            byte[] bytes = new byte[1024];
+            int cnt;
+            while ((cnt = inputStream.read(bytes)) != -1) {
+                // 读到最后，可能没有1024字节
+                crc.update(bytes, 0, cnt);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return crc.getValue();
+    }
 
-	/**
-	 * 
-	 * 计算CRC32校验码 (Modbus)
-	 *
-	 * @param data 字节数组
-	 * @return 校验码
-	 */
-	public static String crc32ToHex(byte[] data) {
-		return Long.toHexString(crc32(data)).toUpperCase();
-	}
+    /**
+     * 计算CRC32校验码 (Modbus)
+     *
+     * @param data 字节数组
+     * @return 校验码
+     */
+    public static String crc32ToHex(byte[] data) {
+        return Long.toHexString(crc32(data)).toUpperCase();
+    }
 
-	public static String crc32ToHex(File file) {
-		return Long.toHexString(crc32(file)).toUpperCase();
-	}
+    public static String crc32ToHex(File file) {
+        return Long.toHexString(crc32(file)).toUpperCase();
+    }
 
-	public static String crc32ToHex(InputStream inputStream) {
-		return Long.toHexString(crc32(inputStream)).toUpperCase();
-	}
+    public static String crc32ToHex(InputStream inputStream) {
+        return Long.toHexString(crc32(inputStream)).toUpperCase();
+    }
 
-	public static String fullFormatHex(short value) {
-		return fullFormatHex(short2Hex(value));
-	}
+    public static String fullFormatHex(short value) {
+        return fullFormatHex(short2Hex(value));
+    }
 
-	public static String fullFormatHex(char value) {
-		return fullFormatHex(char2Hex(value));
-	}
+    public static String fullFormatHex(char value) {
+        return fullFormatHex(char2Hex(value));
+    }
 
-	/**
-	 * 补全为16进制数
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String fullFormatHex(int value) {
-		return fullFormatHex(int2Hex(value));
-	}
+    /**
+     * 补全为16进制数
+     *
+     * @param value
+     * @return
+     */
+    public static String fullFormatHex(int value) {
+        return fullFormatHex(int2Hex(value));
+    }
 
-	public static String fullFormatHex(long value) {
-		return fullFormatHex(long2Hex(value));
-	}
+    public static String fullFormatHex(long value) {
+        return fullFormatHex(long2Hex(value));
+    }
 
-	public static String fullFormatHex(float value) {
-		return fullFormatHex(float2Hex(value));
-	}
+    public static String fullFormatHex(float value) {
+        return fullFormatHex(float2Hex(value));
+    }
 
-	public static String fullFormatHex(double value) {
-		return fullFormatHex(double2Hex(value));
-	}
+    public static String fullFormatHex(double value) {
+        return fullFormatHex(double2Hex(value));
+    }
 
-	/**
-	 * 显示完整格式的16进制,占2个字节
-	 * 
-	 * @param data
-	 *             <p>
-	 *             OxFF --> Ox00FF
-	 *             <p>
-	 *             FF --> 00FF
-	 * @return
-	 */
-	public static String fullFormatHex(String data) {
-		int zeroNum = 4 - data.length();
-		if (data.startsWith("0x") || data.startsWith("0X")) {
-			zeroNum = 6 - data.length();
-			data = data.substring(0, 2) + String.format("%0" + zeroNum + "d", 0) + data.substring(2);
-		} else if (zeroNum > 0) {
-			data = String.format("%0" + zeroNum + "d", 0) + data;
-		}
-		return data.toUpperCase();
-	}
+    /**
+     * 显示完整格式的16进制,占2个字节
+     *
+     * @param data <p>
+     *             OxFF --> Ox00FF
+     *             <p>
+     *             FF --> 00FF
+     * @return
+     */
+    public static String fullFormatHex(String data) {
+        int zeroNum = 4 - data.length();
+        if (data.startsWith("0x") || data.startsWith("0X")) {
+            zeroNum = 6 - data.length();
+            data = data.substring(0, 2) + String.format("%0" + zeroNum + "d", 0) + data.substring(2);
+        } else if (zeroNum > 0) {
+            data = String.format("%0" + zeroNum + "d", 0) + data;
+        }
+        return data.toUpperCase();
+    }
 
-	public static byte bin2Byte(String bin) {
-		return 0;
-	}
+    public static byte bin2Byte(String bin) {
+        return 0;
+    }
 
-	public static char bin2Char(String bin) {
-		return 0;
-	}
+    public static char bin2Char(String bin) {
+        return 0;
+    }
 
-	public static short bin2Short(String bin) {
-		return Short.parseShort(bin, 2);
-	}
+    public static short bin2Short(String bin) {
+        return Short.parseShort(bin, 2);
+    }
 
-	public static int bin2Int(String bin) {
-		return Integer.parseInt(bin, 2);
-	}
+    public static int bin2Int(String bin) {
+        return Integer.parseInt(bin, 2);
+    }
 
-	public static long bin2Long(String bin) {
-		return Long.parseLong(bin, 2);
-	}
+    public static long bin2Long(String bin) {
+        return Long.parseLong(bin, 2);
+    }
 
-	public static float bin2Float(String bin) {
-		return Float.intBitsToFloat(bin2Int(bin));
-	}
+    public static float bin2Float(String bin) {
+        return Float.intBitsToFloat(bin2Int(bin));
+    }
 
-	public static double bin2Double(String bin) {
-		return Double.longBitsToDouble(bin2Long(bin));
-	}
+    public static double bin2Double(String bin) {
+        return Double.longBitsToDouble(bin2Long(bin));
+    }
 
-	public static char byte2Ascii(byte[] value) {
-		return (char) byte2Short(value);
-	}
+    public static char byte2Ascii(byte[] value) {
+        return (char) byte2Short(value);
+    }
 
-	public static short byte2Short(byte[] value) {
-		return (short) (((value[0] & 0xFF) << 8) | value[1] & 0xFF);
-	}
+    public static short byte2Short(byte[] value) {
+        return (short) (((value[0] & 0xFF) << 8) | value[1] & 0xFF);
+    }
 
-	public static short toShort(byte[] value) {
-		return ByteBuffer.wrap(value).getShort();
-	}
+    public static short toShort(byte[] value) {
+        return ByteBuffer.wrap(value).getShort();
+    }
 
-	public static int byte2Int(byte[] value) {
-		byte[] a = new byte[4];
-		int i = a.length - 1, j = value.length - 1;
-		for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
-			if (j >= 0) {
-				a[i] = value[j];
-			} else {
-				a[i] = 0;// 如果b.length不足4,则将高位补0
-			}
-		}
-		return (a[0] & 0xFF) << 24 | (a[1] & 0xFF) << 16
+    public static int byte2Int(byte[] value) {
+        byte[] a = new byte[4];
+        int i = a.length - 1, j = value.length - 1;
+        for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
+            if (j >= 0) {
+                a[i] = value[j];
+            } else {
+                a[i] = 0;// 如果b.length不足4,则将高位补0
+            }
+        }
+        return (a[0] & 0xFF) << 24 | (a[1] & 0xFF) << 16
 
-				| (a[2] & 0xFF) << 8 | a[3] & 0xFF;
-	}
+                | (a[2] & 0xFF) << 8 | a[3] & 0xFF;
+    }
 
-	public static int toInt(byte[] value) {
-		return ByteBuffer.wrap(value).getInt();
-	}
+    public static int toInt(byte[] value) {
+        return ByteBuffer.wrap(value).getInt();
+    }
 
-	public static long byte2Long(byte[] value) {
-		byte[] a = new byte[8];
-		int i = a.length - 1, j = value.length - 1;
-		for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
-			if (j >= 0) {
-				a[i] = value[j];
-			} else {
-				a[i] = 0;// 如果b.length不足4,则将高位补0
-			}
-		}
+    public static long byte2Long(byte[] value) {
+        byte[] a = new byte[8];
+        int i = a.length - 1, j = value.length - 1;
+        for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
+            if (j >= 0) {
+                a[i] = value[j];
+            } else {
+                a[i] = 0;// 如果b.length不足4,则将高位补0
+            }
+        }
 
-		return ((((long) a[0] & 0xFF) << 56) | (((long) a[1] & 0xFF) << 48)
+        return ((((long) a[0] & 0xFF) << 56) | (((long) a[1] & 0xFF) << 48)
 
-				| (((long) a[2] & 0xFF) << 40) | (((long) a[3] & 0xFF) << 32)
+                | (((long) a[2] & 0xFF) << 40) | (((long) a[3] & 0xFF) << 32)
 
-				| (((long) a[4] & 0xFF) << 24) | (((long) a[5] & 0xFF) << 16)
+                | (((long) a[4] & 0xFF) << 24) | (((long) a[5] & 0xFF) << 16)
 
-				| (((long) a[6] & 0xFF) << 8) | (((long) a[7] & 0xFF) << 0));
-	}
+                | (((long) a[6] & 0xFF) << 8) | (((long) a[7] & 0xFF) << 0));
+    }
 
-	public static long toLong(byte[] value) {
-		if (value.length < 8) {// 位数不够,前补0
-			byte[] target = new byte[8];
-			int fillZero = target.length - value.length;
-			Arrays.fill(target, 0, fillZero, (byte) 0);
-			System.arraycopy(value, 0, target, value.length, value.length);
-			return ByteBuffer.wrap(target).getLong();
-		}
+    public static long toLong(byte[] value) {
+        if (value.length < 8) {// 位数不够,前补0
+            byte[] target = new byte[8];
+            int fillZero = target.length - value.length;
+            Arrays.fill(target, 0, fillZero, (byte) 0);
+            System.arraycopy(value, 0, target, value.length, value.length);
+            return ByteBuffer.wrap(target).getLong();
+        }
 
-		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.put(value);
-		buffer.flip();
-		return buffer.getLong();
-	}
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(value);
+        buffer.flip();
+        return buffer.getLong();
+    }
 
-	public static float byte2Float(byte[] value) {
-		return Float.intBitsToFloat(byte2Int(value));
-	}
+    public static float byte2Float(byte[] value) {
+        return Float.intBitsToFloat(byte2Int(value));
+    }
 
-	public static float toFloat(byte[] value) {
-		ByteBuffer buffer = ByteBuffer.allocate(4);
-		buffer.put(value);
-		buffer.flip();
-		return buffer.getFloat();
+    public static float toFloat(byte[] value) {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.put(value);
+        buffer.flip();
+        return buffer.getFloat();
 //		return ByteBuffer.wrap(value).getFloat();
 	}
 
@@ -507,6 +504,28 @@ public class ConvertUtil {
 	public static String double2Hex(double value) {
 		return Long.toHexString(Double.doubleToLongBits(value));
 	}
+
+    /**
+     * 可以将科学记数转成原来的值
+     *
+     * @param d
+     * @return
+     */
+    public static Long double2Long(double d) {
+        NumberFormat nf = NumberFormat.getInstance();
+        // 去掉逗号
+        nf.setGroupingUsed(false);
+        String str = nf.format(d);
+        Long value = Long.parseLong(str);
+        return value;
+    }
+
+    public static String double2String(double d) {
+        NumberFormat nf = NumberFormat.getInstance();
+        // 去掉逗号
+        nf.setGroupingUsed(false);
+        return nf.format(d);
+    }
 
 	/**
 	 * 转2进制
@@ -833,5 +852,5 @@ public class ConvertUtil {
 		number = 235_6895;
 		System.out.println("number1235_6895:" + numberConvertCapital(number));
 		System.out.println("107,000:" + numberConvertCapital(107000));
-	}
+    }
 }

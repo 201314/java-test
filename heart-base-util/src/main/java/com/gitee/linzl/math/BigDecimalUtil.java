@@ -12,44 +12,6 @@ import java.text.DecimalFormat;
  */
 public class BigDecimalUtil {
     /**
-     * 分转成元
-     *
-     * @param points 多少分钱
-     * @return
-     */
-    public static String pointsToYuan(int points) {
-        DecimalFormat df = new DecimalFormat("#0.00");
-        return df.format(points / 100.00);
-    }
-
-    /**
-     * 元转成分
-     *
-     * @param yuan 多少元
-     * @return
-     */
-    public static BigDecimal yuanTopoints(String yuan) {
-        return multiply(yuan, "100");
-    }
-
-    /**
-     * 按百分比显示数据
-     *
-     * @param obj
-     * @return
-     */
-    public static String percent(Object obj) {
-        DecimalFormat format = new DecimalFormat("0.00%");
-        return format.format(obj);
-    }
-
-    public static String format(long number, int length) {// 或者是double
-        DecimalFormat df = new DecimalFormat("00000000");
-        // 补够8位数
-        return df.format(number);
-    }
-
-    /**
      * 加法
      *
      * @param first
@@ -121,6 +83,10 @@ public class BigDecimalUtil {
     }
 
     public static BigDecimal multiply(Double first, Double second) {
+        /**
+         * 浮点型的计算，不建议直接使用BigDecimal(double val)
+         * 因为如果传入0.1,打印的结果会是0.1000000000000000055511151231257827021181583404541015625
+         */
         BigDecimal bdFirst = BigDecimal.valueOf(first);
         BigDecimal bdSecond = BigDecimal.valueOf(second);
         return bdFirst.multiply(bdSecond);
@@ -159,11 +125,7 @@ public class BigDecimalUtil {
         return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
     }
 
-
     public static void main(String[] args) {
-        System.out.println(pointsToYuan(1101));
-        System.out.println(percent(1.092));
-
         System.out.println(BigDecimalUtil.divide("-27.9", "3.6"));
         DecimalFormat df = new DecimalFormat("#0.00");
         System.out.println(df.format(201 / 100.00));

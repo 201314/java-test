@@ -10,9 +10,9 @@
 	<!-- snapshot快照，alpha内测，beta公测，Release稳定，GA正式发布 -->
 	<version>0.0.1-SNAPSHOT</version>
 	<!-- 默认是jar,可以是war,zip,pom -->
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<!-- 项目描述名 -->
-	<name>baseUtil</name>
+	<name>heart-base-util</name>
 	<!-- 项目地址 -->
 	<url>http://repo2.maven.org/maven2</url>
 	<dependencies>

@@ -1,17 +1,14 @@
 package com.gitee.linzl.lambda.collection;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * 1.stream不存储数据
@@ -154,12 +151,13 @@ public class StreamGrammarDemo {
 		 * 按照字符长度排序
 		 */
 		Arrays.stream(arr1).sorted((x, y) -> {
-			if (x.length() > y.length())
+			if (x.length() > y.length()) {
 				return 1;
-			else if (x.length() < y.length())
+			} else if (x.length() < y.length()) {
 				return -1;
-			else
+			} else {
 				return 0;
+			}
 		}).forEach(System.out::println);
 		Arrays.stream(arr1).sorted(Comparator.comparing(String::length)).forEach(System.out::println);
 	}
@@ -230,5 +228,22 @@ public class StreamGrammarDemo {
 		Stream.of(pers).mapToInt((val) -> {
 			return val.intValue();
 		}).sum();
+
+		List<Student> userList = new ArrayList<>();
+		Student first = new Student("hello",12);
+		first.setMoney(new BigDecimal(12.03));
+		userList.add(first);
+
+		Student second = new Student("who",34);
+		second.setMoney(new BigDecimal(48.03));
+		userList.add(second);
+		 // java 8 stream version
+        BigDecimal result2 = userList.stream()
+                // 将user对象的mongey取出来map为Bigdecimal
+                .map(Student::getMoney)
+                // 使用reduce聚合函数,实现累加器
+                //第一个参数是我们给出的初值，第二个参数是累加器
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        System.out.println("result2 = "+result2);
 	}
 }

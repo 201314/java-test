@@ -515,8 +515,20 @@ public class DateUtil {
     }
 
     public static LocalDateTime toLocalDateTime(LocalDate date) {
+        /** 0点 **/
         return date.atStartOfDay();
     }
+
+    public static LocalDateTime minTime(LocalDate date) {
+        return LocalDateTime.of(date,LocalTime.MIN);
+    }
+    public static LocalDateTime noonTime(LocalDate date) {
+        return LocalDateTime.of(date,LocalTime.NOON);
+    }
+    public static LocalDateTime maxTime(LocalDate date) {
+        return LocalDateTime.of(date,LocalTime.MAX);
+    }
+
 
     /**
      * @param date 2018-11-11 转换成 2018-11-11 00:00

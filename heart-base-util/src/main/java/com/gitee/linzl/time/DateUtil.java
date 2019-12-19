@@ -522,11 +522,30 @@ public class DateUtil {
     public static LocalDateTime minTime(LocalDate date) {
         return LocalDateTime.of(date,LocalTime.MIN);
     }
-    public static LocalDateTime noonTime(LocalDate date) {
-        return LocalDateTime.of(date,LocalTime.NOON);
+
+    public static Date minTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR,0);
+        cal.set(Calendar.MINUTE,0);
+        return cal.getTime();
     }
-    public static LocalDateTime maxTime(LocalDate date) {
-        return LocalDateTime.of(date,LocalTime.MAX);
+
+    public static Date noonTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR,12);
+        cal.set(Calendar.MINUTE,0);
+        return cal.getTime();
+    }
+    public static Date maxTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR,23);
+        cal.set(Calendar.MINUTE,59);
+        cal.set(Calendar.SECOND,59);
+        cal.set(Calendar.MILLISECOND,999999999);
+        return cal.getTime();
     }
 
 

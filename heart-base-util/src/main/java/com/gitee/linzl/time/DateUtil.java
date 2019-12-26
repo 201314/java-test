@@ -371,7 +371,8 @@ public class DateUtil {
      */
     public static long days(LocalDateTime startTime, LocalDateTime endTime) {
         //return compare(startTime, endTime).toDays();
-        return startTime.until(endTime, ChronoUnit.DAYS);
+        //return startTime.until(endTime, ChronoUnit.DAYS);
+        return ChronoUnit.DAYS.between(startTime, endTime);
     }
 
     /**
@@ -388,7 +389,8 @@ public class DateUtil {
 
     public static long hours(LocalDateTime startTime, LocalDateTime endTime) {
         //return compare(startTime, endTime).toHours();
-        return startTime.until(endTime, ChronoUnit.HOURS);
+        //return startTime.until(endTime, ChronoUnit.HOURS);
+        return ChronoUnit.HOURS.between(startTime, endTime);
     }
 
     /**
@@ -405,7 +407,8 @@ public class DateUtil {
 
     public static long minutes(LocalDateTime startTime, LocalDateTime endTime) {
         //return compare(startTime, endTime).toMinutes();
-        return startTime.until(endTime, ChronoUnit.MINUTES);
+        //return startTime.until(endTime, ChronoUnit.MINUTES);
+        return ChronoUnit.MINUTES.between(startTime, endTime);
     }
 
     /**
@@ -429,7 +432,8 @@ public class DateUtil {
      */
     public static long seconds(LocalDateTime startTime, LocalDateTime endTime) {
         //return compare(startTime, endTime).getSeconds();
-        return startTime.until(endTime, ChronoUnit.SECONDS);
+        //return startTime.until(endTime, ChronoUnit.SECONDS);
+        return ChronoUnit.SECONDS.between(startTime, endTime);
     }
 
     /**
@@ -448,7 +452,8 @@ public class DateUtil {
 
     public static long milliSeconds(LocalDateTime startTime, LocalDateTime endTime) {
         //return compare(startTime, endTime).toMillis();
-        return startTime.until(endTime, ChronoUnit.MILLIS);
+        //return startTime.until(endTime, ChronoUnit.MILLIS);
+        return ChronoUnit.MILLIS.between(startTime, endTime);
     }
 
     /**
@@ -520,31 +525,32 @@ public class DateUtil {
     }
 
     public static LocalDateTime minTime(LocalDate date) {
-        return LocalDateTime.of(date,LocalTime.MIN);
+        return LocalDateTime.of(date, LocalTime.MIN);
     }
 
     public static Date minTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR,0);
-        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
         return cal.getTime();
     }
 
     public static Date noonTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR,12);
-        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.HOUR, 12);
+        cal.set(Calendar.MINUTE, 0);
         return cal.getTime();
     }
+
     public static Date maxTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR,23);
-        cal.set(Calendar.MINUTE,59);
-        cal.set(Calendar.SECOND,59);
-        cal.set(Calendar.MILLISECOND,999999999);
+        cal.set(Calendar.HOUR, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999999999);
         return cal.getTime();
     }
 

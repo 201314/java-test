@@ -12,7 +12,7 @@ import com.gitee.linzl.properties.ReadResourceUtil;
 
 /**
  * PS:
- * 
+ *
  * PS:签名：私钥签名，公钥验签。用自己的私钥签名，把公钥给别人。
  * 
  * Java生成的公私钥格式为 pkcs8, 而openssl默认生成的公私钥格式为 pkcs1，两者的密钥实际上是不能直接互用的
@@ -52,7 +52,7 @@ public class KeyPairPathUtil {
 			return public_key_byte;
 		}
 
-		try (InputStream publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/codec/rsa/rsa_public_key.pem");) {
+		try (InputStream publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/cipher/rsa/rsa_public_key.pem");) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("加载公钥路径成功");
 			}
@@ -74,7 +74,7 @@ public class KeyPairPathUtil {
 		}
 
 		try (InputStream privateKey = ReadResourceUtil
-				.getInputStream("com/gitee/linzl/codec/rsa/pkcs8_rsa_private_key.pem");) {
+				.getInputStream("com/gitee/linzl/cipher/rsa/pkcs8_rsa_private_key.pem");) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("加载私钥路径成功");
 			}

@@ -38,6 +38,8 @@ public class AESTest {
 
 	@Test
 	public void AES_CBC_PKCS5PADDING_128() throws Exception {
+		//用这个测试
+		text = "我是加密数据";
 		excuteCBC(AESCipherAlgorithms.AES_CBC_PKCS5PADDING_128);
 	}
 
@@ -124,14 +126,14 @@ public class AESTest {
 		byte[] key = SymmetricCipherUtil.generateKey(aes);
 		BasePrint.printSecretKey(key);
 
-		byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6 };// 长度必须是16
+		//byte[] keyiv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6 };// 长度必须是16
 		// 用密钥初始化Cipher对象
-		IvParameterSpec ips = new IvParameterSpec(keyiv);
+		//IvParameterSpec ips = new IvParameterSpec(keyiv);
 
-		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes, ips);
+		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);
 		BasePrint.printEncryptData(encryptData);
 
-		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes, ips);
+		byte[] decryptData = SymmetricCipherUtil.decrypt(encryptData, key, aes);
 		BasePrint.printDecryptData(decryptData);
 	}
 
@@ -142,7 +144,7 @@ public class AESTest {
 	 * @throws Exception
 	 */
 	private void excute(IAlgorithm aes) throws Exception {
-		byte[] key = SymmetricCipherUtil.generateKey(aes);
+		byte[] key = "Ux5di0G9pYHdkDtk1hYfKQ==".getBytes();//SymmetricCipherUtil.generateKey(aes);
 		BasePrint.printSecretKey(key);
 
 		byte[] encryptData = SymmetricCipherUtil.encrypt(text.getBytes(), key, aes);

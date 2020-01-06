@@ -1,22 +1,13 @@
 package com.gitee.linzl.cipher.symmetric;
 
 import java.security.Key;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.util.Objects;
-
-import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import com.gitee.linzl.cipher.AbstractCipher;
 import com.gitee.linzl.cipher.IAlgorithm;
-import com.gitee.linzl.cipher.asymmetrical.AsymmetricalCipherUtil;
-import com.gitee.linzl.cls.ClassUtils;
 
 /**
  * 对称加解密工具：加密密钥与解密密钥相同。

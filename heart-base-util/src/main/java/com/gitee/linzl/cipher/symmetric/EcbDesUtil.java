@@ -61,18 +61,16 @@ public class EcbDesUtil {
 	/**
 	 * 单倍长密钥DEA加密算法
 	 * 
-	 * @param hexKey
-	 *            16进制密钥(单倍长密钥8字节)
-	 * @param hexData
-	 *            16进制的明文数据
+	 * @param hexKey  16进制密钥(单倍长密钥8字节)
+	 * @param hexData 16进制的明文数据
 	 */
 	public static String encodeDES(String hexKey, String hexData) {
 		if (hexKey.length() != 16) {
 			throw new RuntimeException("单倍长密钥DEA加密算法密钥必须为16位十六进制数,此密钥长度为：" + hexKey.length());
 		}
-		byte[] key = null;
+		byte[] rawSecretKey = null;
 		try {
-			key = Hex.decodeHex(hexKey);
+			rawSecretKey = Hex.decodeHex(hexKey);
 		} catch (DecoderException e1) {
 			e1.printStackTrace();
 		}
@@ -95,9 +93,11 @@ public class EcbDesUtil {
 			// hexData=NumberUtil.format2Hex(hexData.length(),1)+hexData;
 			hexData = fillLastBlock(hexData);
 			// log.info("des数据补齐后="+hexData);
+			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(
+					DESCipherAlgorithms.DES_ECB_NOPADDING_56, rawSecretKey);
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = SymmetricCipherUtil.encrypt(buffer, key, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
+				buffer = encryptBuilder.encrypt(buffer).finish();
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -111,27 +111,27 @@ public class EcbDesUtil {
 	/**
 	 * 单倍长密钥DEA解密算法
 	 * 
-	 * @param hexKey
-	 *            十六进制密钥(16字节)
-	 * @param hexData
-	 *            十六进制密文(长度为8字节倍数)
+	 * @param hexKey  十六进制密钥(16字节)
+	 * @param hexData 十六进制密文(长度为8字节倍数)
 	 */
 	public static String decodeDES(String hexKey, String hexData) {
 		if (hexKey.length() != 16) {
 			throw new RuntimeException("单倍长密钥DEA解密算法密钥必须为16位十六进制数,此密钥长度为：" + hexKey.length());
 		}
-		byte[] key = null;
+		byte[] rawSecretKey = null;
 		try {
-			key = Hex.decodeHex(hexKey);
+			rawSecretKey = Hex.decodeHex(hexKey);
 		} catch (DecoderException e1) {
 			e1.printStackTrace();
 		}
 		byte[] buffer;
 		StringBuilder sb = new StringBuilder();
 		try {
+			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(
+					DESCipherAlgorithms.DES_ECB_NOPADDING_56, rawSecretKey);
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = SymmetricCipherUtil.decrypt(buffer, key, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
+				buffer = decryptBuilder.decrypt(buffer).finish();
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -144,10 +144,8 @@ public class EcbDesUtil {
 	/**
 	 * 双倍长密钥（16字节长）3DEA加密算法
 	 * 
-	 * @param hexKey
-	 *            16进制密钥(16字节32位长)
-	 * @param hexData
-	 *            16进制的明文数据
+	 * @param hexKey  16进制密钥(16字节32位长)
+	 * @param hexData 16进制的明文数据
 	 */
 	public static String encode3DES(String hexKey, String hexData) {
 		if (hexKey.length() != 32) {
@@ -182,11 +180,18 @@ public class EcbDesUtil {
 			// hexData=NumberUtil.format2Hex(hexData.length(),1)+hexData;
 			hexData = fillLastBlock(hexData);
 			System.out.println("补足长度hex:" + hexData);
+
+			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+					lkey);
+
+			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+					rkey);
+
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = SymmetricCipherUtil.encrypt(buffer, lkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
-				buffer = SymmetricCipherUtil.decrypt(buffer, rkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
-				buffer = SymmetricCipherUtil.encrypt(buffer, lkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
+				buffer = encryptBuilder.encrypt(buffer).finish();
+				buffer = decryptBuilder.decrypt(buffer).finish();
+				buffer = encryptBuilder.encrypt(buffer).finish();
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -200,10 +205,8 @@ public class EcbDesUtil {
 	/**
 	 * 双倍长密钥（16字节长）3DEA解密算法
 	 * 
-	 * @param hexKey
-	 *            十六进制密钥(32位16字节)
-	 * @param hexData
-	 *            十六进制密文(长度为8字节倍数)
+	 * @param hexKey  十六进制密钥(32位16字节)
+	 * @param hexData 十六进制密文(长度为8字节倍数)
 	 */
 	public static String decode3DES(String hexKey, String hexData) {
 		if (hexKey.length() != 32) {
@@ -220,11 +223,17 @@ public class EcbDesUtil {
 		byte[] buffer;
 		StringBuilder sb = new StringBuilder();
 		try {
+			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+					rkey);
+
+			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+					lkey);
+			
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = SymmetricCipherUtil.decrypt(buffer, lkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
-				buffer = SymmetricCipherUtil.encrypt(buffer, rkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
-				buffer = SymmetricCipherUtil.decrypt(buffer, lkey, DESCipherAlgorithms.DES_ECB_NOPADDING_56);
+				buffer = decryptBuilder.decrypt(buffer).finish();
+				buffer = encryptBuilder.encrypt(buffer).finish();
+				buffer = decryptBuilder.decrypt(buffer).finish();
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {

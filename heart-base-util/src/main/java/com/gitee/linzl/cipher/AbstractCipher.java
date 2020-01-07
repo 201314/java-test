@@ -1,14 +1,17 @@
 package com.gitee.linzl.cipher;
 
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.security.*;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Objects;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -30,26 +33,87 @@ public abstract class AbstractCipher {
     }
 
     /**
-     * @param rawData   待加密原生数据
-     * @param key       密钥,非对称加密填写公钥
-     * @param algorithm
+     * 生成对称密钥
+     *
      * @return
-     * @throws Exception
      */
-    public static byte[] encrypt(byte[] rawData, Key key, IAlgorithm algorithm) throws Exception {
-        return encrypt(rawData, key, algorithm, null);
+    public static byte[] generateKey(IAlgorithm algorithm) throws Exception {
+        // 实例化密钥生成器
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.getKeyAlgorithm());
+        // 此处解决mac，linux报错
+        // SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        // keyGenerator.init(algorithm.getSize(), random);
+        keyGenerator.init(algorithm.getSize());
+        // 生成密钥
+        SecretKey secretKey = keyGenerator.generateKey();
+        // 获取二进制密钥编码形式
+        return secretKey.getEncoded();
     }
 
     /**
-     * @param base64
-     * @param key       密钥,非对称加密填写公钥
+     * 随机生成密钥对,非对称加解密，一般情况下不使用，只用于测试
+     *
      * @param algorithm
      * @return
-     * @throws Exception
      */
-    public static String encryptToBase64(String base64, Key key, IAlgorithm algorithm) throws Exception {
-        return encryptToBase64(base64, key, algorithm, null);
+    public static KeyPair generateKeyPair(IAlgorithm algorithm) {
+        // 实例化密钥生成器
+        String algorithmName = algorithm.getKeyAlgorithm();
+        KeyPairGenerator keyPairGen = null;
+        try {
+            keyPairGen = KeyPairGenerator.getInstance(algorithmName);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (algorithm.getSize() != null && algorithm.getSize() >= 0) {
+            keyPairGen.initialize(algorithm.getSize());
+        }
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        return keyPair;
     }
+
+    /**
+     * 非对称加密，加载私钥字节
+     *
+     * @param privateKeyByte 私钥字节
+     * @throws Exception 加载私钥时产生的异常
+     */
+    public static PrivateKey generatePrivate(byte[] privateKeyByte, IAlgorithm algorithm) throws Exception {
+        // 实例化密钥生成器
+        String algorithmName = algorithm.getKeyAlgorithm();
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
+            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
+            return keyFactory.generatePrivate(privateKeySpec);// RSAPrivateKey
+        } catch (NoSuchAlgorithmException e) {
+            throw new Exception("无此算法");
+        } catch (InvalidKeySpecException e) {
+            throw new Exception("私钥非法");
+        }
+    }
+
+    /**
+     * 非对称加密，加载公钥字节
+     *
+     * @param pubicKeyByte 公钥字节
+     * @throws Exception 加载公钥时产生的异常
+     */
+    public static PublicKey generatePublic(byte[] pubicKeyByte, IAlgorithm algorithm) throws Exception {
+        // 实例化密钥生成器
+        String algorithmName = algorithm.getKeyAlgorithm();
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
+            EncodedKeySpec keySpec = new X509EncodedKeySpec(pubicKeyByte);
+            return keyFactory.generatePublic(keySpec);// RSAPublicKey
+        } catch (NoSuchAlgorithmException e) {
+            throw new Exception("无此算法");
+        } catch (InvalidKeySpecException e) {
+            throw new Exception("公钥非法");
+        } catch (NullPointerException e) {
+            throw new Exception("公钥数据为空");
+        }
+    }
+
 
     /**
      * @param rawData   原生数据
@@ -73,10 +137,15 @@ public abstract class AbstractCipher {
         return cipher.doFinal(rawData);
     }
 
-    public static String encryptToBase64(String base64, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-        byte[] out = encrypt(Base64.getDecoder().decode(base64), key, algorithm, iv);
-        // 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-        return Base64.getEncoder().encodeToString(out);
+    /**
+     * @param rawData   待加密原生数据
+     * @param key       密钥,非对称加密填写公钥
+     * @param algorithm
+     * @return
+     * @throws Exception
+     */
+    public static byte[] encrypt(byte[] rawData, Key key, IAlgorithm algorithm) throws Exception {
+        return encrypt(rawData, key, algorithm, null);
     }
 
     /**
@@ -88,10 +157,6 @@ public abstract class AbstractCipher {
      */
     public static byte[] decrypt(byte[] encryptedData, Key key, IAlgorithm algorithm) throws Exception {
         return decrypt(encryptedData, key, algorithm, null);
-    }
-
-    public static String decrypt(String encryptedBase64, Key key, IAlgorithm algorithm) throws Exception {
-        return decrypt(encryptedBase64, key, algorithm, null);
     }
 
     /**
@@ -142,5 +207,45 @@ public abstract class AbstractCipher {
             }
         }
         return spec;
+    }
+
+    /**
+     * 对数据进行签名
+     *
+     * @param data       需要签名的数据
+     * @param privateKey 私钥
+     * @param algorithm  签名算法
+     * @return
+     * @throws Exception
+     */
+    public static byte[] sign(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
+        // 用私钥对信息生成数字签名
+        String signAlgorithm = algorithm.getSignAlgorithm();
+        Signature signature = Signature.getInstance(signAlgorithm);
+        signature.initSign(privateKey);
+        signature.update(data);
+        return signature.sign();
+    }
+
+    /**
+     * 验证签名
+     *
+     * @param data      签名前的数据
+     * @param publicKey 公钥
+     * @param sign      签名后的数据
+     * @return
+     * @throws Exception
+     */
+    public static boolean verifySign(byte[] data, PublicKey publicKey, byte[] sign, IAlgorithm algorithm)
+            throws Exception {
+        // 用私钥对信息生成数字签名
+        String signAlgorithm = algorithm.getSignAlgorithm();
+        Signature signature = Signature.getInstance(signAlgorithm);
+        signature.initVerify(publicKey);
+        signature.update(data);
+
+        // 执行加密操作,加密后的结果通常都会用Base64编码进行传输
+        // 验证签名是否正常
+        return signature.verify(sign);
     }
 }

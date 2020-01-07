@@ -52,7 +52,7 @@ public class KeyPairPathUtil {
 			return public_key_byte;
 		}
 
-		try (InputStream publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/cipher/rsa/rsa_public_key.pem");) {
+		try (InputStream publicKey = ReadResourceUtil.getInputStream("com/gitee/linzl/cipher/rsa_public_key.pem");) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("加载公钥路径成功");
 			}
@@ -74,7 +74,7 @@ public class KeyPairPathUtil {
 		}
 
 		try (InputStream privateKey = ReadResourceUtil
-				.getInputStream("com/gitee/linzl/cipher/rsa/pkcs8_rsa_private_key.pem");) {
+				.getInputStream("com/gitee/linzl/cipher/pkcs8_rsa_private_key.pem");) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("加载私钥路径成功");
 			}

@@ -121,7 +121,7 @@ public class AESTest {
      * @throws Exception
      */
     private void excuteCBC(IAlgorithm aes) throws Exception {
-        byte[] rawSecretKey = AbstractCipher.generateKey(aes);
+        byte[] rawSecretKey = BaseCipher.generateKey(aes);
         BasePrint.printSecretKey(rawSecretKey);
 
         byte[] keyiv = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6};// 长度必须是16
@@ -144,7 +144,7 @@ public class AESTest {
      * @throws Exception
      */
     private void excute(IAlgorithm aes) throws Exception {
-        byte[] rawSecretKey = AbstractCipher.generateKey(aes);
+        byte[] rawSecretKey = BaseCipher.generateKey(aes);
         BasePrint.printSecretKey(rawSecretKey);
 
         SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(aes,

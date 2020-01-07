@@ -88,7 +88,7 @@ public class DESTest {
 
     // CBC 要使用IV 密钥
     private void excuteCBC(IAlgorithm algorithm) throws Exception {
-        byte[] rawSecretKey = AbstractCipher.generateKey(algorithm);
+        byte[] rawSecretKey = BaseCipher.generateKey(algorithm);
         BasePrint.printSecretKey(rawSecretKey);
 
         byte[] ivParameterSpec = {1, 2, 3, 4, 5, 6, 7, 8};// 长度必须是8
@@ -106,7 +106,7 @@ public class DESTest {
     }
 
     private void excute(IAlgorithm algorithm) throws Exception {
-        byte[] rawSecretKey = AbstractCipher.generateKey(algorithm);
+        byte[] rawSecretKey = BaseCipher.generateKey(algorithm);
         BasePrint.printSecretKey(rawSecretKey);
 
         SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(algorithm,

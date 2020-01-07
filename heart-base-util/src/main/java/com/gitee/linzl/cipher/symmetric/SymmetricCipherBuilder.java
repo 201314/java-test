@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.gitee.linzl.cipher.AbstractCipher;
+import com.gitee.linzl.cipher.BaseCipher;
 import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
@@ -43,24 +43,6 @@ public class SymmetricCipherBuilder {
     private SymmetricCipherBuilder() {
     }
 
-    /**
-     * 生成对称密钥,一般生成后转成base64存放在文件中
-     *
-     * @return
-     */
-    public static byte[] generateKey(IAlgorithm algorithm) throws Exception {
-        // 实例化密钥生成器
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.getKeyAlgorithm());
-        // 此处解决mac，linux报错
-        // SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        // keyGenerator.init(algorithm.getSize(), random);
-        keyGenerator.init(algorithm.getSize());
-        // 生成密钥
-        SecretKey secretKey = keyGenerator.generateKey();
-        // 获取二进制密钥编码形式
-        return secretKey.getEncoded();
-    }
-    
     public static class EncryptBuilder {
         private byte[] data;
         private IAlgorithm algorithm;
@@ -100,17 +82,17 @@ public class SymmetricCipherBuilder {
 
         public byte[] finish() throws Exception {
             if (Objects.isNull(ivParameterSpec)) {
-                return AbstractCipher.encrypt(data, secretKeySpec, algorithm);
+                return BaseCipher.encrypt(data, secretKeySpec, algorithm);
             }
-            return AbstractCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+            return BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
         }
 
         public String finishToBase64() throws Exception {
             byte[] out;
             if (Objects.isNull(ivParameterSpec)) {
-                out = AbstractCipher.encrypt(data, secretKeySpec, algorithm);
+                out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
             } else {
-                out = AbstractCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+                out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
             }
             return Base64.getEncoder().encodeToString(out);
         }
@@ -154,17 +136,17 @@ public class SymmetricCipherBuilder {
 
         public byte[] finish() throws Exception {
             if (Objects.isNull(ivParameterSpec)) {
-                return AbstractCipher.decrypt(data, secretKeySpec, algorithm);
+                return BaseCipher.decrypt(data, secretKeySpec, algorithm);
             }
-            return AbstractCipher.decrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+            return BaseCipher.decrypt(data, secretKeySpec, algorithm, ivParameterSpec);
         }
 
         public String finishToString() throws Exception {
             byte[] out;
             if (Objects.isNull(ivParameterSpec)) {
-                out = AbstractCipher.encrypt(data, secretKeySpec, algorithm);
+                out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
             } else {
-                out = AbstractCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+                out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
             }
             return new String(out);
         }

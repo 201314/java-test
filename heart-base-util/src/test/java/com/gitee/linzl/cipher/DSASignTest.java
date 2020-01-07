@@ -44,21 +44,21 @@ public class DSASignTest {
 
     private void rsaSignRandom(SignatureAlgorithms algorithm) throws Exception {
         System.out.println("start===========JDK随机密钥===========start");
-        KeyPair keyPair = AbstractCipher.generateKeyPair(algorithm);
+        KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PrivateKey privateKey = keyPair.getPrivate();
         BasePrint.printPrivateKey(privateKey.getEncoded());
 
-        AsymmetricCipherBuilder.SignBuilder signBuilder = new AsymmetricCipherBuilder.SignBuilder(algorithm,
+        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
                 privateKey.getEncoded());
 
-        byte[] signData = signBuilder.sign(text.getBytes()).finish();
+        byte[] signData = signBuilder.sign(text.getBytes());
         BasePrint.printEncryptData(signData);
 
         PublicKey publicKey = keyPair.getPublic();
         BasePrint.printPublicKey(publicKey.getEncoded());
-        AsymmetricCipherBuilder.VerifySignBuilder verifySignBuilder = new AsymmetricCipherBuilder.VerifySignBuilder(algorithm,
+        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder = new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm,
                 publicKey.getEncoded());
-        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), signData).finish();
+        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), signData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========JDK随机密钥===========end");
     }

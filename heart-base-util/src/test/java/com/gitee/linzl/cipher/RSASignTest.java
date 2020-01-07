@@ -60,21 +60,21 @@ public class RSASignTest {
 
     private void rsaSignRandom(SignatureAlgorithms algorithm) throws Exception {
         System.out.println("start===========JDK随机密钥===========start");
-        KeyPair keyPair = AbstractCipher.generateKeyPair(algorithm);
+        KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PrivateKey priKey = keyPair.getPrivate();
         BasePrint.printPrivateKey(priKey.getEncoded());
 
-        AsymmetricCipherBuilder.SignBuilder signBuilder = new AsymmetricCipherBuilder.SignBuilder(algorithm,
+        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
                 priKey.getEncoded());
-        byte[] encryptData = signBuilder.sign(text.getBytes()).finish();
+        byte[] encryptData = signBuilder.sign(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
         PublicKey pubKey = keyPair.getPublic();
         BasePrint.printPublicKey(pubKey.getEncoded());
 
-        AsymmetricCipherBuilder.VerifySignBuilder verifySignBuilder =
-                new AsymmetricCipherBuilder.VerifySignBuilder(algorithm, pubKey.getEncoded());
-        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData).finish();
+        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder =
+                new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm, pubKey.getEncoded());
+        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========JDK随机密钥===========end");
     }
@@ -82,17 +82,17 @@ public class RSASignTest {
     private void rsaSign(SignatureAlgorithms algorithm) throws Exception {
         System.out.println("start===========指定密钥===========start");
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-        AsymmetricCipherBuilder.SignBuilder signBuilder = new AsymmetricCipherBuilder.SignBuilder(algorithm,
+        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
                 Base64.decodeBase64(privateKey));
 
-        byte[] encryptData = signBuilder.sign(text.getBytes()).finish();
+        byte[] encryptData = signBuilder.sign(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-        AsymmetricCipherBuilder.VerifySignBuilder verifySignBuilder =
-                new AsymmetricCipherBuilder.VerifySignBuilder(algorithm, Base64.decodeBase64(publicKey));
+        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder =
+                new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm, Base64.decodeBase64(publicKey));
 
-        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData).finish();
+        boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========指定密钥===========end");
     }

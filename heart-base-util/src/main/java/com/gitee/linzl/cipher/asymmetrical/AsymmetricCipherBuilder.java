@@ -10,7 +10,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-import com.gitee.linzl.cipher.AbstractCipher;
+import com.gitee.linzl.cipher.BaseCipher;
 import com.gitee.linzl.cipher.IAlgorithm;
 
 /**
@@ -44,143 +44,9 @@ import com.gitee.linzl.cipher.IAlgorithm;
 public class AsymmetricCipherBuilder {
     private AsymmetricCipherBuilder() {
     }
+ 
 
-    public static class SignBuilder {
-        private byte[] data;
-        private PrivateKey privateKey;
-        private IAlgorithm algorithm;
-
-        /**
-         * 非对称加密，加载私钥字节
-         *
-         * @param algorithm
-         * @param privateKeyByte 私钥字节
-         * @throws Exception
-         */
-        public SignBuilder(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
-            // 实例化密钥生成器
-            String algorithmName = algorithm.getKeyAlgorithm();
-            this.algorithm = algorithm;
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
-                EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
-                // RSAPrivateKey
-                privateKey = keyFactory.generatePrivate(privateKeySpec);
-            } catch (NoSuchAlgorithmException e) {
-                throw new Exception("无此算法");
-            } catch (InvalidKeySpecException e) {
-                throw new Exception("私钥非法");
-            }
-        }
-
-        public SignBuilder(IAlgorithm algorithm, String base64PrivateKey) throws Exception {
-            this(algorithm, Base64.getDecoder().decode(base64PrivateKey));
-        }
-
-        public SignBuilder sign(byte[] data) {
-            this.data = data;
-            return this;
-        }
-
-        public SignBuilder sign(String base64Data) {
-            this.data = Base64.getDecoder().decode(base64Data);
-            return this;
-        }
-
-        /**
-         * 对数据进行签名
-         *
-         * @return
-         * @throws Exception
-         */
-        public byte[] finish() throws Exception {
-            // 用私钥对信息生成数字签名
-            return AbstractCipher.sign(data, privateKey, algorithm);
-        }
-
-        public String finishToBase64() throws Exception {
-            // 用私钥对信息生成数字签名
-            byte[] out = AbstractCipher.sign(data, privateKey, algorithm);
-            return Base64.getEncoder().encodeToString(out);
-        }
-    }
-
-    public static class VerifySignBuilder {
-        /**
-         * 未签名前的数据
-         **/
-        private byte[] data;
-        private PublicKey publicKey;
-        private IAlgorithm algorithm;
-        /**
-         * 签名数据
-         */
-        private byte[] signData;
-
-        /**
-         * 非对称加密，加载公钥字节
-         *
-         * @param algorithm
-         * @param publicKeyByte 公钥字节
-         * @throws Exception
-         */
-        public VerifySignBuilder(IAlgorithm algorithm, byte[] publicKeyByte) throws Exception {
-            // 实例化密钥生成器
-            String algorithmName = algorithm.getKeyAlgorithm();
-            this.algorithm = algorithm;
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
-                EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyByte);
-                // RSAPublicKey
-                this.publicKey = keyFactory.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException e) {
-                throw new Exception("无此算法");
-            } catch (InvalidKeySpecException e) {
-                throw new Exception("私钥非法");
-            }
-        }
-
-        public VerifySignBuilder(IAlgorithm algorithm, String base64PublicKey) throws Exception {
-            this(algorithm, Base64.getDecoder().decode(base64PublicKey));
-        }
-
-        public VerifySignBuilder verify(byte[] sourceData, byte[] signData) {
-            this.data = sourceData;
-            this.signData = signData;
-            return this;
-        }
-
-        public VerifySignBuilder verify(String sourceBase64Data, byte[] signData) {
-            this.data = Base64.getDecoder().decode(sourceBase64Data);
-            this.signData = signData;
-            return this;
-        }
-
-        public VerifySignBuilder verify(byte[] sourceData, String base64Sign) {
-            this.data = sourceData;
-            this.signData = Base64.getDecoder().decode(base64Sign);
-            return this;
-        }
-
-        public VerifySignBuilder verify(String sourceBase64Data, String base64Sign) {
-            this.data = Base64.getDecoder().decode(sourceBase64Data);
-            this.signData = Base64.getDecoder().decode(base64Sign);
-            return this;
-        }
-
-        /**
-         * 验证签名
-         *
-         * @return
-         * @throws Exception
-         */
-        public boolean finish() throws Exception {
-            return AbstractCipher.verifySign(data, publicKey, signData, algorithm);
-        }
-    }
-
-    public static class EncryptBuilder {
-        private byte[] data;
+    public static class EncryptVerifyBuilder {
         private IAlgorithm algorithm;
         private PublicKey publicKey;
 
@@ -191,89 +57,75 @@ public class AsymmetricCipherBuilder {
          * @param publicKeyByte 公钥字节
          * @throws Exception
          */
-        public EncryptBuilder(IAlgorithm algorithm, byte[] publicKeyByte) throws Exception {
-            // 实例化密钥生成器
-            String algorithmName = algorithm.getKeyAlgorithm();
+        public EncryptVerifyBuilder(IAlgorithm algorithm, byte[] publicKeyByte) throws Exception {
             this.algorithm = algorithm;
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
-                EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyByte);
-                // RSAPublicKey
-                this.publicKey = keyFactory.generatePublic(keySpec);
-
-            } catch (NoSuchAlgorithmException e) {
-                throw new Exception("无此算法");
-            } catch (InvalidKeySpecException e) {
-                throw new Exception("私钥非法");
-            }
+            this.publicKey = BaseCipher.generatePublic(algorithm, publicKeyByte);
         }
 
-        public EncryptBuilder(IAlgorithm algorithm, String base64PrivateKey) throws Exception {
+        public EncryptVerifyBuilder(IAlgorithm algorithm, String base64PrivateKey) throws Exception {
             this(algorithm, Base64.getDecoder().decode(base64PrivateKey));
         }
 
-        public EncryptBuilder encrypt(byte[] data) {
-            this.data = data;
-            return this;
+        public byte[] encrypt(byte[] data)throws Exception {
+            return BaseCipher.encrypt(data, publicKey, algorithm);
         }
 
-        public EncryptBuilder encrypt(String base64Data) {
-            this.data = Base64.getDecoder().decode(base64Data);
-            return this;
-        }
-
-        public byte[] finish() throws Exception {
-            return AbstractCipher.encrypt(data, publicKey, algorithm);
-        }
-
-        public String finishToBase64() throws Exception {
-            byte[] out = AbstractCipher.encrypt(data, publicKey, algorithm);
+        public String encrypt(String base64Data) throws Exception {
+        	byte[] data = Base64.getDecoder().decode(base64Data);
+            byte[] out = BaseCipher.encrypt(data, publicKey, algorithm);
             return Base64.getEncoder().encodeToString(out);
+        }
+
+        public boolean verify(byte[] sourceData, byte[] signData)  throws Exception {
+            return BaseCipher.verifySign(sourceData, publicKey, signData, algorithm);
+        }
+
+        public boolean verify(byte[] sourceData, String base64Sign)  throws Exception {
+            byte[] signData = Base64.getDecoder().decode(base64Sign);
+            return BaseCipher.verifySign(sourceData, publicKey, signData, algorithm);
+        }
+
+        public boolean verify(String sourceBase64Data, String base64Sign) throws Exception {
+        	byte[] data = Base64.getDecoder().decode(sourceBase64Data);
+            byte[] signData = Base64.getDecoder().decode(base64Sign);
+            return BaseCipher.verifySign(data, publicKey, signData, algorithm);
         }
     }
 
-    public static class DecryptBuilder {
-        private byte[] data;
+    public static class DecryptSignBuilder {
         private IAlgorithm algorithm;
         private PrivateKey privateKey;
 
-        public DecryptBuilder(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
-            // 实例化密钥生成器
-            String algorithmName = algorithm.getKeyAlgorithm();
+        public DecryptSignBuilder(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
             this.algorithm = algorithm;
-            try {
-                KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
-                EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
-                // RSAPrivateKey
-                privateKey = keyFactory.generatePrivate(privateKeySpec);
-            } catch (NoSuchAlgorithmException e) {
-                throw new Exception("无此算法");
-            } catch (InvalidKeySpecException e) {
-                throw new Exception("私钥非法");
-            }
+            this.privateKey = BaseCipher.generatePrivate(algorithm, privateKeyByte);
         }
 
-        public DecryptBuilder(IAlgorithm algorithm, String base64PrivateKey) throws Exception {
+        public DecryptSignBuilder(IAlgorithm algorithm, String base64PrivateKey) throws Exception {
             this(algorithm, Base64.getDecoder().decode(base64PrivateKey));
         }
 
-        public DecryptBuilder decrypt(byte[] data) {
-            this.data = data;
-            return this;
+        public byte[] decrypt(byte[] data) throws Exception {
+            return BaseCipher.decrypt(data, privateKey, algorithm);
         }
 
-        public DecryptBuilder decrypt(String base64Data) {
-            this.data = Base64.getDecoder().decode(base64Data);
-            return this;
-        }
-
-        public byte[] finish() throws Exception {
-            return AbstractCipher.decrypt(data, privateKey, algorithm);
-        }
-
-        public String finishToString() throws Exception {
-            byte[] out = AbstractCipher.encrypt(data, privateKey, algorithm);
+        public String decrypt(String base64Data)  throws Exception {
+        	byte[] data = Base64.getDecoder().decode(base64Data);
+            byte[] out = BaseCipher.encrypt(data, privateKey, algorithm);
             return new String(out);
+        }
+
+        public byte[] sign(byte[] data) throws Exception {
+            // 用私钥对信息生成数字签名
+            byte[] out = BaseCipher.sign(data, privateKey, algorithm);
+            return out;
+        }
+
+        public String sign(String base64Data) throws Exception {
+        	byte[] data = Base64.getDecoder().decode(base64Data);
+            // 用私钥对信息生成数字签名
+            byte[] out = BaseCipher.sign(data, privateKey, algorithm);
+            return Base64.getEncoder().encodeToString(out);
         }
     }
 }

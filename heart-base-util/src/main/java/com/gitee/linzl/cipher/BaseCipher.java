@@ -18,13 +18,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import com.gitee.linzl.cls.ClassUtils;
 
-public abstract class AbstractCipher {
+public class BaseCipher {
     private static final String aesIvParameterSpec = "0102030405060708";
     private static final String desIvParameterSpec = "12345678";
     private static final boolean bcPresent;
 
     static {
-        ClassLoader classLoader = AbstractCipher.class.getClassLoader();
+        ClassLoader classLoader = BaseCipher.class.getClassLoader();
         bcPresent = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
 
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
@@ -33,7 +33,7 @@ public abstract class AbstractCipher {
     }
 
     /**
-     * 生成对称密钥
+     * 生成对称密钥,一般生成后转成base64存放在文件中，一般情况下不使用，只用于测试
      *
      * @return
      */
@@ -78,7 +78,7 @@ public abstract class AbstractCipher {
      * @param privateKeyByte 私钥字节
      * @throws Exception 加载私钥时产生的异常
      */
-    public static PrivateKey generatePrivate(byte[] privateKeyByte, IAlgorithm algorithm) throws Exception {
+    public static PrivateKey generatePrivate(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
         // 实例化密钥生成器
         String algorithmName = algorithm.getKeyAlgorithm();
         try {
@@ -98,7 +98,7 @@ public abstract class AbstractCipher {
      * @param pubicKeyByte 公钥字节
      * @throws Exception 加载公钥时产生的异常
      */
-    public static PublicKey generatePublic(byte[] pubicKeyByte, IAlgorithm algorithm) throws Exception {
+    public static PublicKey generatePublic(IAlgorithm algorithm, byte[] pubicKeyByte) throws Exception {
         // 实例化密钥生成器
         String algorithmName = algorithm.getKeyAlgorithm();
         try {

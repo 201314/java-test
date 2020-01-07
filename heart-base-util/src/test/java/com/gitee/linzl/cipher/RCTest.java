@@ -27,7 +27,7 @@ public class RCTest {
     }
 
     private void excute(IAlgorithm algorithm) throws Exception {
-        byte[] rawSecretKey = AbstractCipher.generateKey(algorithm);
+        byte[] rawSecretKey = BaseCipher.generateKey(algorithm);
         BasePrint.printSecretKey(rawSecretKey);
 
         SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(algorithm,

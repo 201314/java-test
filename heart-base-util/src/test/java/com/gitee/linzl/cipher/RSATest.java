@@ -42,15 +42,15 @@ public class RSATest {
     private void execute(IAlgorithm algorithm) throws Exception {
         System.out.println("start===========指定密钥 公钥加密，私钥解密===========start");
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-        AsymmetricCipherBuilder.EncryptBuilder encryptBuilder = new AsymmetricCipherBuilder.EncryptBuilder(algorithm,
+        AsymmetricCipherBuilder.EncryptVerifyBuilder encryptBuilder = new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm,
                 Base64.decodeBase64(publicKey));
-        byte[] encryptData = encryptBuilder.encrypt(text.getBytes()).finish();
+        byte[] encryptData = encryptBuilder.encrypt(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-        AsymmetricCipherBuilder.DecryptBuilder decryptBuilder = new AsymmetricCipherBuilder.DecryptBuilder(algorithm,
+        AsymmetricCipherBuilder.DecryptSignBuilder decryptBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
                 Base64.decodeBase64(privateKey));
-        byte[] decryptData = decryptBuilder.decrypt(encryptData).finish();
+        byte[] decryptData = decryptBuilder.decrypt(encryptData);
         BasePrint.printDecryptData(decryptData);
         System.out.println("end===========指定密钥 公钥加密，私钥解密===========end");
     }
@@ -58,38 +58,38 @@ public class RSATest {
     private void execute22(IAlgorithm algorithm) throws Exception {
         System.out.println("start===========指定密钥 私钥加密，公钥解密===========start");
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-        PrivateKey priKey = AbstractCipher.generatePrivate(Base64.decodeBase64(privateKey), algorithm);
+        PrivateKey priKey = BaseCipher.generatePrivate(algorithm, Base64.decodeBase64(privateKey));
         BasePrint.printPrivateKey(priKey.getEncoded());
 
-        byte[] encryptData = AbstractCipher.encrypt(text.getBytes(), priKey, algorithm);
+        byte[] encryptData = BaseCipher.encrypt(text.getBytes(), priKey, algorithm);
         BasePrint.printEncryptData(encryptData);
 
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-        PublicKey pubKey = AbstractCipher.generatePublic(Base64.decodeBase64(publicKey), algorithm);
+        PublicKey pubKey = BaseCipher.generatePublic(algorithm, Base64.decodeBase64(publicKey));
         BasePrint.printPublicKey(pubKey.getEncoded());
 
-        byte[] decryptData = AbstractCipher.decrypt(encryptData, pubKey, algorithm);
+        byte[] decryptData = BaseCipher.decrypt(encryptData, pubKey, algorithm);
         BasePrint.printDecryptData(decryptData);
         System.out.println("end===========指定密钥  私钥加密，公钥解密===========end");
     }
 
     private void executeRandom(IAlgorithm algorithm) throws Exception {
         System.out.println("start===========JDK随机密钥===========start");
-        KeyPair keyPair = AbstractCipher.generateKeyPair(algorithm);
+        KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PublicKey pubKey = keyPair.getPublic();
         BasePrint.printPublicKey(pubKey.getEncoded());
 
-        AsymmetricCipherBuilder.EncryptBuilder encryptBuilder = new AsymmetricCipherBuilder.EncryptBuilder(algorithm,
+        AsymmetricCipherBuilder.EncryptVerifyBuilder encryptBuilder = new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm,
                 pubKey.getEncoded());
-        byte[] encryptData = encryptBuilder.encrypt(text.getBytes()).finish();
+        byte[] encryptData = encryptBuilder.encrypt(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
         PrivateKey priKey = keyPair.getPrivate();
         BasePrint.printPrivateKey(priKey.getEncoded());
 
-        AsymmetricCipherBuilder.DecryptBuilder decryptBuilder = new AsymmetricCipherBuilder.DecryptBuilder(algorithm,
+        AsymmetricCipherBuilder.DecryptSignBuilder decryptBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
                 priKey.getEncoded());
-        byte[] decryptData = decryptBuilder.decrypt(encryptData).finish();
+        byte[] decryptData = decryptBuilder.decrypt(encryptData);
         BasePrint.printDecryptData(decryptData);
         System.out.println("end===========JDK随机密钥===========end");
     }

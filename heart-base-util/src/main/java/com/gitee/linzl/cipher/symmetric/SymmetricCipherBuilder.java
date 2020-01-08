@@ -40,115 +40,64 @@ import com.gitee.linzl.cipher.IAlgorithm;
  * @author linzl
  */
 public class SymmetricCipherBuilder {
-    private SymmetricCipherBuilder() {
+    protected IAlgorithm algorithm;
+    protected IvParameterSpec ivParameterSpec;
+    protected SecretKeySpec secretKeySpec;
+
+    public SymmetricCipherBuilder(IAlgorithm algorithm, byte[] rawSecretKey) {
+        this.secretKeySpec = new SecretKeySpec(rawSecretKey, algorithm.getKeyAlgorithm());
+        this.algorithm = algorithm;
     }
 
-    public static class EncryptBuilder {
-        private byte[] data;
-        private IAlgorithm algorithm;
-        private IvParameterSpec ivParameterSpec;
-        private SecretKeySpec secretKeySpec;
-
-        public EncryptBuilder(IAlgorithm algorithm, byte[] rawSecretKey) {
-            this.secretKeySpec = new SecretKeySpec(rawSecretKey, algorithm.getKeyAlgorithm());
-            this.algorithm = algorithm;
-        }
-
-        public EncryptBuilder(IAlgorithm algorithm, String base64SecretKey) {
-            this.secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(base64SecretKey), algorithm.getKeyAlgorithm());
-            this.algorithm = algorithm;
-        }
-
-        public EncryptBuilder encrypt(byte[] data) {
-            this.data = data;
-            return this;
-        }
-
-        public EncryptBuilder encrypt(String base64Data) {
-            this.data = Base64.getDecoder().decode(base64Data);
-            return this;
-        }
-
-        public EncryptBuilder ivParameterSpec(byte[] ivParameterSpec) {
-            //用密钥初始化Cipher对象
-            this.ivParameterSpec = new IvParameterSpec(ivParameterSpec);
-            return this;
-        }
-
-        public EncryptBuilder ivParameterSpec(String ivParameterSpec) {
-            this.ivParameterSpec = new IvParameterSpec(ivParameterSpec.getBytes());
-            return this;
-        }
-
-        public byte[] finish() throws Exception {
-            if (Objects.isNull(ivParameterSpec)) {
-                return BaseCipher.encrypt(data, secretKeySpec, algorithm);
-            }
-            return BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
-        }
-
-        public String finishToBase64() throws Exception {
-            byte[] out;
-            if (Objects.isNull(ivParameterSpec)) {
-                out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
-            } else {
-                out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
-            }
-            return Base64.getEncoder().encodeToString(out);
-        }
+    public SymmetricCipherBuilder(IAlgorithm algorithm, String base64SecretKey) {
+        this.secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(base64SecretKey), algorithm.getKeyAlgorithm());
+        this.algorithm = algorithm;
     }
 
-    public static class DecryptBuilder {
-        private byte[] data;
-        private IAlgorithm algorithm;
-        private IvParameterSpec ivParameterSpec;
-        private SecretKeySpec secretKeySpec;
+    public SymmetricCipherBuilder ivParameterSpec(byte[] ivParameterSpec) {
+        this.ivParameterSpec = new IvParameterSpec(ivParameterSpec);
+        return this;
+    }
 
-        public DecryptBuilder(IAlgorithm algorithm, byte[] rawSecretKey) {
-            this.secretKeySpec = new SecretKeySpec(rawSecretKey, algorithm.getKeyAlgorithm());
-            this.algorithm = algorithm;
-        }
+    public SymmetricCipherBuilder ivParameterSpec(String ivParameterSpec) {
+        this.ivParameterSpec = new IvParameterSpec(ivParameterSpec.getBytes());
+        return this;
+    }
 
-        public DecryptBuilder(IAlgorithm algorithm, String base64SecretKey) {
-            this.secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(base64SecretKey), algorithm.getKeyAlgorithm());
-            this.algorithm = algorithm;
-        }
 
-        public DecryptBuilder decrypt(byte[] data) {
-            this.data = data;
-            return this;
+    public byte[] encrypt(byte[] data) throws Exception {
+        if (Objects.isNull(ivParameterSpec)) {
+            return BaseCipher.encrypt(data, secretKeySpec, algorithm);
         }
+        return BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+    }
 
-        public DecryptBuilder decrypt(String base64Data) {
-            this.data = Base64.getDecoder().decode(base64Data);
-            return this;
+    public String encrypt(String base64Data) throws Exception {
+        byte[] data = Base64.getDecoder().decode(base64Data);
+        byte[] out;
+        if (Objects.isNull(ivParameterSpec)) {
+            out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
+        } else {
+            out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
         }
+        return Base64.getEncoder().encodeToString(out);
+    }
 
-        public DecryptBuilder ivParameterSpec(byte[] ivParameterSpec) {
-            this.ivParameterSpec = new IvParameterSpec(ivParameterSpec);
-            return this;
+    public byte[] decrypt(byte[] data) throws Exception {
+        if (Objects.isNull(ivParameterSpec)) {
+            return BaseCipher.decrypt(data, secretKeySpec, algorithm);
         }
+        return BaseCipher.decrypt(data, secretKeySpec, algorithm, ivParameterSpec);
+    }
 
-        public DecryptBuilder ivParameterSpec(String ivParameterSpec) {
-            this.ivParameterSpec = new IvParameterSpec(ivParameterSpec.getBytes());
-            return this;
+    public String decrypt(String base64Data) throws Exception {
+        byte[] data = Base64.getDecoder().decode(base64Data);
+        byte[] out;
+        if (Objects.isNull(ivParameterSpec)) {
+            out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
+        } else {
+            out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
         }
-
-        public byte[] finish() throws Exception {
-            if (Objects.isNull(ivParameterSpec)) {
-                return BaseCipher.decrypt(data, secretKeySpec, algorithm);
-            }
-            return BaseCipher.decrypt(data, secretKeySpec, algorithm, ivParameterSpec);
-        }
-
-        public String finishToString() throws Exception {
-            byte[] out;
-            if (Objects.isNull(ivParameterSpec)) {
-                out = BaseCipher.encrypt(data, secretKeySpec, algorithm);
-            } else {
-                out = BaseCipher.encrypt(data, secretKeySpec, algorithm, ivParameterSpec);
-            }
-            return new String(out);
-        }
+        return new String(out);
     }
 }

@@ -126,14 +126,13 @@ public class AESTest {
 
         byte[] keyiv = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6};// 长度必须是16
 
-        SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(aes,
+
+        SymmetricCipherBuilder cipherBuilder = new SymmetricCipherBuilder(aes,
                 rawSecretKey);
-        byte[] encryptData = encryptBuilder.encrypt(text.getBytes()).ivParameterSpec(keyiv).finish();
+        byte[] encryptData = cipherBuilder.ivParameterSpec(keyiv).encrypt(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
-        SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(aes,
-                rawSecretKey);
-        byte[] decryptData = decryptBuilder.decrypt(encryptData).ivParameterSpec(keyiv).finish();
+        byte[] decryptData = cipherBuilder.ivParameterSpec(keyiv).decrypt(encryptData);
         BasePrint.printDecryptData(decryptData);
     }
 
@@ -147,14 +146,12 @@ public class AESTest {
         byte[] rawSecretKey = BaseCipher.generateKey(aes);
         BasePrint.printSecretKey(rawSecretKey);
 
-        SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(aes,
+        SymmetricCipherBuilder cipherBuilder = new SymmetricCipherBuilder(aes,
                 rawSecretKey);
-        byte[] encryptData = encryptBuilder.encrypt(text.getBytes()).finish();
+        byte[] encryptData = cipherBuilder.encrypt(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
-        SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(aes,
-                rawSecretKey);
-        byte[] decryptData = decryptBuilder.decrypt(encryptData).finish();
+        byte[] decryptData = cipherBuilder.decrypt(encryptData);
         BasePrint.printDecryptData(decryptData);
     }
 

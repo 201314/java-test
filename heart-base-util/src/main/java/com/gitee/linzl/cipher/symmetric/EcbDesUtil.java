@@ -93,11 +93,11 @@ public class EcbDesUtil {
 			// hexData=NumberUtil.format2Hex(hexData.length(),1)+hexData;
 			hexData = fillLastBlock(hexData);
 			// log.info("des数据补齐后="+hexData);
-			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(
+			SymmetricCipherBuilder cipherBuilder = new SymmetricCipherBuilder(
 					DESCipherAlgorithms.DES_ECB_NOPADDING_56, rawSecretKey);
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = encryptBuilder.encrypt(buffer).finish();
+				buffer = cipherBuilder.encrypt(buffer);
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -127,11 +127,11 @@ public class EcbDesUtil {
 		byte[] buffer;
 		StringBuilder sb = new StringBuilder();
 		try {
-			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(
+			SymmetricCipherBuilder cipherBuilder = new SymmetricCipherBuilder(
 					DESCipherAlgorithms.DES_ECB_NOPADDING_56, rawSecretKey);
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = decryptBuilder.decrypt(buffer).finish();
+				buffer = cipherBuilder.decrypt(buffer);
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -181,17 +181,17 @@ public class EcbDesUtil {
 			hexData = fillLastBlock(hexData);
 			System.out.println("补足长度hex:" + hexData);
 
-			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+			SymmetricCipherBuilder encryptBuilder = new SymmetricCipherBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
 					lkey);
 
-			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+			SymmetricCipherBuilder decryptBuilder = new SymmetricCipherBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
 					rkey);
 
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = encryptBuilder.encrypt(buffer).finish();
-				buffer = decryptBuilder.decrypt(buffer).finish();
-				buffer = encryptBuilder.encrypt(buffer).finish();
+				buffer = encryptBuilder.encrypt(buffer);
+				buffer = decryptBuilder.decrypt(buffer);
+				buffer = encryptBuilder.encrypt(buffer);
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {
@@ -223,17 +223,17 @@ public class EcbDesUtil {
 		byte[] buffer;
 		StringBuilder sb = new StringBuilder();
 		try {
-			SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+			SymmetricCipherBuilder encryptBuilder = new SymmetricCipherBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
 					rkey);
 
-			SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
+			SymmetricCipherBuilder decryptBuilder = new SymmetricCipherBuilder(DESCipherAlgorithms.DES_ECB_NOPADDING_56,
 					lkey);
 			
 			for (int i = 0; i < hexData.length(); i = i + 16) {
 				buffer = Hex.decodeHex(hexData.substring(i, i + 16));
-				buffer = decryptBuilder.decrypt(buffer).finish();
-				buffer = encryptBuilder.encrypt(buffer).finish();
-				buffer = decryptBuilder.decrypt(buffer).finish();
+				buffer = decryptBuilder.decrypt(buffer);
+				buffer = encryptBuilder.encrypt(buffer);
+				buffer = decryptBuilder.decrypt(buffer);
 				sb.append(Hex.encodeHexString(buffer));
 			}
 		} catch (Exception e) {

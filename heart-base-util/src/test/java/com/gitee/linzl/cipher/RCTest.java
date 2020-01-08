@@ -30,14 +30,12 @@ public class RCTest {
         byte[] rawSecretKey = BaseCipher.generateKey(algorithm);
         BasePrint.printSecretKey(rawSecretKey);
 
-        SymmetricCipherBuilder.EncryptBuilder encryptBuilder = new SymmetricCipherBuilder.EncryptBuilder(algorithm,
+        SymmetricCipherBuilder cipherBuilder = new SymmetricCipherBuilder(algorithm,
                 rawSecretKey);
-        byte[] encryptData = encryptBuilder.encrypt(text.getBytes()).finish();
+        byte[] encryptData = cipherBuilder.encrypt(text.getBytes());
         BasePrint.printEncryptData(encryptData);
 
-        SymmetricCipherBuilder.DecryptBuilder decryptBuilder = new SymmetricCipherBuilder.DecryptBuilder(algorithm,
-                rawSecretKey);
-        byte[] decryptData = decryptBuilder.decrypt(encryptData).finish();
+        byte[] decryptData = cipherBuilder.decrypt(encryptData);
         BasePrint.printDecryptData(decryptData);
     }
 }

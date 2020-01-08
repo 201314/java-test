@@ -119,7 +119,7 @@ public class MoneyUtil {
      * @return
      */
     public static String abbreviation(Double number, int maxLength) {
-        String str = ConvertUtil.double2String(number);
+        String str = ConvertUtil.toString(number);
         if (str.length() <= maxLength) {
             return str;
         }
@@ -135,7 +135,7 @@ public class MoneyUtil {
      * @return
      */
     public static String numberConvertCapital(double number) {
-        String str = ConvertUtil.double2String(number);
+        String str = ConvertUtil.toString(number);
 
         int dotIdx = str.indexOf(".");
         String integral = dotIdx > -1 ? str.substring(0, dotIdx) : str;

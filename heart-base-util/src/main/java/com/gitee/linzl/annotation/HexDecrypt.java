@@ -14,6 +14,6 @@ public class HexDecrypt implements Decrypt {
 
 	@Override
 	public String decrypt(String text) {
-		return ConvertUtil.string2Hex(text);
+		return ConvertUtil.toHex(text);
 	}
 }

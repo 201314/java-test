@@ -1,10 +1,6 @@
 package com.gitee.linzl.codec;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -12,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -147,11 +144,11 @@ public class ConvertUtil {
     }
 
     public static String fullFormatHex(short value) {
-        return fullFormatHex(short2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     public static String fullFormatHex(char value) {
-        return fullFormatHex(char2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     /**
@@ -161,19 +158,19 @@ public class ConvertUtil {
      * @return
      */
     public static String fullFormatHex(int value) {
-        return fullFormatHex(int2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     public static String fullFormatHex(long value) {
-        return fullFormatHex(long2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     public static String fullFormatHex(float value) {
-        return fullFormatHex(float2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     public static String fullFormatHex(double value) {
-        return fullFormatHex(double2Hex(value));
+        return fullFormatHex(toHex(value));
     }
 
     /**
@@ -196,39 +193,156 @@ public class ConvertUtil {
         return data.toUpperCase();
     }
 
+    public static byte[] char2Byte(char value) {
+        return toByteExt((short) value);
+    }
+
+    public static byte[] toByte(char value) {
+        return ByteBuffer.allocate(2).putChar(value).array();
+    }
+
+    public static byte[] toByteExt(short value) {
+        byte[] result = new byte[2];
+        // 由高位到低位
+        result[0] = (byte) ((value & 0xFF) >> 8);
+        result[1] = (byte) (value & 0xFF);
+        return result;
+    }
+
+    public static byte[] toByte(short value) {
+        return ByteBuffer.allocate(2).putShort(value).array();
+    }
+
+    /**
+     * 转 字节
+     *
+     * @param value 58165-->16进制为E335
+     * @return
+     */
+    public static byte[] toByteExt(int value) {
+        byte[] result = new byte[4];
+        // 由高位到低位
+        result[0] = (byte) ((value >> 24)& 0xFF);
+        result[1] = (byte) ((value >> 16)& 0xFF);
+        result[2] = (byte) ((value >> 8)& 0xFF);
+        result[3] = (byte) (value & 0xFF);
+        return result;
+    }
+
+    public static byte[] toByte(int value) {
+        return ByteBuffer.allocate(4).putInt(value).array();
+    }
+
+    public static byte[] toByteExt(long value) {
+        byte[] byteNum = new byte[8];
+        for (int ix = 0; ix < 8; ++ix) {
+            int offset = 64 - (ix + 1) * 8;
+            byteNum[ix] = (byte) ((value & 0xFF) >> offset);
+        }
+        return byteNum;
+    }
+
+    public static byte[] toByte(long value) {
+        return ByteBuffer.allocate(8).putLong(value).array();
+    }
+
+    public static byte[] toByteExt(float value) {
+        return toByteExt(Float.floatToIntBits(value));
+    }
+
+    public static byte[] toByte(float value) {
+        return ByteBuffer.allocate(4).putFloat(value).array();
+    }
+
+    public static byte[] toByteExt(double value) {
+        return toByteExt(Double.doubleToLongBits(value));
+    }
+
+    public static byte[] toByte(double value) {
+        return ByteBuffer.allocate(8).putDouble(value).array();
+    }
+
+    /**
+     * 将16进制转换为二进制
+     *
+     * @param hex
+     * @return
+     */
+    public static byte[] hex2Byte(String hex) {
+        if (hex.length() < 1) {
+            return null;
+        }
+        if (hex.length() % 2 != 0) {
+            // 字节数组长度不是偶数直接抛出异常不予处理
+            throw new IllegalArgumentException("The byte Array's length is not even!");
+        }
+
+        byte[] result = new byte[hex.length() / 2];
+        String item;
+        for (int n = 0, length = hex.length(); n < length; n += 2) {
+            item = new String(hex.getBytes(), n, 2);
+            result[n / 2] = (byte) Integer.parseInt(item, 16);
+        }
+        return result;
+    }
+
+    /**
+     * 二进制转字节
+     *
+     * @param bin
+     * @return
+     */
     public static byte bin2Byte(String bin) {
         return 0;
     }
 
-    public static char bin2Char(String bin) {
+    public static byte[] string2Byte(String value) {
+        return value.getBytes();
+    }
+
+    public static char toCharExt(byte[] value) {
+        return (char) toShortExt(value);
+    }
+
+    public static char toChar(byte[] value) {
+        return ByteBuffer.wrap(value).getChar();
+    }
+
+    public static char toChar(short value) {
+        return (char) value;
+    }
+
+    public static char toChar(int value) {
+        return (char) value;
+    }
+
+    public static char toChar(long value) {
+        return (char) value;
+    }
+
+    public static char toChar(float value) {
+        return (char) value;
+    }
+
+    public static char toChar(double value) {
+        return (char) value;
+    }
+
+    /**
+     * 二进制转char Ascii
+     *
+     * @param bin
+     * @return
+     */
+    public static char toCharExt(String bin) {
         return 0;
     }
 
-    public static short bin2Short(String bin) {
-        return Short.parseShort(bin, 2);
+    public static char[] toChar(String value) {
+        return value.toCharArray();
     }
 
-    public static int bin2Int(String bin) {
-        return Integer.parseInt(bin, 2);
-    }
-
-    public static long bin2Long(String bin) {
-        return Long.parseLong(bin, 2);
-    }
-
-    public static float bin2Float(String bin) {
-        return Float.intBitsToFloat(bin2Int(bin));
-    }
-
-    public static double bin2Double(String bin) {
-        return Double.longBitsToDouble(bin2Long(bin));
-    }
-
-    public static char byte2Ascii(byte[] value) {
-        return (char) byte2Short(value);
-    }
-
-    public static short byte2Short(byte[] value) {
+    public static short toShortExt(byte[] value) {
         return (short) (((value[0] & 0xFF) << 8) | value[1] & 0xFF);
     }
 
@@ -236,7 +350,35 @@ public class ConvertUtil {
         return ByteBuffer.wrap(value).getShort();
     }
 
-    public static int byte2Int(byte[] value) {
+    public static short toShort(byte value) {
+        return value;
+    }
+
+    public static short toShort(char value) {
+        return (short) value;
+    }
+
+    public static short toShort(int value) {
+        return (short) value;
+    }
+
+    public static short toShort(long value) {
+        return (short) value;
+    }
+
+    public static short toShort(float value) {
+        return (short) value;
+    }
+
+    public static short toShort(double value) {
+        return (short) value;
+    }
+
+    public static short toShort(String bin) {
+        return Short.parseShort(bin, 2);
+    }
+
+    public static int toIntExt(byte[] value) {
         byte[] a = new byte[4];
         int i = a.length - 1, j = value.length - 1;
         for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
@@ -255,7 +397,48 @@ public class ConvertUtil {
         return ByteBuffer.wrap(value).getInt();
     }
 
-    public static long byte2Long(byte[] value) {
+    public static int toInt(char value) {
+        return value;
+    }
+
+    public static int toInt(short value) {
+        return value;
+    }
+
+    public static int toInt(long value) {
+        return (int) value;
+    }
+
+    public static int toInt(float value) {
+        return (int) value;
+    }
+
+    public static int toInt(double value) {
+        return (int) value;
+    }
+
+    /**
+     * 二进制转Int
+     *
+     * @param bin
+     * @return
+     */
+    public static int toInt(String bin) {
+        return Integer.parseInt(bin, 2);
+    }
+
+    /**
+     * 16进制转int
+     *
+     * @param hex
+     * @return
+     */
+    public static int hex2Int(String hex) {
+        BigInteger bigInteger = new BigInteger(hex, 16);
+        return bigInteger.intValue();
+    }
+
+    public static long toLongExt(byte[] value) {
         byte[] a = new byte[8];
         int i = a.length - 1, j = value.length - 1;
         for (; i >= 0; i--, j--) {// 从b的尾部(即int值的低位)开始copy数据
@@ -290,8 +473,47 @@ public class ConvertUtil {
         return buffer.getLong();
     }
 
-    public static float byte2Float(byte[] value) {
-        return Float.intBitsToFloat(byte2Int(value));
+    public static long toLong(char value) {
+        return value;
+    }
+
+    public static long toLong(short value) {
+        return value;
+    }
+
+    public static long toLong(int value) {
+        return value;
+    }
+
+    public static long toLong(float value) {
+        return (long) value;
+    }
+
+    /**
+     * 可以将科学记数转成原来的值
+     *
+     * @param value
+     * @return
+     */
+    public static Long toLong(double value) {
+        NumberFormat nf = NumberFormat.getInstance();
+        // 去掉逗号
+        nf.setGroupingUsed(false);
+        String str = nf.format(value);
+        return Long.parseLong(str);
+    }
+
+    public static Long hex2Long(String hex) {
+        BigInteger bigInteger = new BigInteger(hex, 16);
+        return bigInteger.longValue();
+    }
+
+    public static long bin2Long(String bin) {
+        return Long.parseLong(bin, 2);
+    }
+
+    public static float toFloatExt(byte[] value) {
+        return Float.intBitsToFloat(toIntExt(value));
     }
 
     public static float toFloat(byte[] value) {
@@ -300,557 +522,481 @@ public class ConvertUtil {
         buffer.flip();
         return buffer.getFloat();
 //		return ByteBuffer.wrap(value).getFloat();
-	}
+    }
 
-	public static double byte2Double(byte[] value) {
-		return Double.longBitsToDouble(byte2Long(value));
-	}
-
-	public static double toDouble(byte[] value) {
-		if (value.length < 8) {// 位数不够,前补0
-			byte[] target = new byte[8];
-			int fillZero = target.length - value.length;
-			Arrays.fill(target, 0, fillZero, (byte) 0);
-			System.arraycopy(value, 0, target, value.length, value.length);
-			return ByteBuffer.wrap(target).getDouble();
-		}
-
-		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.put(value, 0, value.length);
-		buffer.flip();
-		return buffer.getDouble();
-	}
-
-	public static String byte2String(byte[] value) {
-		return new String(value);
-	}
-
-	public static String toString(byte[] value) {
-		return getString(ByteBuffer.wrap(value), Charset.forName("UTF-8"));
-	}
-
-	/**
-	 * 将字节转换成16进制
-	 * 
-	 * @param buf
-	 * @return
-	 */
-	public static String byte2Hex(byte buf[]) {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < buf.length; i++) {
-			String hex = Integer.toHexString(buf[i] & 0xFF);
-			hex = hex.length() == 1 ? 0 + hex : hex;
-			sb.append(hex.toUpperCase());
-		}
-		return sb.toString();
-	}
-
-	public static byte[] char2Byte(char value) {
-		return short2Byte((short) value);
-	}
-
-	public static byte[] toByte(char value) {
-		return ByteBuffer.allocate(2).putChar(value).array();
-	}
-
-	public static int char2Int(char value) {
-		return value;
-	}
-
-	public static String char2Hex(char value) {
-		return Integer.toHexString(value);
-	}
-
-	public static byte[] short2Byte(short value) {
-		byte[] result = new byte[2];
-		// 由高位到低位
-		result[0] = (byte) ((value & 0xFF) >> 8);
-		result[1] = (byte) (value & 0xFF);
-		return result;
-	}
-
-	public static byte[] toByte(short value) {
-		return ByteBuffer.allocate(2).putShort(value).array();
-	}
-
-	public static char short2Ascii(short value) {
-		return (char) value;
-	}
-
-	public static String short2Hex(short value) {
-		return Integer.toHexString(value);
-	}
-
-	/**
-	 * 转 字节
-	 * 
-	 * @param value 58165-->16进制为E335
-	 * @return
-	 */
-	public static byte[] int2Byte(int value) {
-		byte[] result = new byte[4];
-		// 由高位到低位
-		result[0] = (byte) ((value & 0xFF) >> 24);
-		result[1] = (byte) ((value & 0xFF) >> 16);
-		result[2] = (byte) ((value & 0xFF) >> 8);
-		result[3] = (byte) (value & 0xFF);
-		return result;
-	}
-
-	public static byte[] toByte(int value) {
-		return ByteBuffer.allocate(4).putInt(value).array();
-	}
-
-	public static char int2Ascii(int value) {
-		return (char) value;
-	}
-
-	/**
-	 * 转16进制数
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String int2Hex(int value) {
-		return Integer.toHexString(value);
-	}
-
-	/**
-	 * 转为2进制
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String int2Bin(int value) {
-		return Integer.toBinaryString(value);
-	}
-	// Integer.parseInt(binaryString,2) 转10进制
-
-	public static byte[] long2Byte(long value) {
-		byte[] byteNum = new byte[8];
-		for (int ix = 0; ix < 8; ++ix) {
-			int offset = 64 - (ix + 1) * 8;
-			byteNum[ix] = (byte) ((value & 0xFF) >> offset);
-		}
-		return byteNum;
-	}
-
-	public static byte[] toByte(long value) {
-		return ByteBuffer.allocate(8).putLong(value).array();
-	}
-
-	public static char long2Ascii(long value) {
-		return (char) value;
-	}
-
-	public static String long2Hex(long value) {
-		return Long.toHexString(value);
-	}
-
-	/**
-	 * 转为2进制
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String long2Bin(long value) {
-		return Long.toBinaryString(value);
-	}
-
-	public static byte[] float2Byte(float value) {
-		return int2Byte(Float.floatToIntBits(value));
-	}
-
-	public static byte[] toByte(float value) {
-		return ByteBuffer.allocate(4).putFloat(value).array();
-	}
-
-	public static char float2Ascii(float value) {
-		return (char) value;
-	}
-
-	/**
-	 * 将十进制浮点型转换为十六进制浮点型
-	 *
-	 * @return String
-	 * @since 1.0
-	 */
-	public static String float2Hex(float value) {
-		return Integer.toHexString(Float.floatToIntBits(value));
-	}
-
-	/**
-	 * 转2进制
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String float2Bin(float value) {
-		return int2Bin(Float.floatToIntBits(value));
-	}
-
-	public static byte[] double2Byte(double value) {
-		return long2Byte(Double.doubleToLongBits(value));
-	}
-
-	public static byte[] toByte(double value) {
-		return ByteBuffer.allocate(8).putDouble(value).array();
-	}
-
-	public static char double2Ascii(double value) {
-		return (char) value;
-	}
-
-	public static String double2Hex(double value) {
-		return Long.toHexString(Double.doubleToLongBits(value));
-	}
-
-    /**
-     * 可以将科学记数转成原来的值
-     *
-     * @param d
-     * @return
-     */
-    public static Long double2Long(double d) {
-        NumberFormat nf = NumberFormat.getInstance();
-        // 去掉逗号
-        nf.setGroupingUsed(false);
-        String str = nf.format(d);
-        Long value = Long.parseLong(str);
+    public static float toFloat(char value) {
         return value;
     }
 
-    public static String double2String(double d) {
+    public static float toFloat(short value) {
+        return value;
+    }
+
+    public static float toFloat(double value) {
+        return (float) value;
+    }
+
+    /**
+     * 将16进制单精度浮点型转换为10进制浮点型
+     *
+     * @return float
+     * @since 1.0
+     */
+    public static float hex2Float(String hex) {
+        BigInteger bigInteger = new BigInteger(hex, 16);
+        return Float.intBitsToFloat(bigInteger.intValue());
+    }
+
+    /**
+     * 二进制转浮点型
+     *
+     * @param bin
+     * @return
+     */
+    public static float bin2Float(String bin) {
+        return Float.intBitsToFloat(toInt(bin));
+    }
+
+    public static double toDoubleExt(byte[] value) {
+        return Double.longBitsToDouble(toLongExt(value));
+    }
+
+    public static double toDouble(byte[] value) {
+        if (value.length < 8) {// 位数不够,前补0
+            byte[] target = new byte[8];
+            int fillZero = target.length - value.length;
+            Arrays.fill(target, 0, fillZero, (byte) 0);
+            System.arraycopy(value, 0, target, value.length, value.length);
+            return ByteBuffer.wrap(target).getDouble();
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(value, 0, value.length);
+        buffer.flip();
+        return buffer.getDouble();
+    }
+
+    public static double toDouble(char value) {
+        return value;
+    }
+
+    public static double toDouble(short value) {
+        return value;
+    }
+
+    public static double hex2Double(String hex) {
+        BigInteger bigInteger = new BigInteger(hex, 16);
+        return Double.longBitsToDouble(bigInteger.longValue());
+    }
+
+    public static double bin2Double(String bin) {
+        return Double.longBitsToDouble(bin2Long(bin));
+    }
+
+
+    public static String toBin(byte value) {
+        return null;
+    }
+
+    public static String toBin(char value) {
+        return null;
+    }
+
+    public static String toBin(short value) {
+        return Integer.toBinaryString(value);
+    }
+
+    /**
+     * 转为2进制
+     *
+     * @param value
+     * @return
+     */
+    public static String toBin(int value) {
+        return Integer.toBinaryString(value);
+        // Integer.parseInt(binaryString,2) 转10进制
+    }
+
+    /**
+     * 转为2进制
+     *
+     * @param value
+     * @return
+     */
+    public static String toBin(long value) {
+        return Long.toBinaryString(value);
+    }
+
+    /**
+     * 转2进制
+     *
+     * @param value
+     * @return
+     */
+    public static String toBin(float value) {
+        return toBin(Float.floatToIntBits(value));
+    }
+
+    /**
+     * 转2进制
+     *
+     * @param value
+     * @return
+     */
+    public static String toBin(double value) {
+        return toBin(Double.doubleToLongBits(value));
+    }
+
+    public static String toString(byte[] value) {
+        //return new String(value);
+        return getString(ByteBuffer.wrap(value), Charset.forName("UTF-8"));
+    }
+
+    public static String toString(char value) {
+        return String.valueOf(value);
+    }
+
+    public static String toString(short value) {
+        return String.valueOf(value);
+    }
+
+    public static String toString(int value) {
+        return String.valueOf(value);
+    }
+
+    public static String toString(long value) {
+        return String.valueOf(value);
+    }
+
+    public static String toString(float value) {
+        return String.valueOf(value);
+    }
+
+    public static String toString(double d) {
         NumberFormat nf = NumberFormat.getInstance();
         // 去掉逗号
         nf.setGroupingUsed(false);
         return nf.format(d);
     }
 
-	/**
-	 * 转2进制
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String double2Bin(double value) {
-		return long2Bin(Double.doubleToLongBits(value));
-	}
+    /**
+     * 16进制转字符串,必须符合16进制表达法，4位为一个16进制
+     *
+     * @param hex
+     * @return
+     */
+    public static String hex2String(String hex) {
+        return new String(hex2Byte(hex));
+    }
 
-	public static byte[] string2Byte(String value) {
-		return value.getBytes();
-	}
+    /**
+     * 将字节转换成16进制
+     *
+     * @param buf
+     * @return
+     */
+    public static String toHex(byte buf[]) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < buf.length; i++) {
+            String hex = Integer.toHexString(buf[i] & 0xFF);
+            hex = hex.length() == 1 ? 0 + hex : hex;
+            sb.append(hex.toUpperCase());
+        }
+        return sb.toString();
+    }
 
-	public static char[] string2Ascii(String value) {
-		return value.toCharArray();
-	}
+    public static String toHex(char value) {
+        return Integer.toHexString(value);
+    }
 
-	/**
-	 * 字符串转16进制, 16进制表达法, 不够4位高位补0
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static String string2Hex(String str) {
-		return byte2Hex(str.getBytes());
-	}
+    public static String toHex(short value) {
+        return Integer.toHexString(value);
+    }
 
-	/**
-	 * 将16进制转换为二进制
-	 * 
-	 * @param hex
-	 * @return
-	 */
-	public static byte[] hex2Byte(String hex) {
-		if (hex.length() < 1) {
-			return null;
-		}
-		if (hex.length() % 2 != 0) {
-			// 字节数组长度不是偶数直接抛出异常不予处理
-			throw new IllegalArgumentException("The byte Array's length is not even!");
-		}
+    /**
+     * 转16进制数
+     *
+     * @param value
+     * @return
+     */
+    public static String toHex(int value) {
+        return Integer.toHexString(value);
+    }
 
-		byte[] result = new byte[hex.length() / 2];
-		String item = null;
-		for (int n = 0, length = hex.length(); n < length; n += 2) {
-			item = new String(hex.getBytes(), n, 2);
-			result[n / 2] = (byte) Integer.parseInt(item, 16);
-		}
-		return result;
-	}
+    public static String toHex(long value) {
+        return Long.toHexString(value);
+    }
 
-	public static Integer hex2Int(String hex) {
-		BigInteger bigInteger = new BigInteger(hex, 16);
-		return bigInteger.intValue();
-	}
+    /**
+     * 将十进制浮点型转换为十六进制浮点型
+     *
+     * @return String
+     * @since 1.0
+     */
+    public static String toHex(float value) {
+        return Integer.toHexString(Float.floatToIntBits(value));
+    }
 
-	public static Long hex2Long(String hex) {
-		BigInteger bigInteger = new BigInteger(hex, 16);
-		return bigInteger.longValue();
-	}
+    public static String toHex(double value) {
+        return Long.toHexString(Double.doubleToLongBits(value));
+    }
 
-	/**
-	 * 将16进制单精度浮点型转换为10进制浮点型
-	 *
-	 * @return float
-	 * @since 1.0
-	 */
-	public static float hex2Float(String hex) {
-		BigInteger bigInteger = new BigInteger(hex, 16);
-		return Float.intBitsToFloat(bigInteger.intValue());
-	}
+    /**
+     * 字符串转16进制, 16进制表达法, 不够4位高位补0
+     *
+     * @param value
+     * @return
+     */
+    public static String toHex(String value) {
+        return toHex(value.getBytes());
+    }
 
-	public static double hex2Double(String hex) {
-		BigInteger bigInteger = new BigInteger(hex, 16);
-		return Double.longBitsToDouble(bigInteger.longValue());
-	}
+    /**
+     * 字符串转换unicode
+     *
+     * @param string
+     * @return
+     */
+    public static String string2Unicode(String string) {
+        StringBuffer unicode = new StringBuffer();
+        for (int i = 0; i < string.length(); i++) {
+            // 取出每一个字符
+            char c = string.charAt(i);
+            String hex = Integer.toHexString(c);
+            // 转换为unicode
+            unicode.append("\\u");
+            // if (hex.length() != 4) {
+            // unicode.append(String.format("%0" + (4 - hex.length()) + "d", 0) + hex);
+            // } else {
+            unicode.append(hex);
+            // }
+        }
+        return unicode.toString();
+    }
 
-	/**
-	 * 16进制转字符串,必须符合16进制表达法，4位为一个16进制
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static String hex2String(String hex) {
-		return new String(hex2Byte(hex));
-	}
+    /**
+     * 含有unicode 的字符串转一般字符串
+     *
+     * @param unicodeStr 混有 Unicode 的字符串
+     * @return
+     */
+    public static String unicodeStr2String(String unicodeStr) {
+        // int length = unicodeStr.length();
+        // int count = 0;
+        // 正则匹配条件，可匹配“\\u”1到4位，一般是4位可直接使用 String regex = "\\\\u[a-f0-9A-F]{4}";
+        String regex = "\\\\u[a-f0-9A-F]{1,4}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(unicodeStr);
+        StringBuffer sb = new StringBuffer();
 
-	/**
-	 * 字符串转换unicode
-	 * 
-	 * @param string
-	 * @return
-	 */
-	public static String string2Unicode(String string) {
-		StringBuffer unicode = new StringBuffer();
-		for (int i = 0; i < string.length(); i++) {
-			// 取出每一个字符
-			char c = string.charAt(i);
-			String hex = Integer.toHexString(c);
-			// 转换为unicode
-			unicode.append("\\u");
-			// if (hex.length() != 4) {
-			// unicode.append(String.format("%0" + (4 - hex.length()) + "d", 0) + hex);
-			// } else {
-			unicode.append(hex);
-			// }
-		}
-		return unicode.toString();
-	}
+        while (matcher.find()) {
+            String oldChar = matcher.group();// 原本的Unicode字符
+            String newChar = unicode2String(oldChar);// 转换为普通字符
+            // int index = unicodeStr.indexOf(oldChar);
+            // sb.append(unicodeStr.substring(count, index));// 添加前面不是unicode的字符
+            sb.append(newChar);// 添加转换后的字符
+            // count = index + oldChar.length();// 统计下标移动的位置
+        }
+        // sb.append(unicodeStr.substring(count, length));// 添加末尾不是Unicode的字符
+        return sb.toString();
+    }
 
-	/**
-	 * 含有unicode 的字符串转一般字符串
-	 * 
-	 * @param unicodeStr 混有 Unicode 的字符串
-	 * @return
-	 */
-	public static String unicodeStr2String(String unicodeStr) {
-		// int length = unicodeStr.length();
-		// int count = 0;
-		// 正则匹配条件，可匹配“\\u”1到4位，一般是4位可直接使用 String regex = "\\\\u[a-f0-9A-F]{4}";
-		String regex = "\\\\u[a-f0-9A-F]{1,4}";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(unicodeStr);
-		StringBuffer sb = new StringBuffer();
+    /**
+     * unicode 转字符串
+     *
+     * @param unicode 全为 Unicode 的字符串
+     * @return
+     */
+    public static String unicode2String(String unicode) {
+        StringBuffer string = new StringBuffer();
+        String[] hex = unicode.split("\\\\u");
 
-		while (matcher.find()) {
-			String oldChar = matcher.group();// 原本的Unicode字符
-			String newChar = unicode2String(oldChar);// 转换为普通字符
-			// int index = unicodeStr.indexOf(oldChar);
-			// sb.append(unicodeStr.substring(count, index));// 添加前面不是unicode的字符
-			sb.append(newChar);// 添加转换后的字符
-			// count = index + oldChar.length();// 统计下标移动的位置
-		}
-		// sb.append(unicodeStr.substring(count, length));// 添加末尾不是Unicode的字符
-		return sb.toString();
-	}
+        for (int i = 1; i < hex.length; i++) {
+            // 转换出每一个代码点
+            int data = Integer.parseInt(hex[i], 16);
+            // 追加成string
+            string.append((char) data);
+        }
+        return string.toString();
+    }
 
-	/**
-	 * unicode 转字符串
-	 * 
-	 * @param unicode 全为 Unicode 的字符串
-	 * @return
-	 */
-	public static String unicode2String(String unicode) {
-		StringBuffer string = new StringBuffer();
-		String[] hex = unicode.split("\\\\u");
+    /**
+     * 字符串转ByteBuffer
+     *
+     * @param str
+     * @return
+     */
+    public static ByteBuffer getByteBuffer(String str) {
+        return ByteBuffer.wrap(str.getBytes());
+    }
 
-		for (int i = 1; i < hex.length; i++) {
-			// 转换出每一个代码点
-			int data = Integer.parseInt(hex[i], 16);
-			// 追加成string
-			string.append((char) data);
-		}
-		return string.toString();
-	}
+    /**
+     * ByteBuffer转字符串
+     *
+     * @param buffer
+     * @param charset
+     * @return
+     */
+    public static String getString(ByteBuffer buffer, Charset charset) {
+        CharsetDecoder decoder = null;
+        CharBuffer charBuffer = null;
+        try {
+            decoder = charset.newDecoder();
+            // charBuffer = decoder.decode(buffer);//用这个的话，只能输出来一次结果，第二次显示为空
+            charBuffer = decoder.decode(buffer.asReadOnlyBuffer());
+            return charBuffer.toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "";
+        }
+    }
 
-	/**
-	 * 字符串转ByteBuffer
-	 * 
-	 * @param str
-	 * @return
-	 */
-	public static ByteBuffer getByteBuffer(String str) {
-		return ByteBuffer.wrap(str.getBytes());
-	}
+    public static byte[] getLimitByte(ByteBuffer buffer) {
+        int len = buffer.limit() - buffer.position();
+        byte[] bytes = new byte[len];
+        buffer.get(bytes);
+        return bytes;
+    }
 
-	/**
-	 * ByteBuffer转字符串
-	 * 
-	 * @param buffer
-	 * @param charset
-	 * @return
-	 */
-	public static String getString(ByteBuffer buffer, Charset charset) {
-		CharsetDecoder decoder = null;
-		CharBuffer charBuffer = null;
-		try {
-			decoder = charset.newDecoder();
-			// charBuffer = decoder.decode(buffer);//用这个的话，只能输出来一次结果，第二次显示为空
-			charBuffer = decoder.decode(buffer.asReadOnlyBuffer());
-			return charBuffer.toString();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return "";
-		}
-	}
+    static Map<Long, String> map = new HashMap<>(12);
+    static Map<Long, String> unitMap = new HashMap<>();
+    static Map<Long, String> sectionMap = new HashMap<>(3);
 
-	public static byte[] getLimitByte(ByteBuffer buffer) {
-		int len = buffer.limit() - buffer.position();
-		byte[] bytes = new byte[len];
-		buffer.get(bytes);
-		return bytes;
-	}
+    static {
+        map.put(0L, "零");
+        map.put(1L, "壹");
+        map.put(2L, "贰");
+        map.put(3L, "叁");
+        map.put(4L, "肆");
+        map.put(5L, "伍");
+        map.put(6L, "陆");
+        map.put(7L, "柒");
+        map.put(8L, "捌");
+        map.put(9L, "玖");
 
-	static Map<Long, String> map = new HashMap<>(12);
-	static Map<Long, String> unitMap = new HashMap<>();
-	static Map<Long, String> sectionMap = new HashMap<>(3);
+        unitMap.put(1L, "拾");
+        unitMap.put(2L, "佰");
+        unitMap.put(3L, "仟");
 
-	static {
-		map.put(0L, "零");
-		map.put(1L, "壹");
-		map.put(2L, "贰");
-		map.put(3L, "叁");
-		map.put(4L, "肆");
-		map.put(5L, "伍");
-		map.put(6L, "陆");
-		map.put(7L, "柒");
-		map.put(8L, "捌");
-		map.put(9L, "玖");
+        sectionMap.put(1L, "元");
+        // 第2位开始用万
+        sectionMap.put(2L, "万");
+        // 第3位开始用亿
+        sectionMap.put(3L, "亿");
 
-		unitMap.put(1L, "拾");
-		unitMap.put(2L, "佰");
-		unitMap.put(3L, "仟");
-
-		sectionMap.put(1L, "元");
-		// 第2位开始用万
-		sectionMap.put(2L, "万");
-		// 第3位开始用亿
-		sectionMap.put(3L, "亿");
-
-	}
+    }
 
 //分、角、元、拾、佰、仟、万、亿、兆
 
-	/**
-	 * 金额转中文大写
-	 *
-	 * @param number
-	 * @return
-	 */
-	public static String numberConvertCapital(long number) {
-		String str = String.valueOf(number);
-		int numLength = str.length();
-		int section = (numLength + (4 - 1)) / 4;
+    /**
+     * 金额转中文大写
+     *
+     * @param number
+     * @return
+     */
+    public static String numberConvertCapital(long number) {
+        String str = String.valueOf(number);
+        int numLength = str.length();
+        int section = (numLength + (4 - 1)) / 4;
 
-		StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-		int count = 1;
-		while (count <= section) {
-			int startIdx = numLength - 4 * count;
-			startIdx = startIdx > 0 ? startIdx : 0;
+        int count = 1;
+        while (count <= section) {
+            int startIdx = numLength - 4 * count;
+            startIdx = startIdx > 0 ? startIdx : 0;
 
-			int ednInx = numLength - 4 * (count - 1);
+            int ednInx = numLength - 4 * (count - 1);
 
-			String subStr = str.substring(startIdx, ednInx);
-			String result = capital2(Long.parseLong(subStr), count);
-			sb.insert(0, result);
-			count++;
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * 每4位转大写，所有数字和单位都显示出来，完整版
-	 * 
-	 * @param number
-	 * @param section 从右数起第几个4位
-	 * @return
-	 */
-	public static String capital(long number, long section) {
-		StringBuffer sb = new StringBuffer(sectionMap.get(section));
-		long remainder = number % 10;
-		sb.insert(0, map.get(remainder));
-		number = number / 10;
-
-		long tIdx = 0;
-		while (number > 0) {
-			tIdx++;
-			remainder = number % 10;
-			sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
-			number = number / 10;
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * 每4位转大写,可简写
-	 * 
-	 * @param number
-	 * @param section 从右数起第几个4位
-	 * @return
-	 */
-	public static String capital2(long number, long section) {
-		StringBuffer sb = new StringBuffer(sectionMap.get(section));
-		long remainder = number % 10;
-		sb.insert(0, map.get(remainder));
-		number = number / 10;
-
-		long tIdx = 0;
-		while (number > 0) {
-			tIdx++;
-			remainder = number % 10;
-			if (remainder == 0L) {
-				sb.insert(0, map.get(remainder));
-			} else {
-				sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
-			}
-			number = number / 10;
-		}
-
-		String str = sb.toString();
-		String[] arr = str.split("");
-		int lianxuZero = 0;
-		StringBuffer rSb = new StringBuffer();
-		for (String string : arr) {
-			if ("零".endsWith(string)) {
-				lianxuZero++;
-			} else {
-				lianxuZero = 0;
-			}
-			if (lianxuZero <= 1) {
-				rSb.append(string);
-			}
-		}
-
-		return rSb.toString();
-	}
-
-	public static void main(String[] args) {
-		long number = 6895;
-		System.out.println("number6895:" + capital(number, 1));
-		number = 235_6895;
-		System.out.println("number1235_6895:" + numberConvertCapital(number));
-		System.out.println("107,000:" + numberConvertCapital(107000));
+            String subStr = str.substring(startIdx, ednInx);
+            String result = capital2(Long.parseLong(subStr), count);
+            sb.insert(0, result);
+            count++;
+        }
+        return sb.toString();
     }
+
+    /**
+     * 每4位转大写，所有数字和单位都显示出来，完整版
+     *
+     * @param number
+     * @param section 从右数起第几个4位
+     * @return
+     */
+    public static String capital(long number, long section) {
+        StringBuffer sb = new StringBuffer(sectionMap.get(section));
+        long remainder = number % 10;
+        sb.insert(0, map.get(remainder));
+        number = number / 10;
+
+        long tIdx = 0;
+        while (number > 0) {
+            tIdx++;
+            remainder = number % 10;
+            sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
+            number = number / 10;
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 每4位转大写,可简写
+     *
+     * @param number
+     * @param section 从右数起第几个4位
+     * @return
+     */
+    public static String capital2(long number, long section) {
+        StringBuffer sb = new StringBuffer(sectionMap.get(section));
+        long remainder = number % 10;
+        sb.insert(0, map.get(remainder));
+        number = number / 10;
+
+        long tIdx = 0;
+        while (number > 0) {
+            tIdx++;
+            remainder = number % 10;
+            if (remainder == 0L) {
+                sb.insert(0, map.get(remainder));
+            } else {
+                sb.insert(0, map.get(remainder) + unitMap.get(tIdx));
+            }
+            number = number / 10;
+        }
+
+        String str = sb.toString();
+        String[] arr = str.split("");
+        int lianxuZero = 0;
+        StringBuffer rSb = new StringBuffer();
+        for (String string : arr) {
+            if ("零".endsWith(string)) {
+                lianxuZero++;
+            } else {
+                lianxuZero = 0;
+            }
+            if (lianxuZero <= 1) {
+                rSb.append(string);
+            }
+        }
+
+        return rSb.toString();
+    }
+
+    public static void main(String[] args) {
+        long number = 6895;
+        System.out.println("number6895:" + capital(number, 1));
+        number = 235_6895;
+        System.out.println("number1235_6895:" + numberConvertCapital(number));
+        System.out.println("107,000:" + numberConvertCapital(107000));
+        byte bb[] = ByteBuffer.allocate(4).putInt(1).array();
+        System.out.println("bb[]:" + Base64.getEncoder().encodeToString(bb));
+        System.out.println("\"字\".getBytes()==>" + "字".getBytes().length);
+        System.out.println(Base64.getEncoder().encodeToString("字".getBytes()));
+        byte[] c = toByteExt(9998);
+        for (byte c2 : c) {
+            System.out.println(c2);
+        }
+    }
+
+
 }

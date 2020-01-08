@@ -64,6 +64,6 @@ public class KeyGeneratorUtil {
         System.out.println(ip.getHostAddress());
         NetworkInterface network = NetworkInterface.getByInetAddress(ip);
         byte[] mac = network.getHardwareAddress();
-        System.out.println(ConvertUtil.byte2Hex(mac));
+        System.out.println(ConvertUtil.toHex(mac));
     }
 }

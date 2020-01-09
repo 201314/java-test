@@ -15,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
+import org.bouncycastle.util.encoders.Hex;
+
 /**
  * byte 1字节
  * <p>
@@ -204,7 +206,7 @@ public class ConvertUtil {
     public static byte[] toByteExt(short value) {
         byte[] result = new byte[2];
         // 由高位到低位
-        result[0] = (byte) ((value & 0xFF) >> 8);
+        result[0] = (byte) ((value >> 8)& 0xFF);
         result[1] = (byte) (value & 0xFF);
         return result;
     }
@@ -237,7 +239,7 @@ public class ConvertUtil {
         byte[] byteNum = new byte[8];
         for (int ix = 0; ix < 8; ++ix) {
             int offset = 64 - (ix + 1) * 8;
-            byteNum[ix] = (byte) ((value & 0xFF) >> offset);
+            byteNum[ix] = (byte) ((value >> offset)& 0xFF);
         }
         return byteNum;
     }
@@ -983,19 +985,35 @@ public class ConvertUtil {
     }
 
     public static void main(String[] args) {
-        long number = 6895;
-        System.out.println("number6895:" + capital(number, 1));
-        number = 235_6895;
-        System.out.println("number1235_6895:" + numberConvertCapital(number));
-        System.out.println("107,000:" + numberConvertCapital(107000));
-        byte bb[] = ByteBuffer.allocate(4).putInt(1).array();
-        System.out.println("bb[]:" + Base64.getEncoder().encodeToString(bb));
-        System.out.println("\"字\".getBytes()==>" + "字".getBytes().length);
-        System.out.println(Base64.getEncoder().encodeToString("字".getBytes()));
-        byte[] c = toByteExt(9998);
-        for (byte c2 : c) {
-            System.out.println(c2);
-        }
+    	String zi = "林";
+    	System.out.println("zi.getBytes()==>"+zi.getBytes().length);
+    	byte cc[]= ByteBuffer.allocate(4).put(zi.getBytes()).array();
+    	for (byte b : cc) {
+    		System.out.println("b==>"+b);
+		}
+    	System.out.println(Hex.toHexString(cc));
+    	System.out.println("=="+new String(cc)+"==");
+        int number = 45897;
+        byte[] dd = ByteBuffer.allocate(4).putInt(number).array();
+    	for (byte b : dd) {
+    		System.out.println("number==>"+b);
+		}
+    	System.out.println(Hex.toHexString(dd));
+
+    	
+//        long number = 6895;
+//        System.out.println("number6895:" + capital(number, 1));
+//        number = 235_6895;
+//        System.out.println("number1235_6895:" + numberConvertCapital(number));
+//        System.out.println("107,000:" + numberConvertCapital(107000));
+//        byte bb[] = ByteBuffer.allocate(4).putInt(1).array();
+//        System.out.println("bb[]:" + Base64.getEncoder().encodeToString(bb));
+//        System.out.println("\"字\".getBytes()==>" + "字".getBytes().length);
+//        System.out.println(Base64.getEncoder().encodeToString("字".getBytes()));
+//        byte[] c = toByteExt(9998);
+//        for (byte c2 : c) {
+//            System.out.println(c2);
+//        }
     }
 
 

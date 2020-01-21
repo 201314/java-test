@@ -14,7 +14,10 @@ import com.gitee.linzl.cipher.message.DigestUtilsExt;
  * @date 2019年5月15日
  */
 public class Base62Util {
-	public static final String BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	private static final char[] BASE62_CHAR = BASE62.toCharArray();
+	// 可以自定义生成 MD5 加密字符传前的混合加密key
+	private static String KEY = "weibo";
 
 	/**
 	 * 转成10进制
@@ -61,10 +64,9 @@ public class Base62Util {
 		return sb.reverse().toString();
 	}
 
-	private static String KEY = "weibo"; // 可以自定义生成 MD5 加密字符传前的混合加密key
-
 	public static String shortUrl(String url) {
-		String hex = DigestUtilsExt.md5Hex(KEY + url); // 对传入网址进行 MD5 加密，key是加密字符串
+		// 对传入网址进行 MD5 加密，key是加密字符串
+		String hex = DigestUtilsExt.md5Hex(KEY + url);
 
 		for (int i = 0; i < 4; i++) {
 			// 把加密字符按照8位一组16进制与0x3FFFFFFF进行位与运算
@@ -74,21 +76,35 @@ public class Base62Util {
 			long lHexLong = Long.parseLong(sTempSubString, 16) & 0x3FFFFFFF;
 			String outChars = "";
 			for (int j = 0; j < 6; j++) {
-				long index = 0x0000003D & lHexLong; // 把得到的值与 0x0000003D 进行位与运算，取得字符数组 chars 索引
-				outChars += BASE62.toCharArray()[(int) index]; // 把取得的字符相加
-				lHexLong = lHexLong >> 5; // 每次循环按位右移 5 位
+				// 把得到的值与 0x0000003D 进行位与运算，取得字符数组 chars 索引
+				long index = 0x0000003D & lHexLong;
+				// 把取得的字符相加
+				outChars += BASE62.toCharArray()[(int) index];
+				// 每次循环按位右移 5 位
+				lHexLong = lHexLong >> 5;
 			}
 			if (StringUtils.isNotEmpty(outChars)) {
-				return outChars; // 把字符串存入对应索引的输出数组
+				// 把字符串存入对应索引的输出数组
+				return outChars;
 			}
 		}
 		return null;
 	}
 
+	public static  String toBase62(String content){
+		char[] chars = new char[content.getBytes().length];
+		for (int i = 0; i < content.getBytes().length; i++) {
+			chars[i] = BASE62_CHAR[((content.getBytes()[i] & 0xFF) % BASE62_CHAR.length)];
+		}
+		return new String(chars);
+	}
+
 	public static void main(String[] args) {
+		System.out.println("toBase62==>"+toBase62("中国人民共和国"));
 		System.out.println(Base62Util.fromBase10(2576460752303423488L));
 		System.out.println(Base62Util.toBase10("34kdunmzWUw"));
-		String sLongUrl = "http://video.sina.com.cn/p/news/s/v/2015-09-02/105265067233.html"; // 长链接
+		// 长链接
+		String sLongUrl = "http://video.sina.com.cn/p/news/s/v/2015-09-02/105265067233.html";
 		// 打印出结果
 		// http://t.cn/R3Krh36
 

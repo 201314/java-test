@@ -91,16 +91,7 @@ public class Base62Util {
 		return null;
 	}
 
-	public static  String toBase62(String content){
-		char[] chars = new char[content.getBytes().length];
-		for (int i = 0; i < content.getBytes().length; i++) {
-			chars[i] = BASE62_CHAR[((content.getBytes()[i] & 0xFF) % BASE62_CHAR.length)];
-		}
-		return new String(chars);
-	}
-
 	public static void main(String[] args) {
-		System.out.println("toBase62==>"+toBase62("中国人民共和国"));
 		System.out.println(Base62Util.fromBase10(2576460752303423488L));
 		System.out.println(Base62Util.toBase10("34kdunmzWUw"));
 		// 长链接

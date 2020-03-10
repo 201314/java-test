@@ -30,9 +30,18 @@ public class Test {
 		result = context.getPrivilegeResult(count * 189);
 		System.out.println("满100返10 总价格：" + result);
 
-		// 第四种 100元内打0.9折,超出部分满200返50
-		// 注意，打折类DiscountStrategy需要事先设置 折扣参数
-		// 返利类ReturnStrategy 需要事先设置 满返金额\返利金额
+		// ============更常用的一种获取策略方式
+		StrategyFactory factory = StrategyFactory.getInstance();
+		// 第一种 无任何优惠
+		result = factory.getStrategy(0).caculatePreferential(count * 189);
+		System.out.println("无任何优惠 总价格：" + result);
 
+		// 第二种 打折优惠
+		result =  factory.getStrategy(1).caculatePreferential(count * 189);
+		System.out.println("打0.8折后 总价格：" + result);
+
+		// 第三种 满100返10
+		result = factory.getStrategy(2).caculatePreferential(count * 189);
+		System.out.println("满100返10 总价格：" + result);
 	}
 }

@@ -212,4 +212,58 @@ public class ListDemo {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
+    /**
+     * listA内容变为listA和listB都存在的对象,listB不变
+     * 交集
+     */
+    public void retainAll() {
+        List<String> listA = new ArrayList<>();
+        listA.add("A");
+        listA.add("B");
+        listA.add("C");
+
+        List<String> listB = new ArrayList<>();
+        listB.add("B");
+        listB.add("C");
+        listB.add("D");
+        listA.retainAll(listB);
+        System.out.println(listA);
+    }
+
+    /**
+     * listA中存在的listB的内容去重,listB不变
+     * 差集
+     */
+    public void removeAll() {
+        List<String> listA = new ArrayList<>();
+        listA.add("A");
+        listA.add("B");
+        listA.add("C");
+
+        List<String> listB = new ArrayList<>();
+        listB.add("B");
+        listB.add("C");
+        listB.add("D");
+        listA.removeAll(listB);
+        System.out.println(listA);
+    }
+
+    /**
+     * 为了去重，listA先取差集，然后追加全部的listB,listB不变
+     * 并集
+     */
+    public void addAll() {
+        List<String> listA = new ArrayList<>();
+        listA.add("A");
+        listA.add("B");
+        listA.add("C");
+
+        List<String> listB = new ArrayList<>();
+        listB.add("B");
+        listB.add("C");
+        listB.add("D");
+        listA.removeAll(listB);
+        listA.addAll(listB);
+        System.out.println(listA);
+    }
 }

@@ -39,13 +39,29 @@ public class Page<T> {
      */
     private int firstPage = 1;
     /**
+     * 是否第一页
+     */
+    private boolean isFirst;
+    /**
+     * 是否最后一页
+     */
+    private boolean isLast;
+    /**
      * 上一页
      */
     private int prePage;
     /**
+     * 是否有上一页
+     */
+    private boolean hasPre;
+    /**
      * 下一页
      */
     private int nextPage;
+    /**
+     * 是否有下一页
+     */
+    private boolean hasNext;
     /**
      * 当前页，起始记录行号,用于mysql的limit查询
      */
@@ -90,8 +106,26 @@ public class Page<T> {
      * @return
      */
     public int getPrePage() {
-        this.prePage = this.page <= this.firstPage ? this.firstPage : (this.page - 1);
+        this.prePage = hasPre() ? (this.page - 1) : this.firstPage;
         return this.prePage;
+    }
+
+    /**
+     * 是否有上一页
+     *
+     * @return
+     */
+    public boolean hasPre() {
+        return this.page > this.firstPage;
+    }
+
+    /**
+     * 是否第一页,没有上一页时，就是第一页
+     *
+     * @return
+     */
+    public boolean isFirst() {
+        return !hasPre();
     }
 
     /**
@@ -100,7 +134,25 @@ public class Page<T> {
      * @return
      */
     public int getNextPage() {
-        this.nextPage = this.page >= this.pages ? this.pages : (this.page + 1);
+        this.nextPage = hasNext() ? (this.page + 1) : this.pages;
         return this.nextPage;
+    }
+
+    /**
+     * 是否有下一页
+     *
+     * @return
+     */
+    public boolean hasNext() {
+        return this.pages > this.page;
+    }
+
+    /**
+     * 是否最后一页,没有下一页时，就是最后一页
+     *
+     * @return
+     */
+    public boolean isLast() {
+        return !hasNext();
     }
 }

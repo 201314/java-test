@@ -16,7 +16,7 @@ public class BinarySearch {
 			int mid = (low + high) / 2;
 			if (key > a[mid]) {
 				low = mid++; // 后半部分，下标最小为mid++
-			} else if (mid < a[mid]) {
+			} else if (key < a[mid]) {
 				high = mid--;// 后半部分，下标最大为mid--
 			} else {
 				return mid;

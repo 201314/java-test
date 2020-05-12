@@ -60,7 +60,7 @@ public class ConvertUtil {
     }
 
     /**
-     * 计算CRC16校验码
+     * 循环冗余校验,计算CRC16校验码
      *
      * @param data 字节数组
      * @return 校验码
@@ -82,7 +82,7 @@ public class ConvertUtil {
     }
 
     /**
-     * 计算CRC16校验码 (Modbus)
+     * 循环冗余校验,计算CRC16校验码 (Modbus)
      *
      * @param data 字节数组
      * @return 校验码
@@ -92,7 +92,7 @@ public class ConvertUtil {
     }
 
     /**
-     * 计算CRC32校验码
+     * 循环冗余校验,计算CRC32校验码
      *
      * @param data
      * @return

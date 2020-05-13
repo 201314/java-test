@@ -14,7 +14,7 @@ import com.gitee.linzl.cipher.message.DigestUtilsExt;
  * @date 2019年5月15日
  */
 public class Base62Util {
-	private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	private static final String BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	private static final char[] BASE62_CHAR = BASE62.toCharArray();
 	// 可以自定义生成 MD5 加密字符传前的混合加密key
 	private static String KEY = "weibo";

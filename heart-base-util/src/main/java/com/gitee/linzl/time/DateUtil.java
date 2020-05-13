@@ -2,19 +2,7 @@ package com.gitee.linzl.time;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Clock;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.Period;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -88,8 +76,8 @@ public class DateUtil {
     }
 
     public static LocalDateTime getFirstDayBeforeWeek(LocalDateTime date, int week) {
-    	LocalDateTime localDate = date.minusWeeks(week);
-    	localDate = localDate.with(DayOfWeek.MONDAY);
+        LocalDateTime localDate = date.minusWeeks(week);
+        localDate = localDate.with(DayOfWeek.MONDAY);
         return localDate;
     }
 
@@ -273,8 +261,8 @@ public class DateUtil {
      * @param year
      */
     public static LocalDateTime plusYears(int year) {
-    	//LocalDate.now().plusYears(week);
-    	//LocalDate.now().plus(1,ChronoUnit.YEARS);
+        //LocalDate.now().plusYears(week);
+        //LocalDate.now().plus(1,ChronoUnit.YEARS);
         return LocalDateTime.now().plusYears(year);
     }
 
@@ -293,15 +281,15 @@ public class DateUtil {
      * @param day
      */
     public static LocalDateTime plusDays(int day) {
-    	//LocalDate.now().plusDays(day);
-    	//LocalDate.now().plus(1,ChronoUnit.DAYS);
+        //LocalDate.now().plusDays(day);
+        //LocalDate.now().plus(1,ChronoUnit.DAYS);
         return LocalDateTime.now().plusDays(day);
     }
-    
+
     public static LocalDateTime plusWeeks(int week) {
-    	//LocalDate.now().plusWeeks(week);
-    	//LocalDate.now().plus(1,ChronoUnit.WEEKS);
-    	return LocalDateTime.now().plusWeeks(week);
+        //LocalDate.now().plusWeeks(week);
+        //LocalDate.now().plus(1,ChronoUnit.WEEKS);
+        return LocalDateTime.now().plusWeeks(week);
     }
 
     /**
@@ -555,11 +543,11 @@ public class DateUtil {
         return cal.getTime();
     }
 
-    
+
     public static LocalDateTime noonTime(LocalDate date) {
         return LocalDateTime.of(date, LocalTime.NOON);
     }
-    
+
     public static Date noonTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -575,7 +563,7 @@ public class DateUtil {
     public static LocalDateTime maxTime(LocalDate date) {
         return LocalDateTime.of(date, LocalTime.MAX);
     }
-    
+
     public static Date maxTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -650,47 +638,49 @@ public class DateUtil {
 
     /**
      * 例：生日检查
-     * @param args
+     *
+     * @param birthday
      */
     public boolean checkEqual(LocalDate birthday) {
-    	LocalDate now  = LocalDate.now();
-    	MonthDay currentMonthDay =  MonthDay.of(now.getMonth(), now.getDayOfMonth());
-    	MonthDay birth = MonthDay.from(birthday);
-    	return currentMonthDay.equals(birth);
+        LocalDate now = LocalDate.now();
+        MonthDay currentMonthDay = MonthDay.of(now.getMonth(), now.getDayOfMonth());
+        MonthDay birth = MonthDay.from(birthday);
+        return currentMonthDay.equals(birth);
     }
-    
+
     /**
      * 失效检查，如信用卡过期
+     *
      * @return
      */
     public boolean expireCheck() {
-    	YearMonth current = YearMonth.now();
-    	YearMonth credit = YearMonth.of(2019,Month.FEBRUARY);
-    	return current.equals(credit);
+        YearMonth current = YearMonth.now();
+        YearMonth credit = YearMonth.of(2019, Month.FEBRUARY);
+        return current.equals(credit);
     }
-    
+
     public void test() {
-    	// UTC 时钟
-    	Clock.systemUTC();
-    	// 系统时钟
-    	Clock.systemDefaultZone();
-    	
-    	ZoneId america = ZoneId.of("America/New_York");
-    	ZonedDateTime dateAndTimeInNewYork = ZonedDateTime.of(LocalDateTime.now(), america);
-    	//将当时时间转为纽约时间
-    	System.out.println(dateAndTimeInNewYork);
-    	//闰年检查
-    	LocalDate.now().isLeapYear();
-    	//当前时间戳
-    	Instant.now();
-    	
-    	//时间差
-    	LocalDate java8Release = LocalDate.of(2018, 12, 14);
-    	Period period = Period.between(LocalDate.now(), java8Release);
+        // UTC 时钟
+        Clock.systemUTC();
+        // 系统时钟
+        Clock.systemDefaultZone();
+
+        ZoneId america = ZoneId.of("America/New_York");
+        ZonedDateTime dateAndTimeInNewYork = ZonedDateTime.of(LocalDateTime.now(), america);
+        //将当时时间转为纽约时间
+        System.out.println(dateAndTimeInNewYork);
+        //闰年检查
+        LocalDate.now().isLeapYear();
+        //当前时间戳
+        Instant.now();
+
+        //时间差
+        LocalDate java8Release = LocalDate.of(2018, 12, 14);
+        //Period 类表示一段时间的年、月、日和周
+        Period period = Period.between(LocalDate.now(), java8Release);
     }
-    
-    
-    
+
+
     public static void main(String[] args) {
         System.out.println("上周第一天:" + getFirstDayLastWeek());
         System.out.println("上周最后一天:" + getEndDayLastWeek());

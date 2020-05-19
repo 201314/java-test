@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DateUtil {
     /**
@@ -495,16 +496,20 @@ public class DateUtil {
         return null;
     }
 
-    public static Date toDate(LocalDateTime localDateTime) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        ZonedDateTime zdt = localDateTime.atZone(zoneId);
-        return Date.from(zdt.toInstant());
+    public static Date toDate(final LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static Date toDate(LocalDate localDate) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        ZonedDateTime zdt = localDate.atStartOfDay(zoneId);
-        return Date.from(zdt.toInstant());
+    public static Date toDate(final LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Calendar toCalendar(final LocalDateTime localDateTime) {
+        return GregorianCalendar.from(ZonedDateTime.of(localDateTime, ZoneId.systemDefault()));
+    }
+
+    public static Calendar toCalendar(final LocalDate localDate) {
+        return GregorianCalendar.from(ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, ZoneId.systemDefault()));
     }
 
     public static LocalDate toLocalDateTime(String text, String pattern) {
@@ -515,6 +520,9 @@ public class DateUtil {
         return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
     }
 
+    public static LocalDateTime fromMilliseconds(final long milliseconds) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneId.systemDefault());
+    }
 
     public static LocalDateTime toLocalDateTime(Date date) {
         Instant instant = date.toInstant();
@@ -588,6 +596,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime toMaxLocalDateTime(Date date) {
+        // LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         return maxTime(toLocalDate(date));
     }
 

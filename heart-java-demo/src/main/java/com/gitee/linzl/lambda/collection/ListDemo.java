@@ -1,21 +1,15 @@
 package com.gitee.linzl.lambda.collection;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * 1.stream不存储数据
@@ -265,5 +259,22 @@ public class ListDemo {
         listA.removeAll(listB);
         listA.addAll(listB);
         System.out.println(listA);
+    }
+
+    public void merge() {
+        List<String> listA = new ArrayList<>();
+        listA.add("A");
+        listA.add("B");
+        listA.add("C");
+
+        List<String> listB = new ArrayList<>();
+        listB.add("D");
+        listB.add("E");
+        listB.add("F");
+
+        List<String> all =
+                listA.stream().collect(() -> listB,
+                        (list, items) -> list.add(items), (nextList, preList) -> nextList.addAll(preList));
+        System.out.println(all);
     }
 }

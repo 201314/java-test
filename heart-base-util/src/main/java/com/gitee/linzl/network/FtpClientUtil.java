@@ -46,6 +46,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author linzl
  * @email 2225010489@qq.com
  * @date 2018年8月27日
+ *
+ * 已经移到ftp-spring-boot-starter
+ *
  */
 @Slf4j
 public class FtpClientUtil implements Closeable {

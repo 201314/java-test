@@ -80,7 +80,7 @@ public class FileSystemsDemo {
 				StandardWatchEventKinds.ENTRY_DELETE);
 		while (true) {
 			// 获取下一个文件改动事件
-			WatchKey key = service.take(); //
+			WatchKey key = service.take();
 			for (WatchEvent<?> event : key.pollEvents()) {
 				System.out.println(event.context() + " 文件发生了 " + event.kind() + "事件！");
 			}

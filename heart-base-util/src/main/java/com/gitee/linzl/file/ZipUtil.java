@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * zip4j仅支持zip,其他压缩包方式使用
@@ -32,7 +33,7 @@ public class ZipUtil {
      */
     public static List<File> unzip(File zip, String passwd) throws ZipException {
         File parentDir = zip.getParentFile();
-        return unzip(zip, parentDir.getAbsolutePath(), passwd);
+        return unzip(zip, parentDir.getParentFile(), passwd);
     }
 
     /**
@@ -47,28 +48,21 @@ public class ZipUtil {
      * @throws ZipException 压缩文件有损坏或者解压缩失败抛出
      */
     @SuppressWarnings("unchecked")
-    public static List<File> unzip(File zipFile, String dest, String passwd) throws ZipException {
+    public static List<File> unzip(File zipFile, File dest, String passwd) throws ZipException {
         ZipFile zFile = new ZipFile(zipFile);
         zFile.setFileNameCharset("UTF-8");
         if (!zFile.isValidZipFile()) {
             throw new ZipException("压缩文件不合法,可能被损坏.");
         }
-        File destDir = new File(dest);
-        if (destDir.isDirectory() && !destDir.exists()) {
-            destDir.mkdir();
-        }
+
         if (zFile.isEncrypted()) {
             zFile.setPassword(passwd.toCharArray());
         }
-        zFile.extractAll(dest);
+        zFile.extractAll(dest.getPath());
 
         List<FileHeader> headerList = zFile.getFileHeaders();
-        List<File> extractedFileList = new ArrayList<File>();
-        for (FileHeader fileHeader : headerList) {
-            if (!fileHeader.isDirectory()) {
-                extractedFileList.add(new File(destDir, fileHeader.getFileName()));
-            }
-        }
+        List<File> extractedFileList = headerList.stream().filter(fileHeader -> !fileHeader.isDirectory()).map(fileHeader -> new File(dest,
+                fileHeader.getFileName())).collect(Collectors.toList());
         return extractedFileList;
     }
 
@@ -78,8 +72,8 @@ public class ZipUtil {
      * @param src 要压缩的指定文件
      * @return 最终的压缩文件存放的绝对路径, 如果为null则说明压缩失败.
      */
-    public static String zip(String src) {
-        return zip(src, null);
+    public static File zip(File src) {
+        return zip(src, new File(src.getParent(), src.getName() + ".zip"), null);
     }
 
     /**
@@ -89,8 +83,8 @@ public class ZipUtil {
      * @param passwd 压缩使用的密码
      * @return 最终的压缩文件存放的绝对路径, 如果为null则说明压缩失败.
      */
-    public static String zip(String src, String passwd) {
-        return zip(src, null, passwd);
+    public static File zip(File src, String passwd) {
+        return zip(src, new File(src.getParent(), src.getName() + ".zip"), passwd);
     }
 
     /**
@@ -101,7 +95,7 @@ public class ZipUtil {
      * @param passwd 压缩使用的密码
      * @return 最终的压缩文件存放的绝对路径, 如果为null则说明压缩失败.
      */
-    public static String zip(String src, String dest, String passwd) {
+    public static File zip(File src, File dest, String passwd) {
         return zip(src, dest, true, passwd);
     }
 
@@ -119,9 +113,7 @@ public class ZipUtil {
      * @param passwd      压缩使用的密码
      * @return 最终的压缩文件存放的绝对路径, 如果为null则说明压缩失败.
      */
-    public static String zip(String src, String dest, boolean isCreateDir, String passwd) {
-        File srcFile = new File(src);
-        dest = buildDestinationZipFilePath(srcFile, dest);
+    public static File zip(File src, File dest, boolean isCreateDir, String passwd) {
         ZipParameters parameters = new ZipParameters();
         // 压缩方式
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
@@ -135,71 +127,23 @@ public class ZipUtil {
         }
         try {
             ZipFile zipFile = new ZipFile(dest);
-            if (srcFile.isDirectory()) {
+            if (src.isFile()) {
+                zipFile.addFile(src, parameters);
+            } else if (src.isDirectory()) {
                 // 如果不创建目录的话,将直接把给定目录下的文件压缩到压缩文件,即没有目录结构
                 if (!isCreateDir) {
-                    File[] subFiles = srcFile.listFiles();
+                    File[] subFiles = src.listFiles();
                     ArrayList<File> temp = new ArrayList<>();
                     Collections.addAll(temp, subFiles);
                     zipFile.addFiles(temp, parameters);
                     return dest;
                 }
-                zipFile.addFolder(srcFile, parameters);
-            } else {
-                zipFile.addFile(srcFile, parameters);
+                zipFile.addFolder(src, parameters);
             }
             return dest;
         } catch (ZipException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * 构建压缩文件存放路径,如果不存在将会创建 传入的可能是文件名或者目录,也可能不传,此方法用以转换最终压缩文件的存放路径
-     *
-     * @param srcFile   源文件
-     * @param destParam 压缩目标路径
-     * @return 正确的压缩文件存放路径
-     */
-    private static String buildDestinationZipFilePath(File srcFile, String destParam) {
-        if (StringUtils.isEmpty(destParam)) {
-            if (srcFile.isDirectory()) {
-                destParam = srcFile.getParent() + File.separator + srcFile.getName() + ".zip";
-            } else {
-                String fileName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
-                destParam = srcFile.getParent() + File.separator + fileName + ".zip";
-            }
-        } else {
-            // 在指定路径不存在的情况下将其创建出来
-            createDestDirectoryIfNecessary(destParam);
-            if (destParam.endsWith(File.separator)) {
-                String fileName = "";
-                if (srcFile.isDirectory()) {
-                    fileName = srcFile.getName();
-                } else {
-                    fileName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
-                }
-                destParam += fileName + ".zip";
-            }
-        }
-        return destParam;
-    }
-
-    /**
-     * 在必要的情况下创建压缩文件存放目录,比如指定的存放路径并没有被创建
-     *
-     * @param destParam 指定的存放路径,有可能该路径并没有被创建
-     */
-    private static void createDestDirectoryIfNecessary(String destParam) {
-        File destDir = null;
-        if (destParam.endsWith(File.separator)) {
-            destDir = new File(destParam);
-        } else {
-            destDir = new File(destParam.substring(0, destParam.lastIndexOf(File.separator)));
-        }
-        if (!destDir.exists()) {
-            destDir.mkdirs();
-        }
     }
 }

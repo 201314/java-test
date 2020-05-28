@@ -410,8 +410,8 @@ public class FtpClientUtil implements Closeable {
 					// 每次比上一次增加1%(0.01),则打印
 					double currentPercent = (ingSize + beginSize) / (double) endSize;
 
-					BigDecimal bd1 = new BigDecimal(Double.toString(currentPercent));
-					BigDecimal bd2 = new BigDecimal(Double.toString(finishPercent));
+					BigDecimal bd1 = BigDecimal.valueOf(currentPercent);
+					BigDecimal bd2 = BigDecimal.valueOf(finishPercent);
 					double subValue = bd1.subtract(bd2).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
 					if (subValue > 0.05) {
@@ -604,8 +604,8 @@ public class FtpClientUtil implements Closeable {
 								// 每次比上一次增加1%(0.01),则打印
 								double currentPercent = (ingSize + beginSize) / (double) endSize;
 
-								BigDecimal bd1 = new BigDecimal(Double.toString(currentPercent));
-								BigDecimal bd2 = new BigDecimal(Double.toString(finishPercent));
+								BigDecimal bd1 = BigDecimal.valueOf(currentPercent);
+								BigDecimal bd2 = BigDecimal.valueOf(finishPercent);
 								double subValue = bd1.subtract(bd2).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
 								if (subValue > 0.01) {

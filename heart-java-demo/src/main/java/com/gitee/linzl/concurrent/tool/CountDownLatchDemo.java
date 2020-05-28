@@ -23,8 +23,9 @@ public class CountDownLatchDemo {
 				try {
 					startSignal.await();// 因为此处设置了等待，所以只有startSignal执行了countDown才会往下走
 					System.out.println("当前线程=" + Thread.currentThread().getName());
-					doneSignal.countDown();
 				} catch (InterruptedException ex) {
+				} finally {
+					doneSignal.countDown();
 				}
 			});
 			thread.setName("线程-" + i);

@@ -231,63 +231,6 @@ public class ValidationUtil {
 	}
 
 	/**
-	 * 判断整数num是否等于0
-	 * 
-	 * @param num
-	 */
-	public final static boolean isIntEqZero(int num) {
-		return num == 0;
-	}
-
-	/**
-	 * 判断整数num是否大于0
-	 * 
-	 * @param num
-	 */
-	public final static boolean isIntGtZero(int num) {
-		return num > 0;
-	}
-
-	/**
-	 * 判断整数num是否大于或等于0
-	 * 
-	 * @param num
-	 */
-	public final static boolean isIntGteZero(int num) {
-		return num >= 0;
-	}
-
-	/**
-	 * 判断浮点数num是否等于0
-	 * 
-	 * @param num
-	 *            浮点数
-	 */
-	public final static boolean isFloatEqZero(float num) {
-		return num == 0f;
-	}
-
-	/**
-	 * 判断浮点数num是否大于0
-	 * 
-	 * @param num
-	 *            浮点数
-	 */
-	public final static boolean isFloatGtZero(float num) {
-		return num > 0f;
-	}
-
-	/**
-	 * 判断浮点数num是否大于或等于0
-	 * 
-	 * @param num
-	 *            浮点数
-	 */
-	public final static boolean isFloatGteZero(float num) {
-		return num >= 0f;
-	}
-
-	/**
 	 * 判断是否为合法字符(a-zA-Z0-9-_)
 	 * 
 	 * @param text
@@ -326,7 +269,7 @@ public class ValidationUtil {
 	/**
 	 * 是否包含中英文特殊字符，除英文"-_"字符外
 	 * 
-	 * @param str
+	 * @param text
 	 */
 	public static boolean isContainsSpecialChar(String text) {
 		if (StringUtils.isBlank(text)) {

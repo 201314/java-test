@@ -17,7 +17,7 @@ public class CipherSignature {
 	 * @return
 	 */
 	public static String getSignContent(Map<String, String> sortedParams) {
-		List<String> keys = new ArrayList<String>(sortedParams.keySet());
+		List<String> keys = new ArrayList<>(sortedParams.keySet());
 		Collections.sort(keys);
 		StringBuffer content = new StringBuffer();
 		int index = 0;

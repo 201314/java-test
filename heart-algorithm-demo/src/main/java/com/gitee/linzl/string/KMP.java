@@ -13,7 +13,7 @@ public class KMP {
 		int n = text.length();
 		int m = pattern.length();
 
-		int prefix[] = computePrefix();
+		int[] prefix = computePrefix();
 		for (int i : prefix) {
 			System.out.println("--" + i);
 		}

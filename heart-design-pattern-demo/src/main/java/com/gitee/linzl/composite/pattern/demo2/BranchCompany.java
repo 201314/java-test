@@ -29,14 +29,16 @@ public class BranchCompany implements Company {
 			depth--;
 		}
 		System.out.println(str + getName());
-		for (Company com : deparmentList)
+		for (Company com : deparmentList) {
 			com.display(depth + 6 - deparmentList.size());
+		}
 	}
 
 	@Override
 	public void fulfilDuty() {
-		for (Company com : deparmentList)
+		for (Company com : deparmentList) {
 			com.fulfilDuty();
+		}
 	}
 
 	public String getName() {

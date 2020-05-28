@@ -15,6 +15,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -258,7 +259,7 @@ public class FtpClientUtil implements Closeable {
 	 * @return
 	 */
 	public String[] listFileNames(String ftpDir) {
-		String files[] = null;
+		String[] files = null;
 		try {
 			this.ftpClient.changeWorkingDirectory(ftpDir);
 			files = this.ftpClient.listNames();

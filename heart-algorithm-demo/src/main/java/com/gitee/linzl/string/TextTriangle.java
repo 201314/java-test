@@ -8,7 +8,7 @@ package com.gitee.linzl.string;
  */
 public class TextTriangle {
 
-	public int[][] printTriangle(int a[][], int row) {
+	public int[][] printTriangle(int[][] a, int row) {
 		for (int i = 0; i < row; i++) {
 			for (int j = 0; j < a[i].length; j++) {
 				if (j == 0 | j == a[i].length - 1) {
@@ -30,7 +30,7 @@ public class TextTriangle {
 
 	public static void main(String[] args) {
 		int row = 10;
-		int a[][] = new int[row][];
+		int[][] a = new int[row][];
 		for (int i = 0; i < row; i++) {
 			a[i] = new int[i + 1];
 		}

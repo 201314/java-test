@@ -83,7 +83,7 @@ public class NumberOperation {
 	 * 
 	 * 如果都为负数时呢？？？
 	 */
-	public static int findMaxSequence(int a[]) {
+	public static int findMaxSequence(int[] a) {
 		boolean startPositive = true;
 		int curSum = 0;
 		int positiveIndex = -1;
@@ -180,7 +180,7 @@ public class NumberOperation {
 	 * 求出100以内的所有素数/质数
 	 */
 	public static void printPrimeNum2(int num) {
-		int a[] = new int[num + 1];
+		int[] a = new int[num + 1];
 
 		for (int i = 1; i <= num; i++) {
 			a[i] = 1;

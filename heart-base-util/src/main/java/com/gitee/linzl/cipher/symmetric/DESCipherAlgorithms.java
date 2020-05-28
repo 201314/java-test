@@ -53,7 +53,7 @@ public enum DESCipherAlgorithms implements IAlgorithm {
 	private String cipherAlgorithm;
 	private Integer size;
 
-	private DESCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
+	DESCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
 		this.keyAlgorithm = keyAlgorithm;
 		this.size = size;
 		this.cipherAlgorithm = cipherAlgorithm;

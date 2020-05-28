@@ -16,8 +16,9 @@ public class BingoSort {
 		for (int i = 0; i < array.length; i++) {
 			index = i;
 			for (int j = i; j < array.length; j++) { // 查找最小元素
-				if (array[j] < array[index])
+				if (array[j] < array[index]) {
 					index = j;
+				}
 			}
 			if (index != i) { // 将最小元素进行交换
 				temp = array[i];

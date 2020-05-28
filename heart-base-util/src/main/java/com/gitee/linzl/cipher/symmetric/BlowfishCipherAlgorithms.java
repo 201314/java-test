@@ -23,7 +23,7 @@ public enum BlowfishCipherAlgorithms implements IAlgorithm {
 	private String cipherAlgorithm;
 	private Integer size;
 
-	private BlowfishCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
+	BlowfishCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
 		this.keyAlgorithm = keyAlgorithm;
 		this.size = size;
 		this.cipherAlgorithm = cipherAlgorithm;

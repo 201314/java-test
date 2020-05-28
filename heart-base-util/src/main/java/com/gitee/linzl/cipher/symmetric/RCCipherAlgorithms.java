@@ -24,14 +24,14 @@ import com.gitee.linzl.cipher.IAlgorithm;
 public enum RCCipherAlgorithms implements IAlgorithm {
 	// ============AES============
 	RC2("RC2", "RC2", 128),
-
-	RC4("RC4", "RC4/ECB/NOPADDING", 128); // 也可以叫做ARCFOUR
+	// 也可以叫做ARCFOUR
+	RC4("RC4", "RC4/ECB/NOPADDING", 128);
 
 	private String keyAlgorithm;
 	private String cipherAlgorithm;
 	private Integer size;
 
-	private RCCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
+	RCCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
 		this.keyAlgorithm = keyAlgorithm;
 		this.size = size;
 		this.cipherAlgorithm = cipherAlgorithm;

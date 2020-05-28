@@ -13,7 +13,7 @@ import java.util.Arrays;
  * 如此循环到倒数第二个数和最后一个数比较为止。
  */
 public class SelectSort {
-	public static int[] sort(int source[]) {
+	public static int[] sort(int[] source) {
 		for (int i = 0; i < source.length; i++) {
 			for (int j = i + 1; j < source.length; j++) {
 				if (source[i] > source[j]) {
@@ -26,14 +26,14 @@ public class SelectSort {
 	}
 
 	// 交换两个数
-	public static void swap(int source[], int i, int j) {
+	public static void swap(int[] source, int i, int j) {
 		int temp = source[i];
 		source[i] = source[j];
 		source[j] = temp;
 	}
 
 	public static void main(String[] args) {
-		int source[] = { 1, 2, 12, 13, 100, 7, 32, 91, 14, 19, 11, 15 };
+		int[] source = { 1, 2, 12, 13, 100, 7, 32, 91, 14, 19, 11, 15 };
 		System.out.println("排序前：" + Arrays.toString(source));
 		SelectSort.sort(source);
 	}

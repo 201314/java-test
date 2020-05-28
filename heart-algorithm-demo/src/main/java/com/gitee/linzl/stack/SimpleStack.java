@@ -8,7 +8,7 @@ package com.gitee.linzl.stack;
 public class SimpleStack {
 
 	private int length = 100;
-	int stack[] = new int[length];
+	int[] stack = new int[length];
 	static int index = -1;// 初始化栈 为空
 
 	// 判断栈是否满

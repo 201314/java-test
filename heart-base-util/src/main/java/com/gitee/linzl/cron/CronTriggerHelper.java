@@ -36,12 +36,12 @@ public class CronTriggerHelper {
 	static class CronTriggerHolder {
 		// 由于对象实例化是在内部类加载的时候去创建的，因此是线程安全的。
 		// 因为在方法中创建对象，才存在并发问题，静态内部类随着方法调用而被加载，只加载一次，并不存在并发问题，所以是线程安全的。
-		private static final CronTriggerHelper instance = new CronTriggerHelper();
+		private static final CronTriggerHelper INSTANCE = new CronTriggerHelper();
 	}
 
 	// 没有加锁，不会有性能损耗
 	public static CronTriggerHelper getInstance() {
-		return CronTriggerHolder.instance;
+		return CronTriggerHolder.INSTANCE;
 	}
 
 	public class SecondBuilder {

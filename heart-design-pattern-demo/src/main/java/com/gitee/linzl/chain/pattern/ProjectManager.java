@@ -18,8 +18,9 @@ public class ProjectManager extends Manager {
 		}
 		// 无权处理该申请，提交给上级处理
 		else {
-			if (superManager != null)
+			if (superManager != null) {
 				return superManager.handleRequest(apply);
+			}
 		}
 		return false;
 	}

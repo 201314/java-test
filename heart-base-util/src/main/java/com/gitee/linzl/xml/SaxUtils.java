@@ -54,7 +54,7 @@ public class SaxUtils extends DefaultHandler {
 	/**
 	 * 分析具体文档元素 Sax和Dom一样会解析出空白结点
 	 */
-	public void characters(char ch[], int start, int length) throws SAXException {
+	public void characters(char[] ch, int start, int length) throws SAXException {
 		String value = new String(ch, start, length);
 		if ("".equals(value = value.trim())) {
 			return;
@@ -121,7 +121,7 @@ public class SaxUtils extends DefaultHandler {
 		handler.endDocument();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		// try {
 		// createDocXML();
 		// } catch (TransformerConfigurationException e1) {

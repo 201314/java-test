@@ -25,65 +25,74 @@
 
 package com.gitee.linzl.cache;
 
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * FIFO (first in first out) cache.
- *
- * <p>
- * FIFO (first in first out): just adds items to the cache as they are accessed, putting them in a queue or buffer and
- * not changing their location in the buffer; when the cache is full, items are ejected in the order they were
- * added. Cache access overhead is constant time regardless of the size of the cache. The advantage of this algorithm
- * is that it's simple and fast; it can be implemented using a simple array and an index. The disadvantage is that
- * it's not very smart; it doesn't make any effort to keep more commonly used items in cache.
- * <p>
- * Summary for FIFO: fast, not adaptive, not scan resistant.
+ * Timed cache. Not limited by size, objects are removed only when they are expired.
+ * Prune is not invoked explicitly by standard {@link Cache} methods, however,
+ * it is possible to schedule prunes on fined-rate delays.
  */
-public class FIFOCache<K, V> extends AbstractCacheMap<K, V> {
+public class TimedCache<K, V> extends AbstractCacheMap<K, V> {
 
-	public FIFOCache(final int cacheSize) {
-		this(cacheSize, 0);
-	}
-
-	/**
-	 * Creates a new LRU cache.
-	 */
-	public FIFOCache(final int cacheSize, final long timeout) {
-		this.cacheSize = cacheSize;
+	public TimedCache(final long timeout) {
+		this.cacheSize = 0;
 		this.timeout = timeout;
-		cacheMap = new LinkedHashMap<>(cacheSize + 1, 1.0f, false);
+		cacheMap = new HashMap<>();
 	}
-
 
 	// ---------------------------------------------------------------- prune
 
 	/**
-	 * Prune expired objects and, if cache is still full, the first one.
+	 * Prunes expired elements from the cache. Returns the number of removed objects.
 	 */
 	@Override
 	protected int pruneCache() {
         int count = 0;
-		CacheObject<K,V> first = null;
 		Iterator<CacheObject<K,V>> values = cacheMap.values().iterator();
 		while (values.hasNext()) {
-			CacheObject<K,V> co = values.next();
+			CacheObject co = values.next();
 			if (co.isExpired()) {
 				values.remove();
-				onRemove(co.key, co.cachedObject);
-				count++;
-			}
-			if (first == null) {
-				first = co;
-			}
-		}
-		if (isFull()) {
-			if (first != null) {
-				cacheMap.remove(first.key);
-				onRemove(first.key, first.cachedObject);
 				count++;
 			}
 		}
 		return count;
 	}
+
+
+	// ---------------------------------------------------------------- auto prune
+
+	protected Timer pruneTimer;
+
+	/**
+	 * Schedules prune.
+	 */
+	public void schedulePrune(final long delay) {
+		if (pruneTimer != null) {
+			pruneTimer.cancel();
+		}
+		pruneTimer = new Timer();
+		pruneTimer.schedule(
+				new TimerTask() {
+					@Override
+					public void run() {
+						prune();
+					}
+				}, delay, delay
+		);
+	}
+
+	/**
+	 * Cancels prune schedules.
+	 */
+	public void cancelPruneSchedule() {
+		if (pruneTimer != null) {
+			pruneTimer.cancel();
+			pruneTimer = null;
+		}
+	}
+
 }

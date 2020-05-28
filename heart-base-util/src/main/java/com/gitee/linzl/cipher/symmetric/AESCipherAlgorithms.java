@@ -77,7 +77,7 @@ public enum AESCipherAlgorithms implements IAlgorithm {
 	private String cipherAlgorithm;
 	private Integer size;
 
-	private AESCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
+	AESCipherAlgorithms(String keyAlgorithm, String cipherAlgorithm, Integer size) {
 		this.keyAlgorithm = keyAlgorithm;
 		this.size = size;
 		this.cipherAlgorithm = cipherAlgorithm;

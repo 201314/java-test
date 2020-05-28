@@ -68,7 +68,7 @@ public class IdCardUtil {
 	};
 
 	// 每位加权因子
-	private static int power[] = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+	private static int[] power = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
 
 	/**
 	 * 验证所有的身份证的合法性
@@ -142,7 +142,7 @@ public class IdCardUtil {
 		// 获取第18位
 		String idCard18Code = idCard.substring(17, 18);
 
-		char c[] = null;
+		char[] c = null;
 		// 是否都为数字
 		if (ValidationUtil.isDigits(idCard17)) {
 			c = idCard17.toCharArray();
@@ -189,7 +189,7 @@ public class IdCardUtil {
 
 			String idCard17 = idCard.substring(0, 6) + cday.get(Calendar.YEAR) + idCard.substring(8);
 
-			char c[] = idCard17.toCharArray();
+			char[] c = idCard17.toCharArray();
 			if (null != c) {
 				// 将字符数组转为整型数组
 				int[] bit = char2Int(c);

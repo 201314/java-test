@@ -697,7 +697,7 @@ public class ConvertUtil {
      * @param buf
      * @return
      */
-    public static String toHex(byte buf[]) {
+    public static String toHex(byte[] buf) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < buf.length; i++) {
             String hex = Integer.toHexString(buf[i] & 0xFF);
@@ -987,7 +987,7 @@ public class ConvertUtil {
     public static void main(String[] args) {
     	String zi = "林";
     	System.out.println("zi.getBytes()==>"+zi.getBytes().length);
-    	byte cc[]= ByteBuffer.allocate(4).put(zi.getBytes()).array();
+    	byte[] cc = ByteBuffer.allocate(4).put(zi.getBytes()).array();
     	for (byte b : cc) {
     		System.out.println("b==>"+b);
 		}

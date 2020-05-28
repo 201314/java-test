@@ -15,6 +15,8 @@ public class SimpleFactory {
 			oper = new SubOperation();
 			break;
 		// 其他操作的实例化，继续添加case
+		default:
+			break;
 		}
 		return oper;
 	}

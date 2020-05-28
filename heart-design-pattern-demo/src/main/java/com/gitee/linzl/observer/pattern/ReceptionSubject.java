@@ -22,8 +22,9 @@ public class ReceptionSubject implements Subject {
 
 	// 通知所有 观察者 更新 自己
 	public void message() {
-		for (Observer obs : oberverList)
+		for (Observer obs : oberverList) {
 			obs.update();
+		}
 	}
 
 	public void setState(String state) {

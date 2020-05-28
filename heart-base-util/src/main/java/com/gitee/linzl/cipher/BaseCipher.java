@@ -19,13 +19,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import com.gitee.linzl.cls.ClassUtils;
 
 public class BaseCipher {
-    private static final String aesIvParameterSpec = "0102030405060708";
-    private static final String desIvParameterSpec = "12345678";
-    private static final boolean bcPresent;
+    private static final String AES_IV_PARAMETER_SPEC = "0102030405060708";
+    private static final String DES_IV_PARAMETER_SPEC = "12345678";
+    private static final boolean BC_PRESENT;
 
     static {
         ClassLoader classLoader = BaseCipher.class.getClassLoader();
-        bcPresent = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
+        BC_PRESENT = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
 
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -189,7 +189,7 @@ public class BaseCipher {
     private static Cipher getCipher(IAlgorithm algorithm)
             throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
         Cipher cipher;
-        if (bcPresent) {
+        if (BC_PRESENT) {
             cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
         } else {
             cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
@@ -200,10 +200,10 @@ public class BaseCipher {
     private static IvParameterSpec getIvParameterSpec(IAlgorithm algorithm, IvParameterSpec iv) {
         IvParameterSpec spec = iv;
         if (algorithm.getCipherAlgorithm().contains("CBC") && Objects.isNull(spec)) {
-            if (algorithm.getKeyAlgorithm().equalsIgnoreCase("AES")) {
-                spec = new IvParameterSpec(aesIvParameterSpec.getBytes());
-            } else if (algorithm.getKeyAlgorithm().equalsIgnoreCase("DES")) {
-                spec = new IvParameterSpec(desIvParameterSpec.getBytes());
+            if ("AES".equalsIgnoreCase(algorithm.getKeyAlgorithm())) {
+                spec = new IvParameterSpec(AES_IV_PARAMETER_SPEC.getBytes());
+            } else if ("DES".equalsIgnoreCase(algorithm.getKeyAlgorithm())) {
+                spec = new IvParameterSpec(DES_IV_PARAMETER_SPEC.getBytes());
             }
         }
         return spec;

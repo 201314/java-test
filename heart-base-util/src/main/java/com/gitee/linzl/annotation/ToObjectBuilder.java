@@ -14,7 +14,7 @@ public class ToObjectBuilder {
     /**
      * 类名，对应的字段
      */
-    public static final Map<Class<?>, Field[]> declaredFieldsCache = new ConcurrentHashMap<>(256);
+    public static final Map<Class<?>, Field[]> DECLARED_FIELDS_CACHE = new ConcurrentHashMap<>(256);
 
     /**
      * @param content   内容
@@ -22,14 +22,13 @@ public class ToObjectBuilder {
      * @param separator 每个字段间的分隔符
      * @param end       属性拼装完成后的结束符
      * @return
-     * @throws NoSuchFieldException
      * @throws SecurityException
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     public static <T> T toObject(String content, Class<T> clazz, String separator, String end)
-            throws NoSuchFieldException, SecurityException, InstantiationException, IllegalAccessException {
-        Field[] cacheFields = declaredFieldsCache.get(clazz);
+            throws SecurityException, InstantiationException, IllegalAccessException {
+        Field[] cacheFields = DECLARED_FIELDS_CACHE.get(clazz);
         /** 未缓存 */
         if (Objects.isNull(cacheFields)) {
             List<Field> fieldList = new ArrayList<>();
@@ -52,19 +51,16 @@ public class ToObjectBuilder {
                 }
             }
             /**排序*/
-            list.sort((first, second) -> {
-                return Integer.compare(first.getAnnotation(FileField.class).order(),
-                        second.getAnnotation(FileField.class).order());
-            });
+            list.sort(Comparator.comparingInt(field -> field.getAnnotation(FileField.class).order()));
             cacheFields = list.toArray(new Field[0]);
-            declaredFieldsCache.put(clazz, cacheFields);
+            DECLARED_FIELDS_CACHE.put(clazz, cacheFields);
         } else {
             System.out.println("已经缓存");
         }
 
         String[] columns = content.split(separator);
 
-        T obj = (T) clazz.newInstance();
+        T obj = clazz.newInstance();
         // 组装数据
         for (int index = 0, length = cacheFields.length; index < length; index++) {
             Field field = cacheFields[index];

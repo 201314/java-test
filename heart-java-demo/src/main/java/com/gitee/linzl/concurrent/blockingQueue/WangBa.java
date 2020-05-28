@@ -30,7 +30,7 @@ public class WangBa implements Runnable {
         }  
     }  
       
-    public static void main(String args[]){  
+    public static void main(String[] args){
         try{  
             System.out.println("网吧开始营业");  
             WangBa siyu = new WangBa();  

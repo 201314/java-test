@@ -24,7 +24,7 @@ import com.gitee.linzl.xml.SaxUtils;
  */
 public class Dom4jStrategy2 {
 	@SuppressWarnings("resource")
-	public static void main(String args[]) throws Exception {
+	public static void main(String[] args) throws Exception {
 		SAXReader reader = new SAXReader();
 		Document doc = null;
 		try {

@@ -146,8 +146,9 @@ public class ValidationUtil {
 	 * @param str
 	 */
 	public final static boolean isNumeric(String str) {
-		if (isFloat(str) || isPositiveInteger(str))
+		if (isFloat(str) || isPositiveInteger(str)) {
 			return true;
+		}
 		return false;
 	}
 
@@ -184,8 +185,9 @@ public class ValidationUtil {
 	 * @param text
 	 */
 	public final static boolean isTel(String text) {
-		if (isCellPhone(text) || isPhone(text))
+		if (isCellPhone(text) || isPhone(text)) {
 			return true;
+		}
 		return false;
 	}
 
@@ -204,8 +206,9 @@ public class ValidationUtil {
 	 * @param text
 	 */
 	public final static boolean isCellPhone(String text) {
-		if (text.length() != 11)
+		if (text.length() != 11) {
 			return false;
+		}
 		return match(text, CELL_PHONE_NUMBER);
 	}
 
@@ -326,14 +329,16 @@ public class ValidationUtil {
 	 * @param str
 	 */
 	public static boolean isContainsSpecialChar(String text) {
-		if (StringUtils.isBlank(text))
+		if (StringUtils.isBlank(text)) {
 			return false;
+		}
 		String[] chars = { "[", "`", "~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "+", "=", "|", "{", "}",
 				"'", ":", ";", "'", ",", "[", "]", ".", "<", ">", "/", "?", "~", "！", "@", "#", "￥", "%", "…", "&", "*",
 				"（", "）", "—", "+", "|", "{", "}", "【", "】", "‘", "；", "：", "”", "“", "’", "。", "，", "、", "？", "]" };
 		for (String ch : chars) {
-			if (text.contains(ch))
+			if (text.contains(ch)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -412,8 +417,9 @@ public class ValidationUtil {
 	}
 
 	public final static boolean isEmpty(Integer integer) {
-		if (integer == null || integer == 0)
+		if (integer == null || integer == 0) {
 			return true;
+		}
 		return false;
 	}
 
@@ -422,8 +428,9 @@ public class ValidationUtil {
 	}
 
 	public final static boolean isEmpty(Long longs) {
-		if (longs == null || longs == 0)
+		if (longs == null || longs == 0) {
 			return true;
+		}
 		return false;
 	}
 

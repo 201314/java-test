@@ -8,12 +8,12 @@ package com.gitee.linzl.single.pattern;
 
 public class HungrySingleton {
 
-	private static final HungrySingleton single = new HungrySingleton();
+	private static final HungrySingleton SINGLE = new HungrySingleton();
 
 	private HungrySingleton() {
 	}
 
 	public static HungrySingleton getInstance() {
-		return single;
+		return SINGLE;
 	}
 }

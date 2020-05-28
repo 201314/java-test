@@ -28,7 +28,7 @@ public class ArrayAlgorithm {
 	/**
 	 * 两个线性表，按顺序合并，并将重复的数据去除
 	 */
-	public static int[] merge(int first[], int second[]) {
+	public static int[] merge(int[] first, int[] second) {
 		int[] temp = new int[first.length + second.length];
 		int i = 0, j = 0, k = 0;
 		while (j < first.length && i < second.length) {
@@ -170,7 +170,7 @@ public class ArrayAlgorithm {
 	 * @throws Exception
 	 */
 	public static Object[] addData(int index, Object obj, Object[] array) throws Exception {
-		Object newArray[] = new Object[array.length + 1];
+		Object[] newArray = new Object[array.length + 1];
 		if (index < 1 || index > (array.length + 1)) {
 			throw new Exception("插入范围不正确，正确范围为：1~" + array.length);
 		} else {
@@ -216,7 +216,7 @@ public class ArrayAlgorithm {
 	 * @param array
 	 * @throws Exception
 	 */
-	public static Object[] removeData(Object obj, Object array[]) throws Exception {
+	public static Object[] removeData(Object obj, Object[] array) throws Exception {
 		int j = array.length;
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] == obj) {

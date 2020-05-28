@@ -7,7 +7,7 @@ package com.gitee.linzl.stack;
  */
 public class ShareStack {
 	private static int length = 100;
-	int stack[] = new int[length];
+	int[] stack = new int[length];
 	static int firstIndex = -1; // 初始化第一个栈 为空
 	static int secondIndex = length; // 初始化第二个栈为空
 

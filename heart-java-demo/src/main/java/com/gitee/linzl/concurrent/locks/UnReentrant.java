@@ -7,17 +7,23 @@ public class UnReentrant {
 	Lock lock = new ReentrantLock();
 
 	public void outer() {
-		lock.lock();
-		System.out.println("锁一次");
-		inner();// 可重入锁，不然锁死自己吗
-		lock.unlock();
+		try {
+			lock.lock();
+			System.out.println("锁一次");
+			inner();// 可重入锁，不然锁死自己吗
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public void inner() {
-		lock.lock();
-		// do something
-		System.out.println("锁2次");
-		lock.unlock();
+		try {
+			lock.lock();
+			// do something
+			System.out.println("锁2次");
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public static void main(String[] args) {

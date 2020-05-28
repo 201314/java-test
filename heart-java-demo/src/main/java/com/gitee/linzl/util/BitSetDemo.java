@@ -153,7 +153,7 @@ public class BitSetDemo {
      * 简单使用示例
      */
     public static void simpleExample() {
-        String names[] = {"Java", "Source", "and", "Support"};
+        String[] names = {"Java", "Source", "and", "Support"};
         BitSet bits = new BitSet();
         for (int i = 0, n = names.length; i < n; i++) {
             if ((names[i].length() % 2) == 0) {
@@ -203,7 +203,7 @@ public class BitSetDemo {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         String s1 = new String("kvill");
         s1.intern();
         String s2 = "kvill";

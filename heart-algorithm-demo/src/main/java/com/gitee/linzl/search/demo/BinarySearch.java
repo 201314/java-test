@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @param args 折半查找
  */
 public class BinarySearch {
-	public static int findNum(int a[], int key) {
+	public static int findNum(int[] a, int key) {
 		int low = 0;
 		int high = a.length - 1;
 		while (low <= high) {
@@ -26,7 +26,7 @@ public class BinarySearch {
 	}
 
 	public static void main(String[] args) {
-		int a[] = { 12, -19, 5, 3, -6, 11, 10, -20 };
+		int[] a = { 12, -19, 5, 3, -6, 11, 10, -20 };
 		Arrays.sort(a);// 使用二分法查找，必须按升序或者降序先排序
 		System.out.println(Arrays.toString(a));
 		System.out.println("要查找的数所在位置：" + findNum(a, 3));// 找出给定的值所在位置

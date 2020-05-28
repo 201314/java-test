@@ -12,7 +12,7 @@ public class ConstructorUtil {
 		Class demo = Class.forName(str);
 
 		// 获取该类public构造方法
-		Constructor cs[] = demo.getConstructors();
+		Constructor[] cs = demo.getConstructors();
 		for (int i = 0; i < cs.length; i++) {
 			System.out.println("获取该类public构造方法-->" + cs[i].getName());
 		}

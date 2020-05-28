@@ -720,7 +720,7 @@ public class DateUtil {
         todayEnd.set(Calendar.MINUTE, 59);
         todayEnd.set(Calendar.SECOND, 59);
         todayEnd.set(Calendar.MILLISECOND, 999);
-        System.out.println("时差:" + (todayEnd.getTimeInMillis() - new Date().getTime()));
+        System.out.println("时差:" + (todayEnd.getTimeInMillis() - System.currentTimeMillis()));
 
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);

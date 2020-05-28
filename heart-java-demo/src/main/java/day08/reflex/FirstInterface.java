@@ -1,7 +1,7 @@
 package day08.reflex;
 
 public interface FirstInterface {
-	String firstName = "FirstInterface默认为public final类型，且必须赋值,方法都为public";
+	String FIRST_NAME = "FirstInterface默认为public final类型，且必须赋值,方法都为public";
 
 	public void firstOneMethod(String name);
 

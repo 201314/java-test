@@ -197,7 +197,7 @@ public class FtpClientUtil implements Closeable {
 	/**
 	 * 创建目录
 	 * 
-	 * @param dir
+	 * @param file
 	 * @return
 	 */
 	public boolean mkdirParent(File file) {

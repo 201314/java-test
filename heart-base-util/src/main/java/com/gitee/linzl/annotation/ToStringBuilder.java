@@ -78,10 +78,7 @@ public class ToStringBuilder {
                 }
             }
             // 排序
-            list.sort((first, second) -> {
-                return Integer.compare(first.getAnnotation(FileField.class).order(),
-                        second.getAnnotation(FileField.class).order());
-            });
+            list.sort(Comparator.comparingInt(field -> field.getAnnotation(FileField.class).order()));
             cacheFields = list.toArray(new Field[0]);
             declaredFieldsCache.put(clazz, cacheFields);
         } else {
@@ -95,7 +92,7 @@ public class ToStringBuilder {
             FileField fileField = field.getAnnotation(FileField.class);
 
             try {
-                String value = "";
+                String value;
                 String format = fileField.format();
                 if (field.getType().isAssignableFrom(LocalDateTime.class)) {
                     LocalDateTime time = (LocalDateTime) field.get(object);
@@ -144,7 +141,9 @@ public class ToStringBuilder {
         }
         if (direct == PaddingDirection.LEFT) {// 左补
             return sb.toString() + source;
-        } else if (direct == PaddingDirection.RIGHT) {// 右补
+        }
+
+        if (direct == PaddingDirection.RIGHT) {// 右补
             return source + sb.toString();
         }
         return source;

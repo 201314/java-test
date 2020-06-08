@@ -519,6 +519,12 @@ public class DateUtil {
     public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
         return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
     }
+    public static long getTime(LocalDate localDate) {
+        return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+    public static long getTime(LocalDateTime localDateTime) {
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
 
     public static LocalDateTime fromMilliseconds(final long milliseconds) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneId.systemDefault());

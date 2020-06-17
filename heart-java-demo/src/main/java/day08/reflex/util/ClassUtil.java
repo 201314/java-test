@@ -9,6 +9,7 @@ import java.security.ProtectionDomain;
 /**
  * TODO 参考 org.springframework.util.ReflectionUtils 写一个工具类
  *
+ * TODO WildcardType \ GenericArrayType \ TypeVariable \ ParameterizedType 了解
  * @author linzl
  * @description
  * @email 2225010489@qq.com
@@ -91,6 +92,8 @@ public class ClassUtil {
         // 判断是否为复杂类型
         demo.isSynthetic();
     }
+
+    // TODO WildcardType \ GenericArrayType \ TypeVariable \ ParameterizedType 了解
 
     /**
      * 获取接口上的泛型T

@@ -26,14 +26,12 @@ import java.util.ServiceLoader;
  * @date 2019/9/16
  */
 public class SpiFactory {
-
-    public static <T> ServiceLoader<T> loadAll(Class<T> cls) {
-        return ServiceLoader.load(cls);
+    public static <T> Iterator<T> loadAll(Class<T> cls) {
+        return ServiceLoader.load(cls).iterator();
     }
 
     public static <T> T loadFirst(Class<T> cls) {
-        ServiceLoader<T> load = loadAll(cls);
-        Iterator<T> iterator = load.iterator();
+        Iterator<T> iterator = loadAll(cls);
         if (!iterator.hasNext()) {
             throw new IllegalStateException(String.format(
                     "No implementation defined in /META-INF/services/%s, please check whether the file exists and has the right implementation class!",

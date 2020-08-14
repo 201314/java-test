@@ -1,5 +1,7 @@
 package com.gitee.linzl.composite.pattern.demo2;
 
+import com.gitee.linzl.composite.pattern.demo2.Company;
+
 public class HRDepartment implements Company {
 	private String name;
 

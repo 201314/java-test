@@ -1,11 +1,13 @@
 package com.gitee.linzl.composite.pattern.demo2;
 
+import com.gitee.linzl.composite.pattern.demo2.Company;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class BranchCompany implements Company {
 	private String name;
-	private List<Company> deparmentList = new ArrayList<Company>();
+	private List<Company> deparmentList = new ArrayList<>();
 
 	public BranchCompany(String name) {
 		this.name = name;

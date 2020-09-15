@@ -8,7 +8,7 @@ public class ReceptionSubject implements Subject {
 	// 主题通知者的 状态
 	private String state;
 	// 通知 哪些 观察者
-	List<Observer> oberverList = new ArrayList<Observer>();
+	List<Observer> oberverList = new ArrayList<>();
 
 	// 增加观察者
 	public void addOberverList(Observer obs) {
@@ -29,6 +29,7 @@ public class ReceptionSubject implements Subject {
 
 	public void setState(String state) {
 		this.state = state;
+		this.message();
 	}
 
 	@Override

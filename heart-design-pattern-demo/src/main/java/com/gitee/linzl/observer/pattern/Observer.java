@@ -8,6 +8,7 @@ public abstract class Observer {
 	public Observer(String name, Subject sub) {
 		this.name = name;
 		this.sub = sub;
+		sub.addOberverList(this);
 	}
 
 	// 每个观察者 都有不同的 更新信息
@@ -25,9 +26,4 @@ public abstract class Observer {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public void setSub(Subject sub) {
-		this.sub = sub;
-	};
-
 }

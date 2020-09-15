@@ -3,20 +3,19 @@ package com.gitee.linzl.observer.pattern;
 /**
  * 在JAVA中可能通过继续Observable来实现
  *
- * @description
  * @author linzl
+ * @description
  * @email 2225010489@qq.com
  * @date 2019年7月6日
  */
 public class ObserverTest {
-	public static void main(String[] args) {
-		ReceptionSubject recept = new ReceptionSubject();
-		recept.setState("老板回来了");
+    public static void main(String[] args) {
+        ReceptionSubject recept = new ReceptionSubject();
 
-		NBAObserver nba = new NBAObserver("张三", recept);
-		nba.update();
+        new NBAObserver("张三", recept);
+        new StockObserver("李四", recept);
 
-		StockObserver stock = new StockObserver("李四", recept);
-		stock.update();
-	}
+        //告知状态变化，通知所有观察者
+        recept.setState("老板回来了,大家注意");
+    }
 }

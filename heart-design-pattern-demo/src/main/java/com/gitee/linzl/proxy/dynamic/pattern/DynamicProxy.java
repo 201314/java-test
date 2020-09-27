@@ -32,10 +32,10 @@ public class DynamicProxy {
             }
         }
 
-        //if (obj.getClass().isInterface() || Proxy.class.isAssignableFrom(obj.getClass()) || hasInterface) {
-        //    System.out.println("使用JAVA内置动态代理");
-        //    return javaProxy(obj, adv);
-        //}
+        if (obj.getClass().isInterface() || Proxy.class.isAssignableFrom(obj.getClass()) || hasInterface) {
+            System.out.println("使用JAVA内置动态代理");
+            return javaProxy(obj, adv);
+        }
 
         System.out.println("使用cglib动态代理");
         return cglibProxy2(obj, adv);

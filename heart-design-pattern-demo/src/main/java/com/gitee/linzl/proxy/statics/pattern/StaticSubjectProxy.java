@@ -21,14 +21,22 @@ public class StaticSubjectProxy implements Subject {
 	}
 
 	@Override
-	public String request() {
+	public String find() {
 		before();
-		String result = subject.request();
+		String result = subject.find();
 		after();
 		return result;
 	}
 
-	private void before() {
+    @Override
+    public String insert() {
+		before();
+		String result = subject.insert();
+		after();
+		return result;
+    }
+
+    private void before() {
 		System.out.println("代理前预处理");
 	}
 

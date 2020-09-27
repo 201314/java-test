@@ -17,7 +17,7 @@ public class TestProxy {
 	public void staticProxyTest() {
 		// 代理和真实对象的关系在编译时已经确定
 		Subject subject = new StaticSubjectProxy();
-		subject.request();
+		subject.find();
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class TestProxy {
 		DynamicProxy test = new DynamicProxy();
 		Subject proxy = (Subject) test.process(subject, new TestAdvise());
 		// 执行具体主题角色方法
-		proxy.request();
+		proxy.find();
 	}
 
 	/**

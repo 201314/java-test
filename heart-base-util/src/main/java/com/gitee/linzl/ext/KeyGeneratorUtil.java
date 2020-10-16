@@ -48,17 +48,20 @@ public class KeyGeneratorUtil {
         int day = calendar.get(Calendar.DAY_OF_YEAR);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
         //今天是第多少天 0补位操作 必须满足三位
         String dayFmt = String.format("%1$03d", day);
         // 小时：0补位操作 必须满足2位
         String hourFmt = String.format("%1$02d", hour);
         String minuteFmt = String.format("%1$02d", minute);
+        String secondFmt = String.format("%1$02d", second);
 
         StringBuffer prefix = new StringBuffer();
         prefix.append(year - 2000)
                 .append(dayFmt)
                 .append(hourFmt)
-                .append(minuteFmt);
+                .append(minuteFmt)
+                .append(secondFmt);
         return prefix.toString();
     }
 

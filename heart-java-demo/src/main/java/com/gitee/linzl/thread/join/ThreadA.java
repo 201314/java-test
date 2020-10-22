@@ -1,6 +1,7 @@
 package com.gitee.linzl.thread.join;
 
 public class ThreadA extends Thread {
+	@Override
 	public void run() {
 		int count = 1;
 		for (int i = 0; i < 10; i++) {

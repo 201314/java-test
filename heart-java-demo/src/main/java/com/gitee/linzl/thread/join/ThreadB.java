@@ -2,6 +2,7 @@ package com.gitee.linzl.thread.join;
 
 public class ThreadB extends Thread {
 
+	@Override
 	public void run() {
 		try {
 			ThreadA a = new ThreadA();

@@ -12,6 +12,7 @@ public class ThreadLocalDemo {
 	public static ThreadLocal<String> tl = new ThreadLocal<>();
 
 	class ThreadA implements Runnable {
+		@Override
 		public void run() {
 			try {
 				for (int i = 0; i < 100; i++) {
@@ -29,6 +30,7 @@ public class ThreadLocalDemo {
 	}
 
 	class ThreadB implements Runnable {
+		@Override
 		public void run() {
 			try {
 				for (int i = 0; i < 100; i++) {

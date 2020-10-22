@@ -323,17 +323,15 @@ public class FileUtil {
      * @param partFileSuffix 需要合并的文件后缀名
      * @param partFileSize   需要合并文件的字节数大小,必须每个分片固定大小，除了最后一个分片
      * @param mergeFile      合并后的文件
-     * @throws IOException
      */
-    public static void asynMergeFiles(File dir, String partFileSuffix, int partFileSize, File mergeFile)
-            throws IOException {
+    public static void asynMergeFiles(File dir, String partFileSuffix, int partFileSize, File mergeFile) {
         List<File> partFiles = list(dir, partFileSuffix);
         /**
          * 需要合并的分片进行排序
          */
         Collections.sort(partFiles, new FileComparator());
 
-        ExecutorService executor = (ExecutorService) Executors.newCachedThreadPool();
+        ExecutorService executor = Executors.newCachedThreadPool();
 
         Map<Integer, Future<Boolean>> completeMap = new HashMap<>(partFiles.size());
         for (int index = 0, length = partFiles.size(); index < length; index++) {

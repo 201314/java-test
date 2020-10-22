@@ -13,7 +13,7 @@ public class Button2 {
             this.text = text;
         }
 
-        public String getTex() {
+        public String getText() {
             return text;
         }
     }
@@ -25,7 +25,7 @@ public class Button2 {
 
         Button[] buttons1 = buttonStream.toArray(Button[]::new);
         for (Button button : buttons1) {
-            System.out.println(button.getTex());
+            System.out.println(button.getText());
         }
     }
 
@@ -34,7 +34,7 @@ public class Button2 {
         list.forEach(System.out::println);
     }
 
-    public <T> List<T> asList(MyCrator<List<T>> creator, T... a) {
+    public <T> List<T> asList(MyList<List<T>> creator, T... a) {
         List<T> list = creator.create();
         for (T t : a) {
             list.add(t);

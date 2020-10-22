@@ -10,6 +10,7 @@ public class ProduceAndConsumer {
 	private Queue<String> buffer = new LinkedList<>();
 
 	class Producer implements Runnable {
+		@Override
 		public void run() {
 			while (true) {
 				synchronized (lock) {
@@ -30,6 +31,7 @@ public class ProduceAndConsumer {
 	}
 
 	class Consumer implements Runnable {
+		@Override
 		public void run() {
 			try {
 				while (true) {

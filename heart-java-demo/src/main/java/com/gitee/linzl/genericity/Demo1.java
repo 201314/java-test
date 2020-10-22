@@ -1,4 +1,4 @@
-package com.javacode2018.chat05.demo11;
+package com.gitee.linzl.genericity;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;

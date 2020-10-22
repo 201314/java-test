@@ -1,4 +1,4 @@
-/*
+package com.gitee.linzl.lambda.collection;/*
 package com.gitee.linzl.lambda.collection;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;

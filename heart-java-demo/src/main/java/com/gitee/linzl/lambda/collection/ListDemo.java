@@ -1,8 +1,5 @@
 package com.gitee.linzl.lambda.collection;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -19,11 +16,9 @@ import java.util.stream.Stream;
  * 3.stream的延迟执行特性
  */
 public class ListDemo {
-    List<Student> stuList = null;
+    static List<Student> stuList;
 
-    @Before
-    public void init() {
-        Random random = new Random();
+    static {
         stuList = new ArrayList<Student>() {
             {
                 add(new Student("student1", 200));
@@ -38,8 +33,7 @@ public class ListDemo {
         };
     }
 
-    @Test
-    public void listForEach() {
+    public static void listForEach() {
         // 两种写法有何不同
         stuList.forEach(stu -> {
             System.out.println(stu);
@@ -50,18 +44,18 @@ public class ListDemo {
         });
     }
 
-    @Test
+
     /**
      * 对于stream的聚合、消费或收集操作只能进行一次，再次操作会报错
      */
-    public void listTest() {
+    public static void listTest() {
         Stream<String> stream = Stream.generate(() -> "user").limit(20);
         stream.forEach(System.out::println);
         // stream.forEach(System.out::println);
     }
 
-    @Test
-    public void listFilter() {
+
+    public static void listFilter() {
         Objects.requireNonNull(stuList);
         List<String> studentList = stuList.stream().filter(stu -> stu.getScore() > 85)
                 .sorted(Comparator.comparing(Student::getScore).reversed())
@@ -70,8 +64,8 @@ public class ListDemo {
         System.out.println(studentList);
     }
 
-    @Test
-    public void listMap() {
+
+    public static void listMap() {
         List<String> list2 = stuList.stream().map(string -> {
             // 修改数据
             return "stream().map()处理之后：" + string;
@@ -85,76 +79,96 @@ public class ListDemo {
         System.out.println(result);
     }
 
-    @Test
-    public void listMapToInt() {
+
+    public static void listMapToInt() {
         IntStream intStream = stuList.stream().mapToInt(stu -> stu.getScore());
         System.out.println(intStream.sum());
     }
 
-    @Test
-    public void listFlatMap() {
+
+    public static void listFlatMap() {
     }
 
-    @Test
-    public void listFlatMapToInt() {
+
+    public static void listFlatMapToInt() {
     }
 
-    @Test
-    public void listDistinct() {
+    public static void listDistinct() {
+        List<String> list = new ArrayList<>();
+        list.add("1111");
+        list.add("22");
+        list.add("3333");
+        list.add("44");
+        list.add("55");
+        list.add("1111");
+        list.add("3333");
+        List<String> result = list.stream().filter(distinctByKey(b -> b)).collect(Collectors.toList());
+        Set<String> set = new HashSet<>(list);
+        List<String> result2 = new ArrayList<>(set);
+        System.out.println("result:" + result);
+        System.out.println("result2:" + result2);
+
+        List<String> result3 = list.stream().distinct().collect(Collectors.toList());
+        System.out.println("result3:" + result3);
     }
 
-    @Test
-    public void listSorted() {
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>(10);
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    @Test
-    public void listSortedComparator() {
+
+    public static void listSorted() {
     }
 
-    @Test
-    public void listPeek() {
+
+    public static void listSortedComparator() {
     }
 
-    @Test
-    public void listLimit() {
+
+    public static void listPeek() {
     }
 
-    @Test
-    public void listSkip() {
+
+    public static void listLimit() {
     }
 
-    @Test
-    public void listForEachOrdered() {
 
+    public static void listSkip() {
     }
 
-    @Test
-    public void listToArray() {
 
-    }
-
-    @Test
-    public void listToArrayFunction() {
-
-    }
-
-    @Test
-    public void listReduce() {
-
-    }
-
-    @Test
-    public void listReduceOptional() {
-
-    }
-
-    @Test
-    public void listReduceU() {
+    public static void listForEachOrdered() {
 
     }
 
-    @Test
-    public void listCollect() {
+
+    public static void listToArray() {
+
+    }
+
+
+    public static void listToArrayFunction() {
+
+    }
+
+
+    public static void listReduce() {
+
+    }
+
+
+    public static void listReduceOptional() {
+
+    }
+
+
+    public static void listReduceU() {
+
+    }
+
+
+    public static void listCollect() {
         DoubleSummaryStatistics dss = stuList.stream().collect(Collectors.summarizingDouble(Student::getScore));
         // 求平均值
         System.out.println(dss.getAverage());
@@ -164,8 +178,8 @@ public class ListDemo {
         System.out.println(dss.getSum());
     }
 
-    @Test
-    public void listMinAndMax() {
+
+    public static void listMinAndMax() {
         List<String> list = new ArrayList<>();
         list.add("11");
         list.add("22");
@@ -184,33 +198,12 @@ public class ListDemo {
         list.stream().anyMatch(str -> str.equals("33"));
     }
 
-    /**
-     * 去重
-     */
-    @Test
-    public void distinct() {
-        List<String> list = new ArrayList<>();
-        list.add("1111");
-        list.add("22");
-        list.add("3333");
-        list.add("44");
-        list.add("55");
-        list.add("1111");
-        list.add("3333");
-        List<String> result = list.stream().filter(distinctByKey(b -> b)).collect(Collectors.toList());
-        System.out.println(result);
-    }
-
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>(10);
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
 
     /**
      * listA内容变为listA和listB都存在的对象,listB不变
      * 交集
      */
-    public void retainAll() {
+    public static void retainAll() {
         List<String> listA = new ArrayList<>();
         listA.add("A");
         listA.add("B");
@@ -228,7 +221,7 @@ public class ListDemo {
      * listA中存在的listB的内容去重,listB不变
      * 差集
      */
-    public void removeAll() {
+    public static void removeAll() {
         List<String> listA = new ArrayList<>();
         listA.add("A");
         listA.add("B");
@@ -243,10 +236,10 @@ public class ListDemo {
     }
 
     /**
-     * 为了去重，listA先取差集，然后追加全部的listB,listB不变
      * 并集
+     * 为了去重，listA先取差集，然后追加全部的listB,listB不变
      */
-    public void addAll() {
+    public static void addAll() {
         List<String> listA = new ArrayList<>();
         listA.add("A");
         listA.add("B");
@@ -261,7 +254,7 @@ public class ListDemo {
         System.out.println(listA);
     }
 
-    public void merge() {
+    public static void merge() {
         List<String> listA = new ArrayList<>();
         listA.add("A");
         listA.add("B");
@@ -276,5 +269,33 @@ public class ListDemo {
                 listA.stream().collect(() -> listB,
                         (list, items) -> list.add(items), (nextList, preList) -> nextList.addAll(preList));
         System.out.println(all);
+    }
+
+    public static void main(String[] args) {
+        listForEach();
+        listTest();
+        listFilter();
+        listMap();
+        listMapToInt();
+        listFlatMap();
+        listFlatMapToInt();
+        listDistinct();
+        listSorted();
+        listSortedComparator();
+        listPeek();
+        listLimit();
+        listSkip();
+        listForEachOrdered();
+        listToArray();
+        listToArrayFunction();
+        listReduce();
+        listReduceOptional();
+        listReduceU();
+        listCollect();
+        listMinAndMax();
+        retainAll();
+        removeAll();
+        addAll();
+        merge();
     }
 }

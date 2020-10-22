@@ -4,7 +4,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class UsePriorityBlockingQueue {
 	public static void main(String[] args) throws Exception {
-		PriorityBlockingQueue<Task> q = new PriorityBlockingQueue<Task>();
+		PriorityBlockingQueue<Task> q = new PriorityBlockingQueue<>();
 
 		Task t1 = new Task();
 		t1.setId(3);

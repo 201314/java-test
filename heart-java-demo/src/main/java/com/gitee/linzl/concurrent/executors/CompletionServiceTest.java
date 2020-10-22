@@ -13,17 +13,15 @@ public class CompletionServiceTest {
 
 	public static void main(String[] args) {
 		ExecutorService pool = Executors.newFixedThreadPool(8);
-		CompletionService<Boolean> cs = new ExecutorCompletionService<Boolean>(pool);
-		Callable<Boolean> task = new Callable<Boolean>() {
-			public Boolean call() {
-				try {
-					Thread.sleep(1000);
-					System.out.println("插入1000条数据完成");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return true;
-			};
+		CompletionService<Boolean> cs = new ExecutorCompletionService<>(pool);
+		Callable<Boolean> task = () -> {
+			try {
+				Thread.sleep(1000);
+				System.out.println("插入1000条数据完成");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return true;
 		};
 		System.out.println(new SimpleDateFormat("mm:ss").format(new Date()) + "--开始插入数据");
 		for (int i = 0; i < 10; i++) {

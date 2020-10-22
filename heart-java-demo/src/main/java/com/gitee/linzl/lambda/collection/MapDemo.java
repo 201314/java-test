@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class MapDemo {
 
-	public void listToMap() {
+	public static void listToMap() {
 		List<Student> students = new ArrayList<>();
 		Student student = new Student();
 		student.setName("linzl");
@@ -42,6 +42,6 @@ public class MapDemo {
 	}
 
 	public static void main(String[] args) {
-		 
+		listToMap();
 	}
 }

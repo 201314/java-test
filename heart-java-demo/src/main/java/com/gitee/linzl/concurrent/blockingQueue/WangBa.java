@@ -43,7 +43,6 @@ public class WangBa implements Runnable {
         }  
         catch(Exception e){  
             e.printStackTrace();
-        }  
-  
+        }
     }  
 }  

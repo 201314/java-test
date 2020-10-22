@@ -34,7 +34,7 @@ public class UseQueue {
 		 * (String string : list) { System.out.println(string); }
 		 */
 
-		final SynchronousQueue<String> q = new SynchronousQueue<String>();
+		final SynchronousQueue<String> q = new SynchronousQueue<>();
 		Thread t1 = new Thread(() -> {
 			try {
 				System.out.println(q.take());

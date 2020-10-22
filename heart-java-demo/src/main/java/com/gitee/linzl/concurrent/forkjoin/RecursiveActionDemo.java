@@ -5,7 +5,7 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 直接使用Executors,并行框架特别合适递归操作
+ * Executors,并行框架特别合适递归操作
  * 
  * @description
  * 

@@ -31,8 +31,6 @@ public class Wangmin implements Delayed {
 	 */
 	@Override
 	public long getDelay(TimeUnit unit) {
-		// return unit.convert(endTime, TimeUnit.MILLISECONDS) -
-		// unit.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 		return endTime - System.currentTimeMillis();
 	}
 

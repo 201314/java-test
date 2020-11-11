@@ -1,6 +1,7 @@
 package com.bjsxt.height.master.worker;
 
 public class MyWorker extends Worker {
+	@Override
 	public Object handle(Task input) {
 		Object output = null;
 		try {

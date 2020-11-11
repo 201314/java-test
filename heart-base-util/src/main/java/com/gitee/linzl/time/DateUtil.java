@@ -10,6 +10,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoUnit.MONTHS;
+
 public class DateUtil {
     /**
      * 某一年某一个月的第一天
@@ -25,6 +28,18 @@ public class DateUtil {
         // localDate = localDate.withDayOfMonth(1);
         localDate = localDate.with(TemporalAdjusters.firstDayOfMonth());
         return localDate;
+    }
+
+    public static LocalDateTime getFirstDayLastMonth() {
+        return LocalDateTime.now().with(temporal -> temporal.with(DAY_OF_MONTH, 1).minus(1, MONTHS));
+    }
+
+    public static LocalDateTime getFirstDayCurrentMonth() {
+        return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    public static LocalDateTime getFirstDayNextMonth() {
+        return LocalDateTime.now().with(TemporalAdjusters.firstDayOfNextMonth());
     }
 
     /**
@@ -115,7 +130,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getFirstDayLastWeek() {
-        return getFirstDayBeforeWeek(LocalDateTime.now(), 1);
+        return LocalDateTime.now().minusWeeks(1).with(DayOfWeek.MONDAY);
     }
 
     /**
@@ -124,7 +139,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getFirstDayCurrentWeek() {
-        return getFirstDayAfterWeek(LocalDateTime.now(), 0);
+        return LocalDateTime.now().with(DayOfWeek.MONDAY);
     }
 
     /**
@@ -133,7 +148,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getFirstDayNextWeek() {
-        return getFirstDayAfterWeek(LocalDateTime.now(), 1);
+        return LocalDateTime.now().plusWeeks(1).with(DayOfWeek.MONDAY);
     }
 
     /**
@@ -149,6 +164,19 @@ public class DateUtil {
         return localDate;
     }
 
+
+    public static LocalDateTime getEndDayLastMonth() {
+        return LocalDateTime.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    public static LocalDateTime getEndDayCurrentMonth() {
+        return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    public static LocalDateTime getEndDayNextMonth() {
+        return LocalDateTime.now().plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    }
+
     /**
      * 几个月前最后一天
      *
@@ -156,10 +184,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getEndDayBeforeMonth(int month) {
-        LocalDateTime localDate = LocalDateTime.now();
-        localDate = localDate.minusMonths(month);
-        localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
-        return localDate;
+        return LocalDateTime.now().minusMonths(month).with(TemporalAdjusters.lastDayOfMonth());
     }
 
     /**
@@ -169,10 +194,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getEndDayAfterMonth(int month) {
-        LocalDateTime localDate = LocalDateTime.now();
-        localDate = localDate.plusMonths(month + 1);
-        localDate = localDate.with(TemporalAdjusters.lastDayOfMonth());
-        return localDate;
+        return LocalDateTime.now().plusMonths(month).with(TemporalAdjusters.lastDayOfMonth());
     }
 
     /**
@@ -235,7 +257,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getEndDayLastWeek() {
-        return getEndDayBeforeWeek(LocalDateTime.now(), 1);
+        return LocalDateTime.now().minusWeeks(1).with(DayOfWeek.SUNDAY);
     }
 
     /**
@@ -244,7 +266,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getEndDayCurrentWeek() {
-        return getEndDayAfterWeek(LocalDateTime.now(), 0);
+        return LocalDateTime.now().with(DayOfWeek.SUNDAY);
     }
 
     /**
@@ -253,7 +275,7 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getEndDayNextWeek() {
-        return getEndDayAfterWeek(LocalDateTime.now(), 1);
+        return LocalDateTime.now().plusWeeks(1).with(DayOfWeek.SUNDAY);
     }
 
     /**
@@ -519,9 +541,11 @@ public class DateUtil {
     public static LocalDateTime parse2LocalDateTime(String text, String pattern) {
         return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
     }
+
     public static long getTime(LocalDate localDate) {
         return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
+
     public static long getTime(LocalDateTime localDateTime) {
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
@@ -731,5 +755,7 @@ public class DateUtil {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         System.out.println("时差:" + (compare(startTime, endTime).toMillis()));
+
+        System.out.println(getEndDayNextMonth());
     }
 }

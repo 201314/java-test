@@ -30,6 +30,36 @@ public class DateUtil {
         return localDate;
     }
 
+    /**
+     * 获取指定日期所在月第一天
+     *
+     * @param date
+     * @return
+     */
+    public static Date getFirstDayOfMonth(Date date) {
+        date = minTime(date);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int first = cal.getActualMinimum(Calendar.DAY_OF_MONTH);
+        cal.set(Calendar.DAY_OF_MONTH, first);
+        return cal.getTime();
+    }
+
+    /**
+     * 获取指定日期所在月最后一天
+     *
+     * @param date
+     * @return
+     */
+    public static Date getLastDayOfMonth(Date date) {
+        date = maxTime(date);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int last = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        cal.set(Calendar.DAY_OF_MONTH, last);
+        return cal.getTime();
+    }
+
     public static LocalDateTime getFirstDayLastMonth() {
         return LocalDateTime.now().with(temporal -> temporal.with(DAY_OF_MONTH, 1).minus(1, MONTHS));
     }
@@ -576,8 +606,10 @@ public class DateUtil {
     public static Date minTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
 
@@ -589,8 +621,10 @@ public class DateUtil {
     public static Date noonTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR, 12);
+        cal.set(Calendar.HOUR_OF_DAY, 12);
         cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
 
@@ -605,10 +639,10 @@ public class DateUtil {
     public static Date maxTime(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR, 23);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999999999);
+        cal.set(Calendar.MILLISECOND, 999);
         return cal.getTime();
     }
 
@@ -721,7 +755,8 @@ public class DateUtil {
 
 
     public static void main(String[] args) {
-        System.out.println("上周第一天:" + getFirstDayLastWeek());
+        System.out.println(minTime(new Date()));
+        /*System.out.println("上周第一天:" + getFirstDayLastWeek());
         System.out.println("上周最后一天:" + getEndDayLastWeek());
 
         System.out.println("本周第一天:" + getFirstDayCurrentWeek());
@@ -756,6 +791,6 @@ public class DateUtil {
         LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         System.out.println("时差:" + (compare(startTime, endTime).toMillis()));
 
-        System.out.println(getEndDayNextMonth());
+        System.out.println(getEndDayNextMonth());*/
     }
 }

@@ -19,16 +19,21 @@ public class ChainTest {
 
                 new GeneralHandler());
 
-        Apply apply = new Apply();
-        apply.setApplyType(1);
-        apply.setNumber(5);
+        ApplyRequest request = new ApplyRequest();
+        request.setApplyType(1);
+        request.setNumber(5);
 
-        Chain chain = new Chain(handler, apply);
-        System.out.println("请假处理结果：" + chain.proceed());
+        ApplyResponse response = new ApplyResponse();
+        Chain chain = new Chain(handler);
+        chain.doFilter(request,response);
+        System.out.println("请假处理结果：" + response.getApplyResult());
 
-        apply.setApplyType(2);
-        apply.setNumber(126000);
-        chain = new Chain(handler, apply);
-        System.out.println("申请加薪处理结果：" + chain.proceed());
+        ApplyRequest request2 = new ApplyRequest();
+        request2.setApplyType(2);
+        request2.setNumber(1260);
+        Chain chain2 = new Chain(handler);
+        ApplyResponse response2 = new ApplyResponse();
+        chain2.doFilter(request2,response2);
+        System.out.println("申请加薪处理结果：" + response2.getApplyResult());
     }
 }

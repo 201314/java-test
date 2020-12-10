@@ -1,28 +1,20 @@
 package com.gitee.linzl.chain.pattern;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class Chain {
-	public List<ChainHandler> handlers = new LinkedList<>();
+    public List<ChainHandler> handlers;
 
-	private int index = 0;
+    private int index = 0;
 
-	private Apply apply;
+    public Chain(List<ChainHandler> handlers) {
+        this.handlers = handlers;
+    }
 
-	public Chain(List<ChainHandler> handlers, Apply apply) {
-		this.handlers = handlers;
-		this.apply = apply;
-	}
-
-	public Apply getApply() {
-		return this.apply;
-	}
-
-	public boolean proceed() {
-		if (index >= handlers.size()) {
-			return false;
-		}
-		return handlers.get(index++).execute(this);
-	}
+    public void doFilter(ApplyRequest request, ApplyResponse response) {
+        if (index >= handlers.size()) {
+            return;
+        }
+        handlers.get(index++).doFilter(request, response, this);
+    }
 }

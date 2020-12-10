@@ -1,6 +1,6 @@
 package com.gitee.linzl.chain.pattern;
 //申请类
-public class Apply {
+public class ApplyRequest {
 	private int applyType;
 	private int number;
 	public int getApplyType() {

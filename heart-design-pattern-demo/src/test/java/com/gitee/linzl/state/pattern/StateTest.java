@@ -10,18 +10,8 @@ package com.gitee.linzl.state.pattern;
  */
 public class StateTest {
 	public static void main(String[] args) {
-		WorkContext work = new WorkContext();
-
-		work.setHour(9);
-		work.doProcess();
-
-		work.setHour(13);
-		work.doProcess();
-
-		work.setHour(16);
-		work.doProcess();
-
-		work.setHour(20);
+		StateContext work = new StateContext();
+		work.setState(new SupervisorState());
 		work.doProcess();
 	}
 }

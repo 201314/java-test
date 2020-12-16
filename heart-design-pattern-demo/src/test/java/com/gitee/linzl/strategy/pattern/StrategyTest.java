@@ -11,22 +11,21 @@ package com.gitee.linzl.strategy.pattern;
  */
 public class StrategyTest {
 	public static void main(String[] args) {
-		double result = 0.00;
-
+		double result;
 		int count = 5;// 购买数量
-		Context context = null;
+
 		// 第一种 无任何优惠
-		context = new Context(0);
+		SimpleFactory context = new SimpleFactory(0);
 		result = context.getPrivilegeResult(count * 189);
 		System.out.println("无任何优惠 总价格：" + result);
 
 		// 第二种 打折优惠
-		context = new Context(1);
+		context = new SimpleFactory(1);
 		result = context.getPrivilegeResult(count * 189);
 		System.out.println("打0.8折后 总价格：" + result);
 
 		// 第三种 满100返10
-		context = new Context(2);
+		context = new SimpleFactory(2);
 		result = context.getPrivilegeResult(count * 189);
 		System.out.println("满100返10 总价格：" + result);
 

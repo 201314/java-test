@@ -1,9 +1,6 @@
 package com.gitee.linzl.concurrent.callable;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 public class CallableDemo implements Callable<String> {
 	/**
@@ -14,26 +11,29 @@ public class CallableDemo implements Callable<String> {
 		// 模拟执行耗时
 		Thread.sleep(3000);
 		String result = Math.random() + "处理完成";
+		System.out.println("result ---》" + result);
 		return result;
 	}
 
-	// 主控制函数
-	public static void main(String[] args) throws Exception {
-		// 构造FutureTask，并且传入需要真正进行业务逻辑处理的类,该类一定是实现了Callable接口的类
+	public static String run2() throws Exception{
+// 构造FutureTask，并且传入需要真正进行业务逻辑处理的类,该类一定是实现了Callable接口的类
 		FutureTask<String> future = new FutureTask<>(new CallableDemo());
 		// 创建一个固定线程的线程池且线程数为1,
 		ExecutorService executor = Executors.newFixedThreadPool(1);
 		// 这里提交任务future,则开启线程执行RealData的call()方法执行
 		executor.submit(future);
-		System.out.println("请求完毕");
-		try {
-			// 这里可以做额外的数据操作，也就是主程序执行其他业务逻辑
-			Thread.sleep(2000);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		// 调用获取数据方法,如果call()方法没有执行完成,则依然会进行等待
-		System.out.println("数据：" + future.get());
-		executor.shutdown();
+		//executor.shutdown();
+		return future.get(1,TimeUnit.SECONDS);
+	}
+
+	// 主控制函数
+	public static void main(String[] args)  throws Exception{
+		String str = run2();
+		if (str!=null){
+			System.out.println("不为空");
+		}else {
+			System.out.println("pw");
+		}
 	}
 }

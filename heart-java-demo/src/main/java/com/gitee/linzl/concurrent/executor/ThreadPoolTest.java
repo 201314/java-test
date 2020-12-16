@@ -1,4 +1,4 @@
-package com.gitee.linzl.concurrent.threadPoolExecutor;
+package com.gitee.linzl.concurrent.executor;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;

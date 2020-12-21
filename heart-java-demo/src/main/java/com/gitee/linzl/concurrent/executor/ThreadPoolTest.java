@@ -20,8 +20,8 @@ public class ThreadPoolTest {
 			1, // 非频繁执行，核心线程数就1个。
 			3, // 最大线程数，一般为服务器核心数*2+1
 			60, // 线程池中超过核心线程数的线程存活时间
-			TimeUnit.MINUTES, // 存活时间单位，秒
-			new ArrayBlockingQueue<Runnable>(4), // 4容量的阻塞队列，视具体情况而定
+			TimeUnit.MINUTES, // 存活时间单位
+			new ArrayBlockingQueue<>(4), // 4容量的阻塞队列，视具体情况而定
 			new DiyThreadFactory(), // 线程工厂,统一设置参数
 			new DiyRejectedExecutionHandler());// 超过最大线程数时，线程池将会把线程交给RejectedExecutionHandler处理
 

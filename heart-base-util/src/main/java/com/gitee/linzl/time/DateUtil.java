@@ -708,6 +708,38 @@ public class DateUtil {
         return toLocalDateTime(before).isAfter(after);
     }
 
+    public static boolean checkToday(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        LocalDate now =  LocalDate.of(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        return checkToday(now);
+    }
+
+    public static boolean checkToday(LocalDateTime date) {
+        return checkToday(date.toLocalDate());
+    }
+
+    public static boolean checkToday(LocalDate date) {
+        return LocalDate.now().equals(date);
+    }
+
+    public static boolean checkCurrentMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        YearMonth yearMonth = YearMonth.of(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH));
+        YearMonth now = YearMonth.now();
+        return now.equals(yearMonth);
+    }
+
+    public static boolean checkCurrentMonth(LocalDate date) {
+        YearMonth yearMonth = YearMonth.from(date);
+        YearMonth now = YearMonth.now();
+        return now.equals(yearMonth);
+    }
+
+    public static boolean checkCurrentMonth(LocalDateTime date) {
+        return checkCurrentMonth(date.toLocalDate());
+    }
 
     /**
      * 例：生日检查
@@ -792,5 +824,6 @@ public class DateUtil {
         System.out.println("时差:" + (compare(startTime, endTime).toMillis()));
 
         System.out.println(getEndDayNextMonth());*/
+        System.out.println(checkCurrentMonth(LocalDateTime.of(2019, 12, 1, 0, 0)));
     }
 }

@@ -41,11 +41,11 @@ public class ArrayAlgorithm {
 				i++;
 			}
 		}
-		while (i < second.length) {
-			temp[k++] = second[i++];
-		}
 		while (j < first.length) {
 			temp[k++] = second[j++];
+		}
+		while (i < second.length) {
+			temp[k++] = second[i++];
 		}
 		return temp;
 	}

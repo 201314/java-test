@@ -15,7 +15,9 @@ import org.ocpsoft.prettytime.PrettyTime;
  * @author linzl
  */
 public class DateFormatUtil {
-	private static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+	public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+	public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
+	public static final String YYYY_MM_DD = "yyyy-MM-dd";
 
 	public static String format() {
 		return format(YYYY_MM_DD_HH_MM_SS);

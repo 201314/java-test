@@ -1,7 +1,5 @@
 package com.gitee.linzl.codec.token;
 
-import java.io.DataInputStream;
-import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -9,10 +7,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 
-import com.gitee.linzl.properties.ReadResourceUtil;
-
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.CompressionCodecs;
 import io.jsonwebtoken.IncorrectClaimException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;

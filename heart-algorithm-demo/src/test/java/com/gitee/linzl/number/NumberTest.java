@@ -1,6 +1,6 @@
 package com.gitee.linzl.number;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class NumberTest {
 	@Test

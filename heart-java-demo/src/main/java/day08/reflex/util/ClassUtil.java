@@ -8,8 +8,9 @@ import java.security.ProtectionDomain;
 
 /**
  * TODO 参考 org.springframework.util.ReflectionUtils 写一个工具类
- *
+ * <p>
  * TODO WildcardType \ GenericArrayType \ TypeVariable \ ParameterizedType 了解
+ *
  * @author linzl
  * @description
  * @email 2225010489@qq.com
@@ -93,8 +94,6 @@ public class ClassUtil {
         demo.isSynthetic();
     }
 
-    // TODO WildcardType \ GenericArrayType \ TypeVariable \ ParameterizedType 了解
-
     /**
      * 获取接口上的泛型T
      *
@@ -131,15 +130,16 @@ public class ClassUtil {
     private static Class<?> checkType(Type type, int index) {
         if (type instanceof Class<?>) {
             return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
+        }
+        // 获取类上的泛型T
+        if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) type;
             Type t = pt.getActualTypeArguments()[index];
             return checkType(t, index);
-        } else {
-            String className = type == null ? "null" : type.getClass().getName();
-            throw new IllegalArgumentException("Expected a Class, ParameterizedType"
-                    + ", but <" + type + "> is of type " + className);
         }
-    }
 
+        String className = type == null ? "null" : type.getClass().getName();
+        throw new IllegalArgumentException("Expected a Class, ParameterizedType"
+                + ", but <" + type + "> is of type " + className);
+    }
 }

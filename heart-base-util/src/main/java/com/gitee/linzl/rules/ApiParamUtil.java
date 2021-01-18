@@ -14,7 +14,8 @@ import com.alibaba.fastjson.JSONObject;
 
 /**
  * 定义restful api时，可使用表达式，将需要返回的内容进行占位
- * 
+ *
+ * TODO 考虑使用 Ognl来替换
  * @description
  * @author linzl
  * @email 2225010489@qq.com
@@ -26,7 +27,7 @@ public class ApiParamUtil {
 
 	/**
 	 * 找出所有表达式
-	 * 
+	 *
 	 * @param content
 	 * @return
 	 */
@@ -45,7 +46,7 @@ public class ApiParamUtil {
 
 	/**
 	 * 获取表达式对应的值
-	 * 
+	 *
 	 * @param content
 	 * @param keysList
 	 * @return
@@ -55,7 +56,7 @@ public class ApiParamUtil {
 		Map<String, Object> map = new HashMap<>();
 
 		for (String key : keysList) {
-			Object value = null;
+			Object value;
 			if (key.indexOf(".") < 0) {// 单个键
 				value = obj.get(key);
 				map.put(key, String.valueOf(value == null ? "" : value));
@@ -70,7 +71,7 @@ public class ApiParamUtil {
 					} else if (value instanceof String) {
 						map.put(key, String.valueOf(value == null ? "" : value));
 					} else if (value instanceof Number) {
-						map.put(key, (Number) value);
+						map.put(key, value);
 					}
 					index++;
 				}
@@ -81,7 +82,7 @@ public class ApiParamUtil {
 
 	/**
 	 * 替换所有表达式为真正需要的值
-	 * 
+	 *
 	 * @param content
 	 * @param expressionVal
 	 * @return

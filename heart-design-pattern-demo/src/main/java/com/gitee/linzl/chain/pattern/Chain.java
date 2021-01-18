@@ -1,5 +1,6 @@
 package com.gitee.linzl.chain.pattern;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Chain {
@@ -7,8 +8,16 @@ public class Chain {
 
     private int index = 0;
 
+    public Chain() {
+        this.handlers = new ArrayList<>();
+    }
+
     public Chain(List<ChainHandler> handlers) {
         this.handlers = handlers;
+    }
+
+    public void addLast(ChainHandler handler) {
+        handlers.add(handlers.size(), handler);
     }
 
     public void doFilter(ApplyRequest request, ApplyResponse response) {

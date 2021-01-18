@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2018年9月12日
  */
 public class CompositeXmlStrategy {
-	private List<XmlStrategy> xmlStrategys = null;
+	private List<XmlStrategy> xmlStrategys;
 	private final Map<String, XmlStrategy> xmlStrategysCache = new ConcurrentHashMap<>(256);
 
 	public CompositeXmlStrategy() {

@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * 定义restful api时，可使用表达式，将需要返回的内容进行占位
  *
- * TODO 考虑使用 Ognl来替换
+ * TODO 考虑使用 Ognl来替换 或 apollo client的PlaceholderHelper\ spring 的PropertyPlaceholderHelper 替换
  * @description
  * @author linzl
  * @email 2225010489@qq.com

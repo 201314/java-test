@@ -16,7 +16,7 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import com.gitee.linzl.cls.ClassUtils;
+import com.gitee.linzl.reflection.ClassUtils;
 
 public class BaseCipher {
     private static final String AES_IV_PARAMETER_SPEC = "0102030405060708";

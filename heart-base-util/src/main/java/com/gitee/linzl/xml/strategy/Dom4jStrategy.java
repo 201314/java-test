@@ -28,7 +28,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLResult;
 import org.dom4j.io.XMLWriter;
 
-import com.gitee.linzl.cls.ClassUtils;
+import com.gitee.linzl.reflection.ClassUtils;
 import com.gitee.linzl.xml.NodeVo;
 
 /**

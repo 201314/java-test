@@ -9,13 +9,13 @@ public class SimpleFactory {
         // 优惠 条件 的参数 需要 事先 定义：如0.8，100，10
         switch (selectCaseStrategy) {
             case 0:
-                strategy = new NormalStrategy();
+                strategy = new NormalStrategyHandler();
                 break;
             case 1:
-                strategy = new DiscountStrategy(0.8);
+                strategy = new DiscountStrategyHandler(0.8);
                 break;
             case 2:
-                strategy = new ReturnStrategy(100, 10);
+                strategy = new ReturnStrategyHandler(100, 10);
                 break;
             default:
                 break;

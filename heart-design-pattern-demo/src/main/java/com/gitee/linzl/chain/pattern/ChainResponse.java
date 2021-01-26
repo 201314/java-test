@@ -1,10 +1,10 @@
 package com.gitee.linzl.chain.pattern;
 
 //申请结果
-public class ApplyResponse {
+public class ChainResponse {
     private String applyResult;
 
-    public ApplyResponse() {
+    public ChainResponse() {
     }
 
     public void setApplyResult(String applyResult) {

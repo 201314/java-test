@@ -20,7 +20,7 @@ public class Chain {
         handlers.add(handlers.size(), handler);
     }
 
-    public void doFilter(ApplyRequest request, ApplyResponse response) {
+    public void doFilter(ChainRequest request, ChainResponse response) {
         if (index >= handlers.size()) {
             return;
         }

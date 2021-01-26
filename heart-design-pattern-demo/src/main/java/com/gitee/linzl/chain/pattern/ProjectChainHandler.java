@@ -1,11 +1,11 @@
 package com.gitee.linzl.chain.pattern;
 
 //项目经理
-public class ProjectHandler implements ChainHandler {
+public class ProjectChainHandler implements ChainHandler {
 
     // 处理申请，默认为申请不通过
     @Override
-    public void doFilter(ApplyRequest request, ApplyResponse response, Chain chain) {
+    public void doFilter(ChainRequest request, ChainResponse response, Chain chain) {
         // 处理请假
         if (request.getApplyType() == 1 && request.getNumber() <= 3) {
             response.setApplyResult("项目经理通过申请请假");

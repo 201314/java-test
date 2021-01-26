@@ -1,5 +1,5 @@
 package com.gitee.linzl.chain.pattern;
 
 public interface ChainHandler {
-    void doFilter(ApplyRequest request, ApplyResponse response, Chain chain);
+    void doFilter(ChainRequest request, ChainResponse response, Chain chain);
 }

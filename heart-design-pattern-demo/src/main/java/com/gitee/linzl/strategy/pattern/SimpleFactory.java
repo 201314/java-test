@@ -2,7 +2,7 @@ package com.gitee.linzl.strategy.pattern;
 
 //通过上下文，选择合适的优惠   策略类
 public class SimpleFactory {
-    private Strategy strategy;
+    private StrategyHandler<Double, Double> strategy;
 
     // 简单工厂 和 策略模式 的简单结合
     public SimpleFactory(int selectCaseStrategy) {
@@ -22,7 +22,7 @@ public class SimpleFactory {
         }
     }
 
-    public double getPrivilegeResult(double money) {
-        return strategy.caculatePreferential(money);
+    public Double apply(Double money) {
+        return strategy.apply(money);
     }
 }

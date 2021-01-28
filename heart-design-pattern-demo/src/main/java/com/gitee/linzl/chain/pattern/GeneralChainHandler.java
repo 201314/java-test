@@ -1,10 +1,10 @@
 package com.gitee.linzl.chain.pattern;
 
 //总经理
-public class GeneralChainHandler implements ChainHandler {
+public class GeneralChainHandler implements FilterChainHandler {
 
     @Override
-    public void doFilter(ChainRequest request, ChainResponse response, Chain chain) {
+    public void doFilter(ChainRequest request, ChainResponse response, FilterChain chain) {
         // 处理请假，3~15默认允许
         if (request.getApplyType() == 1 && request.getNumber() < 15) {
             response.setApplyResult("总经理通过申请请假");

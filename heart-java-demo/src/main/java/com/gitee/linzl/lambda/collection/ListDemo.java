@@ -93,6 +93,9 @@ public class ListDemo {
     public static void listFlatMapToInt() {
     }
 
+    /**
+     * 去重
+     */
     public static void listDistinct() {
         List<String> list = new ArrayList<>();
         list.add("1111");
@@ -107,6 +110,7 @@ public class ListDemo {
         List<String> result2 = new ArrayList<>(set);
         System.out.println("result:" + result);
         System.out.println("result2:" + result2);
+
 
         List<String> result3 = list.stream().distinct().collect(Collectors.toList());
         System.out.println("result3:" + result3);
@@ -273,7 +277,7 @@ public class ListDemo {
 
     public static void main(String[] args) {
         listForEach();
-        listTest();
+        /*listTest();
         listFilter();
         listMap();
         listMapToInt();
@@ -296,6 +300,6 @@ public class ListDemo {
         retainAll();
         removeAll();
         addAll();
-        merge();
+        merge();*/
     }
 }

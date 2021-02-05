@@ -41,13 +41,9 @@ public class ListDemo {
     @Test
     public void listForEach() {
         // 两种写法有何不同
-        stuList.forEach(stu -> {
-            System.out.println(stu);
-        });
+        stuList.forEach(stu -> System.out.println(stu));
 
-        stuList.stream().forEach(stu -> {
-            System.out.println(stu);
-        });
+        stuList.stream().forEach(stu -> System.out.println(stu));
     }
 
     @Test
@@ -184,9 +180,6 @@ public class ListDemo {
         list.stream().anyMatch(str -> str.equals("33"));
     }
 
-    /**
-     * 去重
-     */
     @Test
     public void distinct() {
         List<String> list = new ArrayList<>();

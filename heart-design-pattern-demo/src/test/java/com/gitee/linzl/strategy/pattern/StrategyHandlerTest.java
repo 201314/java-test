@@ -9,7 +9,7 @@ package com.gitee.linzl.strategy.pattern;
  * 用途：就是用来封装算法的，在实践中几乎可以封装任何类型的规则， 只要在分析过程中听到：需要在不同时间使用不同的业务规则，就可
  * 考虑使用策略模式。
  */
-public class StrategyTest {
+public class StrategyHandlerTest {
     public static void main(String[] args) {
         Double result;
         Double count = 5d;// 购买数量
@@ -30,7 +30,7 @@ public class StrategyTest {
         System.out.println("满100返10 总价格：" + result);
 
         // ============更常用的一种获取策略方式
-        StrategyFactory factory = StrategyFactory.getInstance();
+        StrategyHandlerFactory factory = StrategyHandlerFactory.getInstance();
         // 第一种 无任何优惠
         result = factory.getStrategy(0).apply(count * 189);
         System.out.println("无任何优惠 总价格：" + result);

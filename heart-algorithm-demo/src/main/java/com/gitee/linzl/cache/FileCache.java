@@ -24,8 +24,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 package com.gitee.linzl.cache;
 
-import jodd.io.FileUtil;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -119,7 +117,7 @@ public abstract class FileCache {
 		}
 
 		// add file
-		bytes = FileUtils.readBytes(file);
+		bytes = null;//FileUtil.readBytes(file);
 
 		if ((maxFileSize != 0) && (file.length() > maxFileSize)) {
 			// don't cache files that size exceed max allowed file size

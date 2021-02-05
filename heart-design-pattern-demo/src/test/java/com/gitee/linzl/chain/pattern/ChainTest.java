@@ -11,28 +11,28 @@ public class ChainTest {
      */
     @Test
     public void testDemo2() {
-        List<ChainHandler> handler = Arrays.asList(
+        List<FilterChainHandler> handler = Arrays.asList(
 
-                new ProjectHandler(),
+                new ProjectChainHandler(),
 
-                new MajordomoHandler(),
+                new MajordomoChainHandler(),
 
-                new GeneralHandler());
+                new GeneralChainHandler());
 
-        ApplyRequest request = new ApplyRequest();
+        ChainRequest request = new ChainRequest();
         request.setApplyType(1);
         request.setNumber(5);
 
-        ApplyResponse response = new ApplyResponse();
-        Chain chain = new Chain(handler);
+        ChainResponse response = new ChainResponse();
+        FilterChain chain = new FilterChain(handler);
         chain.doFilter(request,response);
         System.out.println("请假处理结果：" + response.getApplyResult());
 
-        ApplyRequest request2 = new ApplyRequest();
+        ChainRequest request2 = new ChainRequest();
         request2.setApplyType(2);
         request2.setNumber(1260);
-        Chain chain2 = new Chain(handler);
-        ApplyResponse response2 = new ApplyResponse();
+        FilterChain chain2 = new FilterChain(handler);
+        ChainResponse response2 = new ChainResponse();
         chain2.doFilter(request2,response2);
         System.out.println("申请加薪处理结果：" + response2.getApplyResult());
     }

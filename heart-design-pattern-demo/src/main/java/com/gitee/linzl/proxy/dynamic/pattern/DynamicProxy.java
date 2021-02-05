@@ -43,30 +43,26 @@ public class DynamicProxy {
 
     private Object javaProxy(Object obj, Advise adv) {
         return Proxy.newProxyInstance(obj.getClass().getClassLoader(), obj.getClass().getInterfaces(),
-                new InvocationHandler() {
+                (proxy, method, args) -> {
+                    adv.before(method, args, obj);
 
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        adv.before(method, args, obj);
-
-                        Object val = null;
-                        Exception exception = null;
-                        try {
-                            // 直接调用被代理类的方法
-                            val = method.invoke(obj, args);
-                        } catch (Exception e) {
-                            exception = e;
-                        } finally {
-                            adv.after(method, args, obj);
-                        }
-
-                        adv.afterReturnValue(val, method, args, obj);
-
-                        if (Objects.nonNull(exception)) {
-                            adv.afterThrowException(method, args, obj, exception);
-                        }
-                        return val;
+                    Object val = null;
+                    Exception exception = null;
+                    try {
+                        // 直接调用被代理类的方法
+                        val = method.invoke(obj, args);
+                    } catch (Exception e) {
+                        exception = e;
+                    } finally {
+                        adv.after(method, args, obj);
                     }
+
+                    adv.afterReturnValue(val, method, args, obj);
+
+                    if (Objects.nonNull(exception)) {
+                        adv.afterThrowException(method, args, obj, exception);
+                    }
+                    return val;
                 });
     }
 

@@ -6,15 +6,39 @@ import com.gitee.linzl.file.progress.MergeRunnable;
 import com.gitee.linzl.file.progress.SplitRunnable;
 
 import javax.activation.MimetypesFileTypeMap;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.RandomAccessFile;
+import java.io.Reader;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +55,22 @@ import java.util.stream.Stream;
  */
 public class FileUtil {
     private static final String DEFAULT_CHARSET = "GBK";
+
+    /**
+     * 获取jar包或war中 java.util.jar.JarFile#MANIFEST_NAME 的信息
+     *
+     * @param jarFile
+     * @return
+     * @throws IOException
+     */
+    public static Manifest getManifest(File jarFile) throws IOException {
+        Manifest manifest;
+        try (InputStream is = new FileInputStream(jarFile);
+             JarInputStream jin = new JarInputStream(is)) {
+            manifest = jin.getManifest();
+        }
+        return manifest;
+    }
 
     /**
      * 按字符数读取文件,常用于读文本，数字等类型的文本文件 Reader/Writer 如读word\pdf等使用ISO-8859-1
@@ -476,15 +516,5 @@ public class FileUtil {
             contentType = new MimetypesFileTypeMap().getContentType(file);
         }
         return contentType;
-    }
-
-    public static void main(String[] args) throws IOException {
-        //writeHead(new File("D://CZ9700000630000020190117103159.txt"), "我是中国人" .getBytes());
-        List<String> list = Files.readAllLines(Paths.get("D:\\333.txt"));
-        System.out.println(list);
-        Stream<Path> stream = Files.list(Paths.get("D:\\入职文件"));
-        stream.forEach((path) -> {
-            System.out.println(path.toFile());
-        });
     }
 }

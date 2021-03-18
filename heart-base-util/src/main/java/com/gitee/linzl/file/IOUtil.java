@@ -26,19 +26,15 @@ public class IOUtil {
     private static byte[] buf = new byte[1024];
 
     /**
-     * 压缩单个文件
+     * 压缩单个文件 pck ==> package
      *
      * @param srcFile 需要压缩的文件,默认压缩到同目录下,后缀为zip
      * @throws IOException
      */
-    public static void compressionFiles(File srcFile) throws IOException {
-        String compressionFilesName = null;
-        if (srcFile.isDirectory()) {
-            compressionFilesName = srcFile.getName() + ".zip";
-        } else {
-            compressionFilesName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf(".")) + ".zip";
-        }
-        compressionFiles(srcFile, new File(srcFile.getParentFile(), compressionFilesName));
+    public static void pck(File srcFile) throws IOException {
+        String compressionFilesName = srcFile.isDirectory() ? srcFile.getName() : srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
+        compressionFilesName += ".zip";
+        pck(srcFile, new File(srcFile.getParentFile(), compressionFilesName));
     }
 
     /**
@@ -48,9 +44,9 @@ public class IOUtil {
      * @param targetFile 压缩后目标位置,如 D:/测试中文.zip
      * @throws IOException
      */
-    public static void compressionFiles(File srcFile, File targetFile) throws IOException {
+    public static void pck(File srcFile, File targetFile) throws IOException {
         File[] srcFiles = new File[]{srcFile};
-        compressionFiles(srcFiles, targetFile);
+        pck(srcFiles, targetFile);
     }
 
     /**
@@ -60,8 +56,8 @@ public class IOUtil {
      * @param targetFile 压缩后目标位置,如 D:/测试中文.zip
      * @throws IOException
      */
-    public static void compressionFiles(File[] srcFiles, File targetFile) throws IOException {
-        compressionFiles(srcFiles, targetFile, null);
+    public static void pck(File[] srcFiles, File targetFile) throws IOException {
+        pck(srcFiles, targetFile, null);
     }
 
     /**
@@ -72,8 +68,8 @@ public class IOUtil {
      * @param rootName   压缩成功后，根文件夹的全路径,如windows环境下 D:/test,linux环境下 /var/local
      * @throws IOException
      */
-    public static void compressionFiles(File[] srcFiles, File targetFile, String rootName) throws IOException {
-        compressionFiles(srcFiles, targetFile, rootName, null);
+    public static void pck(File[] srcFiles, File targetFile, String rootName) throws IOException {
+        pck(srcFiles, targetFile, rootName, null);
     }
 
     /**
@@ -85,11 +81,11 @@ public class IOUtil {
      * @param comment    压缩包说明
      * @throws IOException
      */
-    public static void compressionFiles(File[] srcFiles, File targetFile, String rootName, String comment)
+    public static void pck(File[] srcFiles, File targetFile, String rootName, String comment)
             throws IOException {
         rootName = (rootName == null ? "/" : rootName.trim().replaceAll("\\\\", "/").replaceAll("//*", "/"));
         ZipOutputStream out = new ZipOutputStream(targetFile);
-        compressionFiles(out, srcFiles, rootName);
+        pck(out, srcFiles, rootName);
         comment = (comment == null ? "" : comment);
         out.setComment(comment);
         out.close();
@@ -101,8 +97,8 @@ public class IOUtil {
      * @param srcFiles 被压缩源文件
      * @param rootName 压缩成功后，根文件夹的全路径,如windows环境下 D:/test,linux环境下 /var/local
      */
-    private static void compressionFiles(ZipOutputStream out, File[] srcFiles, String rootName) {
-        if (!"" .equalsIgnoreCase(rootName) && !rootName.endsWith("/")) {
+    private static void pck(ZipOutputStream out, File[] srcFiles, String rootName) {
+        if (!"".equalsIgnoreCase(rootName) && !rootName.endsWith("/")) {
             rootName += "/";
         }
 
@@ -114,7 +110,7 @@ public class IOUtil {
                     // 标记为目录
                     fileName += "/";
                     out.putNextEntry(new ZipEntry(fileName));
-                    compressionFiles(out, srcFiles[i].listFiles(), fileName);
+                    pck(out, srcFiles[i].listFiles(), fileName);
                 } else {
                     out.putNextEntry(new ZipEntry(fileName));
                     InputStream in = Files.newInputStream(srcFiles[i].toPath());
@@ -139,8 +135,8 @@ public class IOUtil {
      * @return 得到解压后的文件
      * @throws IOException
      */
-    public static List<File> decompressionFiles(File srcFile) throws IOException {
-        return decompressionFiles(srcFile, srcFile.getParentFile());
+    public static List<File> unpck(File srcFile) throws IOException {
+        return unpck(srcFile, srcFile.getParentFile());
     }
 
     /**
@@ -152,7 +148,7 @@ public class IOUtil {
      * @throws IOException
      */
     @SuppressWarnings("rawtypes")
-    public static List<File> decompressionFiles(File srcFile, File destFile) throws IOException {
+    public static List<File> unpck(File srcFile, File destFile) throws IOException {
         FileUtils.forceMkdir(destFile);
 
         List<File> fileList = Collections.emptyList();
@@ -170,9 +166,8 @@ public class IOUtil {
                 }
 
                 try (InputStream in = zip.getInputStream(entry);
-
                      OutputStream out = Files.newOutputStream(file.toPath())) {
-                    int len = 0;
+                    int len;
                     while ((len = in.read(buf)) > 0) {
                         out.write(buf, 0, len);
                     }

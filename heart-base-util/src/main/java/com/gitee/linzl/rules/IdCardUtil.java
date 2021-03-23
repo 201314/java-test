@@ -137,6 +137,20 @@ public class IdCardUtil {
 			return false;
 		}
 
+		// 校验出生日期
+		String birthday = idCard.substring(6, 14);
+		Date birthdate = null;
+		try {
+			birthdate = new SimpleDateFormat("yyyyMMdd").parse(birthday);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Calendar cday = Calendar.getInstance();
+		// 出生日期必须在当天之前
+		if (cday.getTime().getTime() < birthdate.getTime()) {
+			return false;
+		}
+
 		// 获取前17位
 		String idCard17 = idCard.substring(0, 17);
 		// 获取第18位
@@ -200,7 +214,7 @@ public class IdCardUtil {
 				String checkCode = verifyCode.get(sum17);
 				if (null != checkCode) {
 					// 将前17位与第18位校验码拼接
-					return idCard17 += checkCode;
+					return idCard17 + checkCode;
 				}
 			}
 		}

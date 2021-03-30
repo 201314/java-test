@@ -20,15 +20,18 @@ public class KeyGeneratorUtil {
      *
      * @return
      */
-    public static String getUUID() {
+    public static String uuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
+    public static String uuidHex() {
+        return ConvertUtil.toHex(uuid());
+    }
 
-    public static String getTimstamp() {
+    public static String timstampId() {
         return String.valueOf(Calendar.getInstance().getTimeInMillis());
     }
 
-    public static long getRandomId() {
+    public static long randomId() {
         return ThreadLocalRandom.current().nextLong();
     }
 

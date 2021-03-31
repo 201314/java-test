@@ -1,7 +1,5 @@
 package com.gitee.linzl.codec;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.gitee.linzl.cipher.message.DigestUtilsExt;
 
 /**
@@ -15,7 +13,6 @@ import com.gitee.linzl.cipher.message.DigestUtilsExt;
  */
 public class Base62Util {
 	private static final String BASE62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	private static final char[] BASE62_CHAR = BASE62.toCharArray();
 	// 可以自定义生成 MD5 加密字符传前的混合加密key
 	private static String KEY = "weibo";
 
@@ -67,7 +64,7 @@ public class Base62Util {
 	public static String shortUrl(String url) {
 		// 对传入网址进行 MD5 加密，key是加密字符串
 		String hex = DigestUtilsExt.md5Hex(KEY + url);
-
+		String[] resUrl = new String[4];
 		for (int i = 0; i < 4; i++) {
 			// 把加密字符按照8位一组16进制与0x3FFFFFFF进行位与运算
 			String sTempSubString = hex.substring(i * 8, i * 8 + 8);
@@ -83,12 +80,10 @@ public class Base62Util {
 				// 每次循环按位右移 5 位
 				lHexLong = lHexLong >> 5;
 			}
-			if (StringUtils.isNotEmpty(outChars)) {
-				// 把字符串存入对应索引的输出数组
-				return outChars;
-			}
+			// 把字符串存入对应索引的输出数组
+			resUrl[i] = outChars;
 		}
-		return null;
+		return resUrl[0];
 	}
 
 	public static void main(String[] args) {

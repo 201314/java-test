@@ -25,8 +25,8 @@ public class DigestUtilsExt extends DigestUtils {
 	 * @return md5串
 	 */
 	public static String md5Hex(File file) throws IOException {
-		FileInputStream fileInputStream = new FileInputStream(file);
-		return md5Hex(fileInputStream);
+		MessageDigest digest = updateDigest(getMd5Digest(),file);
+		return md5Hex(digest.digest());
 	}
 
 	/**

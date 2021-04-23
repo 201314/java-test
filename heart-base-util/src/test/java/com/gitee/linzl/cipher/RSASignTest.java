@@ -1,25 +1,16 @@
 package com.gitee.linzl.cipher;
 
+import com.gitee.linzl.cipher.asymmetrical.DefaultSign;
+import com.gitee.linzl.cipher.asymmetrical.SignatureAlgorithms;
+import org.apache.commons.codec.binary.Base64;
+import org.junit.Test;
+
+import java.io.File;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import com.gitee.linzl.cipher.asymmetrical.AsymmetricCipherBuilder;
-import org.apache.commons.codec.binary.Base64;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.gitee.linzl.cipher.asymmetrical.SignatureAlgorithms;
-
-public class RSASignTest {
-    private String text = null;
-
-    @Before
-    public void init() {
-        text = "站在云端，敲下键盘，望着通往世界另一头的那扇窗，只为做那读懂0和1的人。。";
-        System.out.println("原文：" + text);
-    }
-
+public class RSASignTest extends AsymmetricBaseTest {
     // =============非对称签名=============
     // 私钥签名，公钥验签
     @Test
@@ -29,9 +20,19 @@ public class RSASignTest {
     }
 
     @Test
+    public void MD2withRSA_File() throws Exception {
+        rsaSignFile(SignatureAlgorithms.MD2withRSA);
+    }
+
+    @Test
     public void MD5withRSA() throws Exception {
         rsaSignRandom(SignatureAlgorithms.MD5withRSA);
         rsaSign(SignatureAlgorithms.MD5withRSA);
+    }
+
+    @Test
+    public void MD5withRSA_File() throws Exception {
+        rsaSignFile(SignatureAlgorithms.MD5withRSA);
     }
 
     @Test
@@ -62,18 +63,16 @@ public class RSASignTest {
         System.out.println("start===========JDK随机密钥===========start");
         KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PrivateKey priKey = keyPair.getPrivate();
-        BasePrint.printPrivateKey(priKey.getEncoded());
+        printPrivateKey(priKey.getEncoded());
 
-        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
-                priKey.getEncoded());
+        DefaultSign signBuilder = new DefaultSign(algorithm, priKey);
         byte[] encryptData = signBuilder.sign(text.getBytes());
-        BasePrint.printEncryptData(encryptData);
+        printEncryptData(encryptData);
 
         PublicKey pubKey = keyPair.getPublic();
-        BasePrint.printPublicKey(pubKey.getEncoded());
+        printPublicKey(pubKey.getEncoded());
 
-        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder =
-                new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm, pubKey.getEncoded());
+        DefaultSign verifySignBuilder = new DefaultSign(algorithm, pubKey);
         boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========JDK随机密钥===========end");
@@ -82,17 +81,32 @@ public class RSASignTest {
     private void rsaSign(SignatureAlgorithms algorithm) throws Exception {
         System.out.println("start===========指定密钥===========start");
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
-                Base64.decodeBase64(privateKey));
+        DefaultSign signBuilder = new DefaultSign(algorithm, BaseCipher.generatePrivate(algorithm, Base64.decodeBase64(privateKey)));
 
         byte[] encryptData = signBuilder.sign(text.getBytes());
-        BasePrint.printEncryptData(encryptData);
+        printEncryptData(encryptData);
 
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder =
-                new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm, Base64.decodeBase64(publicKey));
+        DefaultSign verifySignBuilder = new DefaultSign(algorithm, BaseCipher.generatePublic(algorithm, Base64.decodeBase64(publicKey)));
 
         boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData);
+        System.out.println("验签结果: " + verifyResult);
+        System.out.println("end===========指定密钥===========end");
+    }
+
+    private void rsaSignFile(SignatureAlgorithms algorithm) throws Exception {
+        File file = new File("D:\\360极速浏览器下载", "JetbrainsCrack_jb51.rar");
+        System.out.println("start===========指定密钥===========start");
+        byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
+        DefaultSign signBuilder = new DefaultSign(algorithm, BaseCipher.generatePrivate(algorithm, Base64.decodeBase64(privateKey)));
+
+        byte[] encryptData = signBuilder.sign(file);
+        printEncryptData(encryptData);
+
+        byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
+        DefaultSign verifySignBuilder = new DefaultSign(algorithm, BaseCipher.generatePublic(algorithm, Base64.decodeBase64(publicKey)));
+
+        boolean verifyResult = verifySignBuilder.verify(file, encryptData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========指定密钥===========end");
     }

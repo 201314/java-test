@@ -1,37 +1,19 @@
 package com.gitee.linzl.cipher;
 
-import java.security.*;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Objects;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import com.gitee.linzl.reflection.ClassUtils;
 
 public class BaseCipher {
-    private static final String AES_IV_PARAMETER_SPEC = "0102030405060708";
-    private static final String DES_IV_PARAMETER_SPEC = "12345678";
-    private static final boolean BC_PRESENT;
-
-    static {
-        ClassLoader classLoader = BaseCipher.class.getClassLoader();
-        BC_PRESENT = ClassUtils.isPresent("org.bouncycastle.jce.provider.BouncyCastleProvider", classLoader);
-
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-
     /**
      * 生成对称密钥,一般生成后转成base64存放在文件中，一般情况下不使用，只用于测试
      *
@@ -58,18 +40,22 @@ public class BaseCipher {
      */
     public static KeyPair generateKeyPair(IAlgorithm algorithm) {
         // 实例化密钥生成器
-        String algorithmName = algorithm.getKeyAlgorithm();
         KeyPairGenerator keyPairGen = null;
         try {
-            keyPairGen = KeyPairGenerator.getInstance(algorithmName);
+            keyPairGen = KeyPairGenerator.getInstance(algorithm.getKeyAlgorithm());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        /**
+         * initialize(int keySize, SecureRandom random):使用给定的随机源（random）初始化特定密钥大小的密钥对生成器。
+         * keySize: 健的大小值，这是一个特定于算法的度量。
+         * 值越大，能加密的内容就越多，否则会抛异常：javax.crypto.IllegalBlockSizeException: Data must not be longer than xxx bytes
+         * 如 keySize 为 2048 时加密数据的长度不能超过 245 字节。
+         */
         if (algorithm.getSize() != null && algorithm.getSize() >= 0) {
             keyPairGen.initialize(algorithm.getSize());
         }
-        KeyPair keyPair = keyPairGen.generateKeyPair();
-        return keyPair;
+        return keyPairGen.generateKeyPair();
     }
 
     /**
@@ -80,9 +66,8 @@ public class BaseCipher {
      */
     public static PrivateKey generatePrivate(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
         // 实例化密钥生成器
-        String algorithmName = algorithm.getKeyAlgorithm();
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
             return keyFactory.generatePrivate(privateKeySpec);// RSAPrivateKey
         } catch (NoSuchAlgorithmException e) {
@@ -100,9 +85,8 @@ public class BaseCipher {
      */
     public static PublicKey generatePublic(IAlgorithm algorithm, byte[] pubicKeyByte) throws Exception {
         // 实例化密钥生成器
-        String algorithmName = algorithm.getKeyAlgorithm();
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance(algorithmName);
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec keySpec = new X509EncodedKeySpec(pubicKeyByte);
             return keyFactory.generatePublic(keySpec);// RSAPublicKey
         } catch (NoSuchAlgorithmException e) {
@@ -112,140 +96,5 @@ public class BaseCipher {
         } catch (NullPointerException e) {
             throw new Exception("公钥数据为空");
         }
-    }
-
-
-    /**
-     * @param rawData   原生数据
-     * @param key       密钥
-     * @param algorithm
-     * @param iv        IV向量
-     * @return
-     * @throws Exception
-     */
-    public static byte[] encrypt(byte[] rawData, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-        Cipher cipher = getCipher(algorithm);
-        IvParameterSpec ivParameterSpec = getIvParameterSpec(algorithm, iv);
-        // 初始化Cipher对象，设置为加密模式
-        if (Objects.nonNull(ivParameterSpec)) {
-            // 实例化Cipher对象，它用于完成实际的加密操作
-            cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
-        } else {
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-        }
-        // 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-        return cipher.doFinal(rawData);
-    }
-
-    /**
-     * @param rawData   待加密原生数据
-     * @param key       密钥,非对称加密填写公钥
-     * @param algorithm
-     * @return
-     * @throws Exception
-     */
-    public static byte[] encrypt(byte[] rawData, Key key, IAlgorithm algorithm) throws Exception {
-        return encrypt(rawData, key, algorithm, null);
-    }
-
-    /**
-     * @param encryptedData 待解密的加密数据
-     * @param key           非对称加密时，key为私钥
-     * @param algorithm
-     * @return
-     * @throws Exception
-     */
-    public static byte[] decrypt(byte[] encryptedData, Key key, IAlgorithm algorithm) throws Exception {
-        return decrypt(encryptedData, key, algorithm, null);
-    }
-
-    /**
-     * @param encryptedData 待解密的加密数据
-     * @param key           非对称加密时，key为私钥
-     * @param algorithm
-     * @param iv
-     * @return
-     * @throws Exception
-     */
-    public static byte[] decrypt(byte[] encryptedData, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-        Cipher cipher = getCipher(algorithm);
-        IvParameterSpec ivParameterSpec = getIvParameterSpec(algorithm, iv);
-
-        if (Objects.nonNull(ivParameterSpec)) {
-            // 初始化Cipher对象，设置为解密模式
-            cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
-        } else {
-            cipher.init(Cipher.DECRYPT_MODE, key);
-        }
-        // 执行解密操作
-        return cipher.doFinal(encryptedData);
-    }
-
-    public static String decrypt(String encryptedBase64, Key key, IAlgorithm algorithm, IvParameterSpec iv) throws Exception {
-        byte[] out = decrypt(Base64.getDecoder().decode(encryptedBase64), key, algorithm, iv);
-        return new String(out);
-    }
-
-    private static Cipher getCipher(IAlgorithm algorithm)
-            throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-        Cipher cipher;
-        if (BC_PRESENT) {
-            cipher = Cipher.getInstance(algorithm.getCipherAlgorithm(), BouncyCastleProvider.PROVIDER_NAME);
-        } else {
-            cipher = Cipher.getInstance(algorithm.getCipherAlgorithm());
-        }
-        return cipher;
-    }
-
-    private static IvParameterSpec getIvParameterSpec(IAlgorithm algorithm, IvParameterSpec iv) {
-        IvParameterSpec spec = iv;
-        if (algorithm.getCipherAlgorithm().contains("CBC") && Objects.isNull(spec)) {
-            if ("AES".equalsIgnoreCase(algorithm.getKeyAlgorithm())) {
-                spec = new IvParameterSpec(AES_IV_PARAMETER_SPEC.getBytes());
-            } else if ("DES".equalsIgnoreCase(algorithm.getKeyAlgorithm())) {
-                spec = new IvParameterSpec(DES_IV_PARAMETER_SPEC.getBytes());
-            }
-        }
-        return spec;
-    }
-
-    /**
-     * 对数据进行签名
-     *
-     * @param data       需要签名的数据
-     * @param privateKey 私钥
-     * @param algorithm  签名算法
-     * @return
-     * @throws Exception
-     */
-    public static byte[] sign(byte[] data, PrivateKey privateKey, IAlgorithm algorithm) throws Exception {
-        // 用私钥对信息生成数字签名
-        String signAlgorithm = algorithm.getSignAlgorithm();
-        Signature signature = Signature.getInstance(signAlgorithm);
-        signature.initSign(privateKey);
-        signature.update(data);
-        return signature.sign();
-    }
-
-    /**
-     * 验证签名
-     *
-     * @param data      签名前的数据
-     * @param publicKey 公钥
-     * @param sign      签名后的数据
-     * @return
-     * @throws Exception
-     */
-    public static boolean verifySign(byte[] data, PublicKey publicKey, byte[] sign, IAlgorithm algorithm)
-            throws Exception {
-        // 用私钥对信息生成数字签名
-        String signAlgorithm = algorithm.getSignAlgorithm();
-        Signature signature = Signature.getInstance(signAlgorithm);
-        signature.initVerify(publicKey);
-        signature.update(data);
-
-        // 执行加密操作,加密后的结果通常都会用Base64编码进行传输
-        // 验证签名是否正常
-        return signature.verify(sign);
     }
 }

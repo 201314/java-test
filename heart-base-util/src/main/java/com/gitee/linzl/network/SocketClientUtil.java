@@ -1,14 +1,15 @@
 package com.gitee.linzl.network;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-
-import lombok.extern.slf4j.Slf4j;
+import java.nio.charset.Charset;
 
 @Slf4j
 public class SocketClientUtil {
-	private Socket client = null;
+	private Socket client;
 
 	/**
 	 * 获取Socket工具类实例，默认连接超时时间为30秒
@@ -51,7 +52,7 @@ public class SocketClientUtil {
 	 *            发送的String类型的数据
 	 */
 	public void send(String data) {
-		send(data, "gbk");
+		send(data, Charset.forName("GBK"));
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class SocketClientUtil {
 	 * @param charset
 	 *            String类型的数据的编码方式
 	 */
-	public void send(String data, String charset) {
+	public void send(String data, Charset charset) {
 		try {
 			client.getOutputStream().write(data.getBytes(charset));
 			client.shutdownOutput();
@@ -77,7 +78,7 @@ public class SocketClientUtil {
 	 * @return
 	 */
 	public String receive() {
-		return receive("gbk");
+		return receive(Charset.forName("GBK"));
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class SocketClientUtil {
 	 *            响应的String类型的数据的编码方式
 	 * @return 响应的String类型的数据
 	 */
-	public String receive(String charset) {
+	public String receive(Charset charset) {
 		StringBuilder sb = new StringBuilder(64);
 		try {
 			int rs = 0;
@@ -111,7 +112,7 @@ public class SocketClientUtil {
 	 * @return 响应的String类型的数据
 	 */
 	public String sendAndReceive(String data) {
-		return sendAndReceive(data, "gbk");
+		return sendAndReceive(data, Charset.forName("GBK"));
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class SocketClientUtil {
 	 *            String类型的数据的编码方式
 	 * @return 响应的String类型的数据
 	 */
-	public String sendAndReceive(String data, String charset) {
+	public String sendAndReceive(String data, Charset charset) {
 		send(data, charset);
 		return receive(charset);
 	}
@@ -147,7 +148,7 @@ public class SocketClientUtil {
 		SocketClientUtil clientUtil = new SocketClientUtil("10.63.0.37", 29211);
 		// 加上你的报文
 		String data = "000001039100970000063000002019012218473036EB6EB5972019012218473041659700001100000000001  20190122184730";// true,5648859,541,密钥技术部,
-		String receive = clientUtil.sendAndReceive(data, "gbk");
+		String receive = clientUtil.sendAndReceive(data, Charset.forName("GBK"));
 		System.out.println("socket返回结果:" + receive);
 		clientUtil.close();
 	}

@@ -15,7 +15,7 @@ import com.gitee.linzl.cipher.IAlgorithm;
 public enum SignatureAlgorithms implements IAlgorithm {
 	RawDSA("DSA", "RawDSA", null), // 只能20个字节
 	// 将正文通过SHA1散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
-	SHA1withDSA("DSA", "SHA1withDSA", null),
+	SHA1withDSA("DSA", "SHA1withDSA", 1024),
 	// 将正文通过SHA224散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
 	SHA224withDSA("DSA", "SHA224withDSA", null),
 	// 将正文通过SHA256散列之后，将密文再次通过生成的DSA密钥加密，生成数字签名
@@ -36,7 +36,7 @@ public enum SignatureAlgorithms implements IAlgorithm {
 	private String signAlgorithm;
 	private Integer size;
 
-	private SignatureAlgorithms(String keyAlgorithm, String signAlgorithm, Integer size) {
+	SignatureAlgorithms(String keyAlgorithm, String signAlgorithm, Integer size) {
 		this.keyAlgorithm = keyAlgorithm;
 		this.signAlgorithm = signAlgorithm;
 		this.size = size;

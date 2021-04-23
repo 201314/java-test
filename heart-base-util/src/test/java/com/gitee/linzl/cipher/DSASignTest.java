@@ -1,24 +1,14 @@
 package com.gitee.linzl.cipher;
 
+import com.gitee.linzl.cipher.asymmetrical.DefaultSign;
+import com.gitee.linzl.cipher.asymmetrical.SignatureAlgorithms;
+import org.junit.Test;
+
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import com.gitee.linzl.cipher.asymmetrical.AsymmetricCipherBuilder;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.gitee.linzl.cipher.asymmetrical.SignatureAlgorithms;
-
-public class DSASignTest {
-    private String text = null;
-
-    @Before
-    public void init() {
-        text = "站在云端，敲下键盘，望着通往世界另一头的那扇窗，只为做那读懂0和1的人。。";
-        System.out.println("原文：" + text);
-    }
-
+public class DSASignTest extends SymmetricBaseTest {
     // =============非对称签名=============
     // 私钥签名，公钥验签
     @Test
@@ -46,18 +36,16 @@ public class DSASignTest {
         System.out.println("start===========JDK随机密钥===========start");
         KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PrivateKey privateKey = keyPair.getPrivate();
-        BasePrint.printPrivateKey(privateKey.getEncoded());
+        printPrivateKey(privateKey.getEncoded());
 
-        AsymmetricCipherBuilder.DecryptSignBuilder signBuilder = new AsymmetricCipherBuilder.DecryptSignBuilder(algorithm,
-                privateKey.getEncoded());
+        DefaultSign signBuilder = new DefaultSign(algorithm, privateKey);
 
         byte[] signData = signBuilder.sign(text.getBytes());
-        BasePrint.printEncryptData(signData);
+        printEncryptData(signData);
 
         PublicKey publicKey = keyPair.getPublic();
-        BasePrint.printPublicKey(publicKey.getEncoded());
-        AsymmetricCipherBuilder.EncryptVerifyBuilder verifySignBuilder = new AsymmetricCipherBuilder.EncryptVerifyBuilder(algorithm,
-                publicKey.getEncoded());
+        printPublicKey(publicKey.getEncoded());
+        DefaultSign verifySignBuilder = new DefaultSign(algorithm, publicKey);
         boolean verifyResult = verifySignBuilder.verify(text.getBytes(), signData);
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========JDK随机密钥===========end");

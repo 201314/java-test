@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 public class FileTest {
     @Test
     public void readFileByChars() throws Exception {
-        System.out.println(FileUtil.read(new File("D:\\副本\\333.txt"), null));
+        System.out.println(FileUtil.read(new File("D:\\副本\\333.txt"), "UTF-8"));
     }
 
     @Test

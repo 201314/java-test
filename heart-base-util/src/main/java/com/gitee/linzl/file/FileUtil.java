@@ -90,7 +90,7 @@ public class FileUtil {
         try (InputStream is = new FileInputStream(file);
              Reader reader = new InputStreamReader(is, realCharset);
              BufferedReader breader = new BufferedReader(reader)) {
-            char[] cbuf = new char[is.available()];
+            char[] cbuf = new char[1024];
             while (breader.read(cbuf) > -1) {
                 sb.append(cbuf);
             }

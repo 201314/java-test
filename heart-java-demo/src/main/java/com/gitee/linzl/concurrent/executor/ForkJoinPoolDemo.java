@@ -38,7 +38,7 @@ public class ForkJoinPoolDemo {
         ForkJoinPool pool = new ForkJoinPool();
         ForkJoinTask<String> future = pool.submit(() -> {
             System.out.println("Runnable任务执行");
-        }, "返回指定结果");
+        }, "返回指定/固定结果");
         System.out.println("结果:" + future.join());
         pool.shutdown();
     }

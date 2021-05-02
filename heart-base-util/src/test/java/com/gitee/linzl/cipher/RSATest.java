@@ -13,8 +13,8 @@ public class RSATest extends AsymmetricBaseTest {
 
     @Test
     public void RSA_None_PKCS1PADDING_1024() throws Exception {
-        allocate(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024_DEFAULT);
-        allocate22(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024_DEFAULT);
+        allocate(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024);
+        allocate22(RSACipherAlgorithms.RSA_None_PKCS1PADDING_1024);
     }
 
     @Test  // TODO 无论是否BC,这个都有乱码 只有getOutputSize> 0 ????
@@ -31,7 +31,7 @@ public class RSATest extends AsymmetricBaseTest {
 
     @Test
     public void RSA_ECB_PKCS1PADDING_2048() throws Exception {
-        allocate(RSACipherAlgorithms.RSA_ECB_PKCS1PADDING_2048);
-        random(RSACipherAlgorithms.RSA_ECB_PKCS1PADDING_2048);
+        allocate(RSACipherAlgorithms.RSA_ECB_PKCS1PADDING_2048_DEFAULT);
+        random(RSACipherAlgorithms.RSA_ECB_PKCS1PADDING_2048_DEFAULT);
     }
 }

@@ -30,6 +30,14 @@ public class BigDecimalUtil {
         return bdFirst.add(bdSecond);
     }
 
+    /**
+     * ROUND_HALF_UP四舍五入
+     *
+     * @param first
+     * @param second
+     * @param scale
+     * @return
+     */
     public static BigDecimal add(String first, String second, int scale) {
         return add(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
     }

@@ -2,12 +2,14 @@ package com.gitee.linzl.cipher;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -67,9 +69,11 @@ public class BaseCipher {
     public static PrivateKey generatePrivate(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
         // 实例化密钥生成器
         try {
+            System.out.println("privateKeyByte:"+privateKeyByte.length);
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
-            return keyFactory.generatePrivate(privateKeySpec);// RSAPrivateKey
+            RSAPrivateKey key = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
+            return key;
         } catch (NoSuchAlgorithmException e) {
             throw new Exception("无此算法");
         } catch (InvalidKeySpecException e) {
@@ -86,6 +90,7 @@ public class BaseCipher {
     public static PublicKey generatePublic(IAlgorithm algorithm, byte[] pubicKeyByte) throws Exception {
         // 实例化密钥生成器
         try {
+            System.out.println("pubicKeyByte:"+pubicKeyByte.length);
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec keySpec = new X509EncodedKeySpec(pubicKeyByte);
             return keyFactory.generatePublic(keySpec);// RSAPublicKey

@@ -4,10 +4,14 @@ import com.gitee.linzl.cipher.asymmetrical.DefaultAsymmetricCipher;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 
 public class AsymmetricBaseTest {
     protected String text = null;
@@ -44,26 +48,29 @@ public class AsymmetricBaseTest {
         System.out.println("密文解密后=>" + new String(encryptData, Charset.defaultCharset()));
     }
 
-    public static void printPrivateKey(byte[] privateKey) {
-        System.out.println("=========私钥===============");
-        System.out.println("私钥长度=>" + privateKey.length);
-    }
-
-    public static void printPublicKey(byte[] publicKey) {
-        System.out.println("=========公钥===============");
-        System.out.println("公钥长度=>" + publicKey.length);
-    }
 
     protected void allocate(IAlgorithm algorithm) throws Exception {
+        KeyFactory factory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
         System.out.println("start===========指定密钥 公钥加密，私钥解密===========start");
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
-        printPublicKey(publicKey);
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
-        printPrivateKey(privateKey);
         DefaultAsymmetricCipher cipher = new DefaultAsymmetricCipher(algorithm,
                 BaseCipher.generatePublic(algorithm, Base64.decodeBase64(publicKey)),
                 BaseCipher.generatePrivate(algorithm, Base64.decodeBase64(privateKey)));
         byte[] encryptData = cipher.encrypt(text.getBytes(Charset.defaultCharset()));
+
+        RSAPublicKeySpec publicKeySpec = factory.getKeySpec(cipher.getEncryptKey(), RSAPublicKeySpec.class);
+        BigInteger publicModulus = publicKeySpec.getModulus();
+        //转换为二进制
+        int length = publicModulus.toString(2).length();
+        System.out.println("=========公钥长度===============" + length);
+
+        RSAPrivateKeySpec privateKeySpec = factory.getKeySpec(cipher.getEncryptKey(), RSAPrivateKeySpec.class);
+        BigInteger privateModulus = privateKeySpec.getModulus();
+        //转换为二进制
+        length = privateModulus.toString(2).length();
+        System.out.println("=========私钥长度===============" + length);
+
         printEncryptData(encryptData);
 
         byte[] decryptData = cipher.decrypt(encryptData);
@@ -72,13 +79,26 @@ public class AsymmetricBaseTest {
     }
 
     protected void allocate22(IAlgorithm algorithm) throws Exception {
+        KeyFactory factory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
         System.out.println("start===========指定密钥 私钥加密，公钥解密===========start");
+
         byte[] privateKey = KeyPairPathUtil.getPrivateKeyFile();
         PrivateKey priKey = BaseCipher.generatePrivate(algorithm, Base64.decodeBase64(privateKey));
-        printPrivateKey(priKey.getEncoded());
+
+        RSAPrivateKeySpec privateKeySpec = factory.getKeySpec(priKey, RSAPrivateKeySpec.class);
+        BigInteger privateModulus = privateKeySpec.getModulus();
+        //转换为二进制
+        int length = privateModulus.toString(2).length();
+        System.out.println("=========私钥长度===============" + length);
+
         byte[] publicKey = KeyPairPathUtil.getPublicKeyFile();
         PublicKey pubKey = BaseCipher.generatePublic(algorithm, Base64.decodeBase64(publicKey));
-        printPublicKey(pubKey.getEncoded());
+
+        RSAPublicKeySpec publicKeySpec = factory.getKeySpec(pubKey, RSAPublicKeySpec.class);
+        BigInteger publicModulus = publicKeySpec.getModulus();
+        //转换为二进制
+        length = publicModulus.toString(2).length();
+        System.out.println("=========公钥长度===============" + length);
 
         DefaultAsymmetricCipher cipher = new DefaultAsymmetricCipher(algorithm, priKey, pubKey);
         byte[] encryptData = cipher.encrypt(text.getBytes(Charset.defaultCharset()));
@@ -90,12 +110,24 @@ public class AsymmetricBaseTest {
     }
 
     protected void random(IAlgorithm algorithm) throws Exception {
+        KeyFactory factory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
         System.out.println("start===========JDK随机密钥===========start");
         KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
         PrivateKey priKey = keyPair.getPrivate();
-        printPrivateKey(priKey.getEncoded());
+
+        RSAPrivateKeySpec privateKeySpec = factory.getKeySpec(priKey, RSAPrivateKeySpec.class);
+        BigInteger privateModulus = privateKeySpec.getModulus();
+        //转换为二进制
+        int length = privateModulus.toString(2).length();
+        System.out.println("=========私钥长度===============" + length);
+
         PublicKey pubKey = keyPair.getPublic();
-        printPublicKey(pubKey.getEncoded());
+
+        RSAPublicKeySpec publicKeySpec = factory.getKeySpec(pubKey, RSAPublicKeySpec.class);
+        BigInteger publicModulus = publicKeySpec.getModulus();
+        //转换为二进制
+        length = publicModulus.toString(2).length();
+        System.out.println("=========公钥长度===============" + length);
 
         DefaultAsymmetricCipher cipher = new DefaultAsymmetricCipher(algorithm, pubKey, priKey);
         byte[] encryptData = cipher.encrypt(text.getBytes(Charset.defaultCharset()));

@@ -6,9 +6,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
 import java.io.File;
+import java.math.BigInteger;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 public class RSASignTest extends AsymmetricBaseTest {
     // =============非对称签名=============
@@ -60,17 +65,29 @@ public class RSASignTest extends AsymmetricBaseTest {
     }
 
     private void rsaSignRandom(SignatureAlgorithms algorithm) throws Exception {
+        KeyFactory factory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
         System.out.println("start===========JDK随机密钥===========start");
         KeyPair keyPair = BaseCipher.generateKeyPair(algorithm);
+
         PrivateKey priKey = keyPair.getPrivate();
-        printPrivateKey(priKey.getEncoded());
+
+        RSAPrivateKeySpec privateKeySpec = factory.getKeySpec(priKey, RSAPrivateKeySpec.class);
+        BigInteger privateModulus = privateKeySpec.getModulus();
+        //转换为二进制
+        int length = privateModulus.toString(2).length();
+        System.out.println("=========私钥长度===============" + length);
 
         DefaultSign signBuilder = new DefaultSign(algorithm, priKey);
         byte[] encryptData = signBuilder.sign(text.getBytes());
         printEncryptData(encryptData);
 
         PublicKey pubKey = keyPair.getPublic();
-        printPublicKey(pubKey.getEncoded());
+
+        RSAPublicKeySpec publicKeySpec = factory.getKeySpec(pubKey, RSAPublicKeySpec.class);
+        BigInteger publicModulus = publicKeySpec.getModulus();
+        //转换为二进制
+        length = publicModulus.toString(2).length();
+        System.out.println("=========公钥长度===============" + length);
 
         DefaultSign verifySignBuilder = new DefaultSign(algorithm, pubKey);
         boolean verifyResult = verifySignBuilder.verify(text.getBytes(), encryptData);
@@ -110,5 +127,4 @@ public class RSASignTest extends AsymmetricBaseTest {
         System.out.println("验签结果: " + verifyResult);
         System.out.println("end===========指定密钥===========end");
     }
-
 }

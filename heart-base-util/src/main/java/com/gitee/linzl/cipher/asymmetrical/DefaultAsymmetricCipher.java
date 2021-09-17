@@ -57,6 +57,18 @@ public class DefaultAsymmetricCipher implements ICipher {
     private Key encryptKey;
     private Key decryptKey;
 
+    public IAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public Key getEncryptKey() {
+        return encryptKey;
+    }
+
+    public Key getDecryptKey() {
+        return decryptKey;
+    }
+
     /**
      * 非对称加密
      *

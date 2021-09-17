@@ -47,17 +47,6 @@ public class SymmetricBaseTest {
         System.out.println("密文解密后=>" + new String(encryptData, Charset.defaultCharset()));
     }
 
-    public static void printPrivateKey(byte[] privateKey) {
-        System.out.println("=========私钥===============");
-        System.out.println("私钥长度=>" + privateKey.length);
-    }
-
-    public static void printPublicKey(byte[] publicKey) {
-        System.out.println("=========公钥===============");
-        System.out.println("公钥长度=>" + publicKey.length);
-    }
-
-
     /**
      * jdk默认 CBC 要使用IV 密钥
      *

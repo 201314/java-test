@@ -69,7 +69,6 @@ public class BaseCipher {
     public static PrivateKey generatePrivate(IAlgorithm algorithm, byte[] privateKeyByte) throws Exception {
         // 实例化密钥生成器
         try {
-            System.out.println("privateKeyByte:"+privateKeyByte.length);
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyByte);
             RSAPrivateKey key = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
@@ -90,7 +89,6 @@ public class BaseCipher {
     public static PublicKey generatePublic(IAlgorithm algorithm, byte[] pubicKeyByte) throws Exception {
         // 实例化密钥生成器
         try {
-            System.out.println("pubicKeyByte:"+pubicKeyByte.length);
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getKeyAlgorithm());
             EncodedKeySpec keySpec = new X509EncodedKeySpec(pubicKeyByte);
             return keyFactory.generatePublic(keySpec);// RSAPublicKey

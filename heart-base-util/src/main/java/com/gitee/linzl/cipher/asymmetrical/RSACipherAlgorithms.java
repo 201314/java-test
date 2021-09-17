@@ -32,7 +32,7 @@ public enum RSACipherAlgorithms implements IAlgorithm {
     RSA_ECB_NOPADDING_1024("RSA", "RSA/ECB/NoPadding", 1024),
     // JDK支持 最大加密明文大小:117,最大解密密文大小:128
     RSA_ECB_PKCS1PADDING_1024("RSA", "RSA/ECB/PKCS1Padding", 1024),
-    // JDK支持 最大加密明文大小:245,最大解密密文大小:256
+    // JDK支持 最大加密明文大小:234,最大解密密文大小:256
     RSA_ECB_PKCS1PADDING_2048_DEFAULT("RSA", "RSA/ECB/PKCS1Padding", 2048);
 
     // 加密的数据长度受限 TODO  输入：RSA_size(rsa) – 41, 输出：和modulus一样长

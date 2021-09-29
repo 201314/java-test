@@ -6,14 +6,20 @@ import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 /**
  * 单文件/多文件 压缩、解压功能
@@ -23,7 +29,7 @@ import java.util.List;
  * @author linzl
  */
 public class IOUtil {
-    private static byte[] buf = new byte[1024];
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     /**
      * 压缩单个文件 pck ==> package
@@ -103,6 +109,7 @@ public class IOUtil {
         }
 
         try {
+            byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
             for (int i = 0; i < srcFiles.length; i++) {
                 String fileName = srcFiles[i].getName();
                 fileName = rootName + fileName;
@@ -153,6 +160,7 @@ public class IOUtil {
 
         List<File> fileList = Collections.emptyList();
 
+        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
         try (ZipFile zip = new ZipFile(srcFile)) {
             Enumeration entries = zip.getEntries();
             while (entries.hasMoreElements()) {
@@ -176,5 +184,55 @@ public class IOUtil {
             }
         }
         return fileList;
+    }
+
+    public static byte[] compress(final byte[] src, final int level) throws IOException {
+        byte[] result = src;
+
+        Deflater defeater = new Deflater(level);
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(src.length);
+             DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(byteArrayOutputStream, defeater)) {
+            deflaterOutputStream.write(src);
+            deflaterOutputStream.finish();
+            deflaterOutputStream.close();
+            result = byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            defeater.end();
+            throw e;
+        } finally {
+            defeater.end();
+        }
+
+        return result;
+    }
+
+    public static byte[] uncompress(final byte[] src) throws IOException {
+        byte[] result = src;
+
+        byte[] uncompressData = new byte[DEFAULT_BUFFER_SIZE];
+
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(src);
+             InflaterInputStream inflaterInputStream = new InflaterInputStream(byteArrayInputStream);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(src.length)) {
+            while (true) {
+                int len = inflaterInputStream.read(uncompressData, 0, uncompressData.length);
+                if (len <= 0) {
+                    break;
+                }
+                byteArrayOutputStream.write(uncompressData, 0, len);
+            }
+            byteArrayOutputStream.flush();
+            result = byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw e;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) throws Exception {
+        String str = "我是中国人";
+        byte[] b = Base64.getEncoder().encode(compress(str.getBytes(), 9));
+        byte[] r = uncompress(Base64.getDecoder().decode(b));
+        System.out.println(new String(r));
     }
 }

@@ -16,7 +16,7 @@ import java.security.Key;
 import java.security.Security;
 
 /**
- * 非对称加解密:【B的公钥加密,A的私钥加签 --> B的私钥解密，A的公钥验签】
+ * 非对称加解密:【合作方A的公钥加密,我方B的私钥加签 --> 合作方B的私钥解密，我方A的公钥验签】
  * <p>
  * 密钥管理: 密钥管理容易
  * <p>

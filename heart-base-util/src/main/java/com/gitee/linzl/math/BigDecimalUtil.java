@@ -2,6 +2,7 @@ package com.gitee.linzl.math;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 /**
  * 支持int , long , double ,String
@@ -131,6 +132,14 @@ public class BigDecimalUtil {
 
     public static BigDecimal divide(Double first, Double second, int scale) {
         return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
+    }
+
+    public static BigDecimal defaultIfNull(BigDecimal first, BigDecimal defaultVal) {
+        return Objects.nonNull(first) ? first : defaultVal;
+    }
+
+    public static BigDecimal defaultIfNull(BigDecimal first) {
+        return defaultIfNull(first, BigDecimal.ZERO);
     }
 
     public static void main(String[] args) {

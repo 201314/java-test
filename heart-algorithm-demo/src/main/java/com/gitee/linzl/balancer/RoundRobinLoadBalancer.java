@@ -22,6 +22,9 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 
     @Override
     public Object getObject(List<Object> clientsCopy) {
+        if (clientsCopy.size() == 1) {
+            return clientsCopy.get(0);
+        }
         int ind = Math.abs(index.incrementAndGet() % clientsCopy.size());
         return clientsCopy.get(ind);
     }

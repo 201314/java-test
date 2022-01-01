@@ -2,14 +2,25 @@ package com.gitee.linzl.time;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.Period;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
@@ -715,7 +726,7 @@ public class DateUtil {
     public static boolean checkToday(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        LocalDate now =  LocalDate.of(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        LocalDate now = LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         return checkToday(now);
     }
 
@@ -730,7 +741,7 @@ public class DateUtil {
     public static boolean checkCurrentMonth(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        YearMonth yearMonth = YearMonth.of(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH));
+        YearMonth yearMonth = YearMonth.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH));
         YearMonth now = YearMonth.now();
         return now.equals(yearMonth);
     }
@@ -750,7 +761,7 @@ public class DateUtil {
      *
      * @param birthday
      */
-    public boolean checkEqual(LocalDate birthday) {
+    public static boolean checkEqual(LocalDate birthday) {
         LocalDate now = LocalDate.now();
         MonthDay currentMonthDay = MonthDay.of(now.getMonth(), now.getDayOfMonth());
         MonthDay birth = MonthDay.from(birthday);
@@ -789,6 +800,36 @@ public class DateUtil {
         Period period = Period.between(LocalDate.now(), java8Release);
     }
 
+    /**
+     * 获取年龄，周岁
+     *
+     * @param birthday
+     * @return
+     */
+    public static int getAge(Date birthday) {
+        Calendar birth = Calendar.getInstance();
+        birth.setTime(birthday);
+
+        int birthYear = birth.get(Calendar.YEAR);
+        int birthMonth = birth.get(Calendar.MONTH) + 1;
+        int birthDay = birth.get(Calendar.DAY_OF_MONTH);
+
+        Calendar now = Calendar.getInstance();
+        int nowYear = now.get(Calendar.YEAR);
+        int nowMonth = now.get(Calendar.MONTH) + 1;
+        int nowDay = now.get(Calendar.DAY_OF_MONTH);
+
+        int age = nowYear - birthYear;
+        int month = nowMonth - birthMonth;
+        int day = nowDay - birthDay;
+        /**
+         * 还未到生日当月减1岁 || 生日当月,还未到生日+1天 减1岁
+         */
+        if (month < 0 || (month == 0 && day <= 0)) {
+            age = age - 1;
+        }
+        return age <= 0 ? 0 : age;
+    }
 
     public static void main(String[] args) {
         System.out.println(minTime(new Date()));
@@ -827,7 +868,13 @@ public class DateUtil {
         LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         System.out.println("时差:" + (compare(startTime, endTime).toMillis()));
 
-        System.out.println(getEndDayNextMonth());*/
-        System.out.println(checkCurrentMonth(LocalDateTime.of(2019, 12, 1, 0, 0)));
+        System.out.println(getEndDayNextMonth());
+        System.out.println(checkCurrentMonth(LocalDateTime.of(2019, 12, 1, 0, 0)));*/
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2022);
+        cal.set(Calendar.MONTH, 11);
+        cal.set(Calendar.DAY_OF_MONTH, 31);
+        System.out.println("年龄:" + getAge(cal.getTime()));
     }
 }

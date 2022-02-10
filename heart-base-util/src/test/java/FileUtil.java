@@ -1,4 +1,5 @@
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.formula.functions.Irr;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,18 +16,8 @@ import java.util.stream.Collectors;
  */
 public class FileUtil {
     public static void main(String[] args) throws IOException {
-        List<String> strings = FileUtils.readLines(new File("D://", "CD6071051636602593280.txt"), StandardCharsets.UTF_8);
-        Map<String, String> map = strings.stream().collect(Collectors.toMap(s -> s.substring(0, 23), c -> c, (k1, k2) -> k2));
+        double dd = Irr.irr(new double[]{-220.93d, 75.69d, 75.69d, 75.7d},0.1d);
 
-        TreeMap<String, String> treeMap = new TreeMap<>(String::compareTo);
-        treeMap.putAll(map);
-        treeMap.forEach((s, s2) -> {
-            try {
-                FileUtils.writeLines(new File("D://", "CD6071051636602593280-order.txt"), "UTF-8",
-                        Arrays.asList(s2), true);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        System.out.println(dd);
     }
 }

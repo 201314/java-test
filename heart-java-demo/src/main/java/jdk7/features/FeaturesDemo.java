@@ -116,13 +116,34 @@ public class FeaturesDemo {
 		System.out.println(c == b);
 	}
 
+	/**
+	 * Switch语句支持string类型
+	 */
+	public static String switchString1() {
+		String test = "hello";
+		switch (test) {
+			case "world":
+				System.out.println("我是word");
+				return "1";
+			case "hello":
+				System.out.println("我是hello");
+				return "2";
+			default:
+				System.out.println("我是default");
+				return "3";
+		}
+	}
+
+
+
 	public static void main(String[] args) throws IOException {
-		binary();
+	/*	binary();
 		exception();
 		writeToFileZipFileContents();
 		switchString();
 		testGeneric();
 		testNum();
-		testIntern();
+		testIntern();*/
+		switchString1();
 	}
 }

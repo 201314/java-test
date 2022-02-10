@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -13,35 +12,31 @@ import java.util.stream.Collectors;
  */
 public class MapDemo {
 
-	public static void listToMap() {
-		List<Student> students = new ArrayList<>();
-		Student student = new Student();
-		student.setName("linzl");
-		student.setScore(100);
-		students.add(student);
+    public static void listToMap() {
+        List<Student> students = new ArrayList<>();
+        Student student = new Student();
+        student.setName("linzl");
+        student.setScore(100);
+        students.add(student);
 
-		Student student2 = new Student();
-		student2.setName("linzl2");
-		student2.setScore(null);
-		students.add(student2);
+        Student student2 = new Student();
+        student2.setName("linzl2");
+        student2.setScore(null);
+        students.add(student2);
 
-		// map的key重复 会报Duplicate key ,可以使用以下Function.identity() 换成 c->c,(k1, k2)->k2)避免
-		// Map<String, Student> res =
-		// students.stream().collect(Collectors.toMap(Student::getName,
-		// Function.identity()));
-		Map<String, Student> res = students.stream()
-				.collect(Collectors.toMap(Student::getName, c -> c, (k1, k2) -> k2));
-		;
-		
-		// 如果key,value可能为null时需要判空
-		Map<String, Integer> res2 = students.stream()
-				.collect(Collectors.toMap(stu -> Optional.ofNullable(stu).map(Student::getName).orElse(""),
-						stu -> Optional.ofNullable(stu).map(Student::getScore).orElse(0), (key1, key2) -> key2));
+        // map的key重复 会报Duplicate key ,可以使用以下Function.identity() 换成 c->c,(k1, k2)->k2)避免
+        // Map<String, Student> res =
+        // students.stream().collect(Collectors.toMap(Student::getName,
+        // Function.identity()));
+        Map<String, Student> res = students.stream()
+            .collect(Collectors.toMap(Student::getName, c -> c, (k1, k2) -> k2));
+        ;
 
-		System.out.println(res2);
-	}
+        // 如果key,value可能为null时需要判空
+        Map<String, Integer> res2 = students.stream()
+            .collect(Collectors.toMap(stu -> Optional.ofNullable(stu).map(Student::getName).orElse(""),
+                stu -> Optional.ofNullable(stu).map(Student::getScore).orElse(0), (key1, key2) -> key2));
 
-	public static void main(String[] args) {
-		listToMap();
-	}
+        System.out.println(res2);
+    }
 }

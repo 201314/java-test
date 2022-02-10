@@ -15,7 +15,7 @@ public class Base64Util {
 	/**
 	 * base64 编码文件
 	 * 
-	 * @param filePath 文件路径
+	 * @param file 文件
 	 * @return
 	 * @throws IOException
 	 */
@@ -34,11 +34,5 @@ public class Base64Util {
 	public static void decode(String targetPath, String fileStr) throws IOException {
 		byte[] fileByte = Base64.getDecoder().decode(fileStr);
 		FileUtils.writeByteArrayToFile(new File(targetPath), fileByte);
-	}
-
-	public static void main(String[] args) throws Exception {
-		String content = FileUtils.readFileToString(new File("F:\\anjianOAdoc\\oadoc\\taitan\\missive\\副本.xml"),
-				Charset.forName("UTF-8"));
-		decode("F:\\anjianOAdoc\\oadoc\\taitan\\missive\\测试标题_4920.pdf", content);
 	}
 }

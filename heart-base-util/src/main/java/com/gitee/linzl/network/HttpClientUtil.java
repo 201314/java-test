@@ -1,5 +1,14 @@
 package com.gitee.linzl.network;
 
+import javax.net.ssl.SSLContext;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -26,71 +35,79 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
-import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 /**
  * httpclient 传输数据工具
  */
 @Slf4j
 public class HttpClientUtil {
     public static final int POOL_SIZE = 100;
+
     // 设置连接超时时间,单位毫秒
     public static final int CONNECT_TIMEOUT = 5000;
+
     // 设置读取超时\套接字超时时间,单位毫秒
     public static final int SOCKET_TIMEOUT = 30000;
+
     // 设置从连接池获取连接实例的超时
     public static final int CONNECTION_REQUEST_TIMEOUT = 3000;
-    // 是否允许重连
-    private static final boolean REQUEST_SENT_RETRY_ENABLED = false;
-    // 连接重试次数
-    private static final int RETRY_COUNT = 0;
-    private static final CloseableHttpClient httpClient;
 
-    // 默认配置
-    static {
+    private final CloseableHttpClient httpClient;
+
+    public static HttpClientUtil getInstance() {
+        return new HttpClientUtil();
+    }
+
+    public HttpClientUtil() {
+        this(POOL_SIZE, POOL_SIZE,
+            CONNECT_TIMEOUT,
+            SOCKET_TIMEOUT,
+            CONNECTION_REQUEST_TIMEOUT);
+    }
+
+    public HttpClientUtil(Integer maxTotal, Integer defaultMaxPerRoute) {
+        this(maxTotal, defaultMaxPerRoute,
+            CONNECT_TIMEOUT,
+            SOCKET_TIMEOUT,
+            CONNECTION_REQUEST_TIMEOUT);
+    }
+
+    public HttpClientUtil(Integer maxTotal, Integer defaultMaxPerRoute, Integer connectTimeout,
+                          Integer socketTimeout, Integer connectionRequestTimeout) {
         SSLConnectionSocketFactory sslsf = null;
         try {
             SSLContext sslContext =
-                    (new SSLContextBuilder()).loadTrustMaterial(null, (chain, authType) -> true).build();
+                (new SSLContextBuilder()).loadTrustMaterial(null, (chain, authType) -> true).build();
+            // 信任所有
             sslsf = new SSLConnectionSocketFactory(sslContext, (s, sslSession) -> true);
         } catch (Exception e) {
         }
 
-        // 设置连接池
         PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(
-                RegistryBuilder.<ConnectionSocketFactory>create()
-                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
-                        .register("https", sslsf)
-                        .build()
+            RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                .register("https", sslsf)
+                .build()
         );
         // 设置连接池总共大小
-        connMgr.setMaxTotal(POOL_SIZE);
-        // 第一个连接最大只能是200，所有连接的和加起来不能超过200
-        connMgr.setDefaultMaxPerRoute(connMgr.getMaxTotal());
-        // 关闭空闲两分钟的连接
-        // connMgr.closeIdleConnections(120, TimeUnit.SECONDS);
+        connMgr.setMaxTotal(maxTotal);
+        // 第一个连接最大只能是defaultMaxPerRoute，所有连接的和加起来不能超过defaultMaxPerRoute
+        connMgr.setDefaultMaxPerRoute(defaultMaxPerRoute);
 
-        RequestConfig.Builder builder = RequestConfig.custom();
+        RequestConfig.Builder cfgBuilder = RequestConfig.custom();
         // 设置连接超时
-        builder.setConnectTimeout(CONNECT_TIMEOUT);
+        cfgBuilder.setConnectTimeout(connectTimeout);
         // 设置读取超时
-        builder.setSocketTimeout(SOCKET_TIMEOUT);
+        cfgBuilder.setSocketTimeout(socketTimeout);
         // 设置从连接池获取连接实例的超时
-        builder.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);
-        RequestConfig requestConfig = builder.build();
+        cfgBuilder.setConnectionRequestTimeout(connectionRequestTimeout);
+
+        RequestConfig requestConfig = cfgBuilder.build();
 
         httpClient = HttpClients.custom()
-                .setConnectionManager(connMgr)
-                .setDefaultRequestConfig(requestConfig)
-                .setRetryHandler(new DefaultHttpRequestRetryHandler(RETRY_COUNT, REQUEST_SENT_RETRY_ENABLED)).build();
+            .setConnectionManager(connMgr)
+            .setDefaultRequestConfig(requestConfig)
+            .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
+            .build();
     }
 
     /**
@@ -99,7 +116,7 @@ public class HttpClientUtil {
      * @param url 提交到对应的url,url带参数
      * @return
      */
-    public static String httpGet(String url) {
+    public String httpGet(String url) {
         return httpGet(url, Collections.emptyMap());
     }
 
@@ -109,7 +126,7 @@ public class HttpClientUtil {
      * @param url 提交到对应的url,url带参数
      * @return
      */
-    public static String httpGet(String url, Map<String, String> params) {
+    public String httpGet(String url, Map<String, String> params) {
         StringBuilder builder = new StringBuilder(url);
 
         if (MapUtils.isNotEmpty(params)) {
@@ -133,7 +150,7 @@ public class HttpClientUtil {
         try (CloseableHttpResponse clsResp = httpClient.execute(httpGet)) {
             if (clsResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException(clsResp.getStatusLine().getStatusCode() + ":" +
-                        clsResp.getStatusLine().getReasonPhrase());
+                    clsResp.getStatusLine().getReasonPhrase());
             }
             return EntityUtils.toString(clsResp.getEntity(), Consts.UTF_8);
         } catch (Exception e) {
@@ -148,7 +165,7 @@ public class HttpClientUtil {
      * @param url    文件所在的url
      * @param target 文件下载后存储位置
      */
-    public static void downLoad(String url, File target) {
+    public void downLoad(String url, File target) {
         downLoad(url, target, Collections.emptyMap());
     }
 
@@ -159,7 +176,7 @@ public class HttpClientUtil {
      * @param target       文件下载后存储位置
      * @param headerParams 放在header的参数信息
      */
-    public static void downLoad(String url, File target, Map<String, String> headerParams) {
+    public void downLoad(String url, File target, Map<String, String> headerParams) {
         OutputStream output = null;
         InputStream input = null;
 
@@ -195,7 +212,7 @@ public class HttpClientUtil {
      * @param params 表单参数
      * @return
      */
-    public static String postForm(String url, Map<String, Object> params) {
+    public String postForm(String url, Map<String, Object> params) {
         List<NameValuePair> pairList = new ArrayList<>(params.size());
         if (MapUtils.isNotEmpty(params)) {
             params.forEach((key, val) -> {
@@ -213,21 +230,21 @@ public class HttpClientUtil {
      * @param pairList 表单参数
      * @return
      */
-    public static String postForm(String url, List<NameValuePair> pairList) {
+    public String postForm(String url, List<NameValuePair> pairList) {
         HttpPost httpPost = new HttpPost(url);
         // httpPost.setConfig(requestConfig);待解开
         // 解决中文乱码问题
         HttpEntity pramEntity = EntityBuilder.create()
-                .setContentType(ContentType.APPLICATION_FORM_URLENCODED.withCharset(Consts.UTF_8))
-                .setParameters(pairList)
-                .build();
+            .setContentType(ContentType.APPLICATION_FORM_URLENCODED.withCharset(Consts.UTF_8))
+            .setParameters(pairList)
+            .build();
 
         httpPost.setEntity(pramEntity);
 
         try (CloseableHttpResponse clsResp = httpClient.execute(httpPost)) {
             if (clsResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException(clsResp.getStatusLine().getStatusCode() + ":" +
-                        clsResp.getStatusLine().getReasonPhrase());
+                    clsResp.getStatusLine().getReasonPhrase());
             }
             return EntityUtils.toString(clsResp.getEntity(), Consts.UTF_8);
         } catch (Exception e) {
@@ -242,20 +259,20 @@ public class HttpClientUtil {
      * @param json 需要post的json格式数据
      * @return
      */
-    public static String postJson(String url, String json) {
+    public String postJson(String url, String json) {
         HttpPost httpPost = new HttpPost(url);
         // httpPost.setConfig(requestConfig);待解开
 
         // 解决中文乱码问题
         HttpEntity strEntity = EntityBuilder.create()
-                .setContentType(ContentType.APPLICATION_JSON)
-                .setText(json)
-                .build();
+            .setContentType(ContentType.APPLICATION_JSON)
+            .setText(json)
+            .build();
         httpPost.setEntity(strEntity);
         try (CloseableHttpResponse clsResp = httpClient.execute(httpPost)) {
             if (clsResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException(clsResp.getStatusLine().getStatusCode() + ":" +
-                        clsResp.getStatusLine().getReasonPhrase());
+                    clsResp.getStatusLine().getReasonPhrase());
             }
             return EntityUtils.toString(clsResp.getEntity(), Consts.UTF_8);
         } catch (Exception e) {
@@ -269,7 +286,7 @@ public class HttpClientUtil {
      * @param url      上传地址
      * @param srcFiles 上传的文件
      */
-    public static String upload(String url, File... srcFiles) {
+    public String upload(String url, File... srcFiles) {
         return upload(url, srcFiles, null);
     }
 
@@ -280,14 +297,14 @@ public class HttpClientUtil {
      * @param srcFiles 上传的文件
      * @param params   上传所需要的参数
      */
-    public static String upload(String url, File[] srcFiles, Map<String, String> params) {
+    public String upload(String url, File[] srcFiles, Map<String, String> params) {
         // 把一个普通参数和文件上传给下面这个地址 是一个servlet
         HttpPost httpPost = new HttpPost(url);
 
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         for (int index = 0, length = (srcFiles != null ? srcFiles.length : 0); index < length; index++) {
             entityBuilder.addBinaryBody("file" + index, srcFiles[index], ContentType.APPLICATION_FORM_URLENCODED,
-                    srcFiles[index] != null ? srcFiles[index].getName() : null);
+                srcFiles[index] != null ? srcFiles[index].getName() : null);
         }
 
         if (MapUtils.isNotEmpty(params)) {
@@ -299,7 +316,7 @@ public class HttpClientUtil {
         try (CloseableHttpResponse clsResp = httpClient.execute(httpPost)) {
             if (clsResp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new RuntimeException(clsResp.getStatusLine().getStatusCode() + ":" +
-                        clsResp.getStatusLine().getReasonPhrase());
+                    clsResp.getStatusLine().getReasonPhrase());
             }
             return EntityUtils.toString(clsResp.getEntity(), Consts.UTF_8);
         } catch (Exception e) {

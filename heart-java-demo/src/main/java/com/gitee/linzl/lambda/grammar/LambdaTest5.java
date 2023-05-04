@@ -1,5 +1,14 @@
 package com.gitee.linzl.lambda.grammar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+import com.gitee.linzl.lambda.constructor.Button;
+import com.gitee.linzl.lambda.constructor.FunctionalInterfaceTest;
+import com.gitee.linzl.lambda.constructor.MyInterface1;
+import com.gitee.linzl.lambda.constructor.MyInterface2;
+
 /**
  * 在比较器Comparator接口中定义了若干用于比较和键提取的静态方法和默认方法，默认方法的使用使得方法引用更加方便，
  * 例如使用java.util.Objects类中的静态方法isNull和nonNull
@@ -10,25 +19,20 @@ package com.gitee.linzl.lambda.grammar;
  * 对于第一个冲突，java8规定类中的方法优先级要高于接口中的默认方法，所以接口中默认方法复写Object类中的方法是没有意义的，
  * 因为所有的接口都默认继承自Object类使得默认方法一定会被覆盖。
  */
-public class LambdaTest5 implements myInterface1, myInterface2 {
+public class LambdaTest5 implements MyInterface1  {
+
 	@Override
 	public void getName() {
-		myInterface1.super.getName();
+		MyInterface1.super.getName();
+	}
+
+	@Override
+	public int add() {
+		return 0;
 	}
 
 	public static void main(String[] args) {
-		new LambdaTest5().getName();
-	}
-}
-
-interface myInterface1 {
-	default void getName() {
-		System.out.println("myInterface1 getName");
-	}
-}
-
-interface myInterface2 {
-	default void getName() {
-		System.out.println("myInterface2 getName");
+		LambdaTest5 test4 = new LambdaTest5();
+		test4.getName();
 	}
 }

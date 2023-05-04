@@ -1,16 +1,29 @@
 package com.gitee.linzl.lambda.collection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.gitee.linzl.lambda.constructor.Student;
 
 /**
  * @author linzhenlie
  * @date 2020-04-24
  */
 public class MapDemo {
+    public void test1(){
+        HashMap<Integer, String> map = new HashMap<>();
+        map.put(1, "Java");
+        map.put(2, "Kotlin");
+        map.put(3, "React");
+        map.put(4, "Python");
+        map.put(5, "Go");
+        // forEach 使用的 BiConsumer 消费函数
+        map.forEach((k, v) -> System.out.println(k + ":" + v));
+    }
+
 
     public static void listToMap() {
         List<Student> students = new ArrayList<>();
@@ -30,7 +43,6 @@ public class MapDemo {
         // Function.identity()));
         Map<String, Student> res = students.stream()
             .collect(Collectors.toMap(Student::getName, c -> c, (k1, k2) -> k2));
-        ;
 
         // 如果key,value可能为null时需要判空
         Map<String, Integer> res2 = students.stream()

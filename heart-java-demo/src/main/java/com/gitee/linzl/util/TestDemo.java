@@ -14,17 +14,7 @@ public class TestDemo {
         System.out.println(Objects.hash(first, second));
     }
 
-    public static void testBitSet() {
-
-    }
-
-    public static void testOptional() {
-
-    }
-
     public static void main(String[] args) {
         testObjects();
-        testBitSet();
-        testOptional();
     }
 }

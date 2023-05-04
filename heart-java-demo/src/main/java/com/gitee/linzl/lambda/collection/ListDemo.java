@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import com.gitee.linzl.lambda.constructor.Student;
 
 /**
  * 1.stream不存储数据
@@ -123,6 +124,37 @@ public class ListDemo {
 
 
     public static void listSorted() {
+        List<Integer> studentList = new ArrayList<Integer>() {
+            {
+                add(100);
+                add(97);
+                add(96);
+                add(95);
+            }
+        };
+        // java.util.Comparator 是函数式接口
+        Collections.sort(studentList, (s1, s2) -> Integer.compare(s1, s2));
+        Collections.sort(studentList, Integer::compare);
+        System.out.println(studentList);
+
+        List<String> strLst = new ArrayList<String>() {
+            {
+                add("adfkjsdkfjdskjfkds");
+                add("asdfasdfafgfgf");
+                add("public static void main");
+            }
+        };
+        // 类::实例方法
+        // String::compareToIgnoreCase等同于(x,y)->x.compareToIgnoreCase(y)
+        Collections.sort(strLst, String::compareToIgnoreCase);
+
+        // (1)类::实例方法
+        // (2)类::静态方法
+        // (3)对象::实例方法
+        // 方法引用还可以使用this::methodName及super::methodName表示该对象或者其父类对象中的方法
+
+        // System.out::println 等同于(x)->System.out.println(x),
+        // Math::pow 等同于(x,y)->Math.pow(x,y)
     }
 
 

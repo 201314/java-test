@@ -1,6 +1,7 @@
 package com.gitee.linzl.lambda.collection;
 
 import java.util.Optional;
+import com.gitee.linzl.lambda.constructor.Student;
 
 public class OptionalDemo {
 
@@ -11,7 +12,7 @@ public class OptionalDemo {
         // 创建一个非空值的Optional,如果为空直接报错,of不允许为空，不建议使用
         Student stu = new Student();
         stu.setName("11");
-        // Optional<Student> emptyStu2 = Optional.of(stu);
+        Optional<Student> emptyStu2 = Optional.of(stu);
 
         // 如果user是null，那么得到的Optional对象就是个空对象，但不会让你导致空指针
         Optional<Student> emptyStu3 = Optional.ofNullable(stu);
@@ -33,11 +34,11 @@ public class OptionalDemo {
         // ifPresent(Consumer<? super T>)让你能在变量值存在时执行一个作为参数传入的 方法，否则就不进行任何操作。
         emptyStu3.map(Student::getName).ifPresent(item -> {
             // doSometing
-            System.out.println(item);
+            System.out.println(emptyStu3.map(Student::getName).get());
         });
 
         if (emptyStu3.map(Student::getName).isPresent()) {
-            System.out.println("存在");
+            System.out.println("存在"+ emptyStu3.map(Student::getName).get());
         } else {
             // 没有查到的逻辑
             System.out.println("不存在");
@@ -48,8 +49,9 @@ public class OptionalDemo {
     }
 
     public String get() {
-        String str = null;
-        return Optional.ofNullable(str).orElseThrow(() -> new BusinessException("用户不存在"));
+        String str ="用户";
+        Optional.of(str.equals("test")).filter(t->Boolean.TRUE);
+        return Optional.ofNullable(str).orElseThrow(() -> new RuntimeException("用户不存在"));
     }
 
 }

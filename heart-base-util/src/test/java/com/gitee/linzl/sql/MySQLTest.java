@@ -140,7 +140,7 @@ public class MySQLTest {
         String sqlContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         MySqlStatementParser parser = new MySqlStatementParser(sqlContent);
         List<SQLStatement> stmtList = parser.parseStatementList();
-        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor();
+        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor("pyi");
         stmtList.forEach(sqlStatement -> {
             sqlStatement.accept(visitor);
             System.out.println(visitor.getContent());

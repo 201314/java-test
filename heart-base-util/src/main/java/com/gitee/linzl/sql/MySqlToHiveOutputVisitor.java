@@ -43,9 +43,15 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
     private String formatePrex = "%";
 
     private String content = null;
+    private String tableType = null;
 
     public MySqlToHiveOutputVisitor() {
-        content = null;
+        this.content = null;
+    }
+
+    public MySqlToHiveOutputVisitor(String tableType) {
+        this.content = null;
+        this.tableType = tableType;
     }
 
     private String replaceChar(String str) {
@@ -58,7 +64,6 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .replaceAll("\r\n", "")
             .replaceAll("\n", "");
     }
-
 
     public void endVisit(SQLColumnDefinition columnDefinition) {
         String unionType = null;
@@ -184,7 +189,19 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
     }
 
     public void endVisit(MySqlCreateTableStatement createTable) {
-        String tableName = replaceChar(createTable.getTableName());
+        String tableName = replaceChar(createTable.getTableName()) + "_" + tableType;
+        String createPartition = "";
+        String selectPartition = "";
+        if (StringUtils.equalsAny(tableType, "pdi", "pda")) {
+            createPartition = "PARTITIONED BY (pday STRING COMMENT '按日分区')";
+            selectPartition = ",'${yesterday_p}' AS pday ";
+        } else if (StringUtils.equalsAny(tableType, "pmi")) {
+            createPartition = "PARTITIONED BY (pmonth STRING COMMENT '按月分区')";
+            selectPartition = ",substr('${last_month_start_p}' ,1,6) AS pmonth ";
+        } else if (StringUtils.equalsAny(tableType, "pyi")) {
+            createPartition = "PARTITIONED BY (pyear STRING COMMENT '按年分区')";
+            selectPartition = ",substr('${yesterday_p}' ,1,4) AS pyear ";
+        }
         SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
 
         StringBuilder createContent = new StringBuilder();
@@ -194,7 +211,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .append(replaceChar(sqlCharExpr.getText()))
             .append("'")
             .append(System.lineSeparator())
-            .append("PARTITIONED BY (pday STRING COMMENT '按日分区')")
+            .append(createPartition)
             .append(System.lineSeparator())
             .append("STORED AS ORC;");
 
@@ -222,8 +239,12 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         }
 
         StringBuilder selectContent = new StringBuilder();
+        selectContent.append("INSERT OVERWRITE TABLE ");
+        selectContent.append(tableName);
         selectContent.append(" SELECT ")
             .append(selectColumnContent.deleteCharAt(0))
+            .append(System.lineSeparator())
+            .append(selectPartition)
             .append(" FROM ")
             .append(tableName)
             .append(";");

@@ -31,11 +31,14 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
     private StringBuilder selectColumnContent = new StringBuilder();
 
-    private Map<String, StringBuilder> idxNum = new HashMap<>();
+    private Map<String, StringBuilder> priKeyNum = new HashMap<>();
+    private Integer priKeyIdx = 1;
+
+    private Map<String, StringBuilder> uniqueNum = new HashMap<>();
+
+    private Integer uniqueIdx = 1;
 
     private List<String> columnIdx = new ArrayList<>();
-
-    private Integer keyIdx = 1;
 
     private String formatePrex = "%";
 
@@ -52,8 +55,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .replaceAll(";", "；")
             .replaceAll("（", "(")
             .replaceAll("）", ")")
-            .replaceAll("\r\n","")
-            .replaceAll("\n","");
+            .replaceAll("\r\n", "")
+            .replaceAll("\n", "");
     }
 
 
@@ -107,7 +110,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             case SQLDataType.Constants.DECIMAL:
             case SQLDataType.Constants.BOOLEAN:
                 unionType = SQLDataType.Constants.DECIMAL;
-                if (columnName.contains("_amt")||columnName.contains("_amount")) {
+                if (columnName.contains("_amt") || columnName.contains("_amount")) {
                     columnNameNew = columnName.replaceAll("_amount", "_amt");
                     hiveDataType = "DECIMAL(17,2)";
                 } else {
@@ -162,22 +165,22 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         SQLIndexDefinition idxDefinition = mySqlUnique.getIndexDefinition();
         idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
             SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            idxNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("唯一索引")).append(keyIdx).append(",");
+            uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+                s -> new StringBuilder("业务主键")).append(uniqueIdx).append(",");
         });
 
-        keyIdx++;
+        uniqueIdx++;
     }
 
     public void endVisit(MySqlPrimaryKey primaryKey) {
         SQLIndexDefinition idxDefinition = primaryKey.getIndexDefinition();
         idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
             SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            idxNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("主键")).append(keyIdx).append(",");
+            priKeyNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+                s -> new StringBuilder("主键")).append(priKeyIdx).append(",");
         });
 
-        keyIdx++;
+        priKeyIdx++;
     }
 
     public void endVisit(MySqlCreateTableStatement createTable) {
@@ -196,14 +199,25 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .append("STORED AS ORC;");
 
         String createColumn = createContent.toString();
+        boolean existUnique = false;
         for (int index = 0, length = columnIdx.size(); index < length; index++) {
             String columnName = columnIdx.get(index);
-            StringBuilder columIdxBuilder = idxNum.get(columnName);
+            StringBuilder columIdxBuilder = uniqueNum.get(columnName);
+            String comment = "";
+            if (Objects.nonNull(columIdxBuilder)) {
+                comment = columIdxBuilder.reverse().deleteCharAt(0).reverse().insert(0, "(").append(")").toString();
+                existUnique = true;
+            }
+            createColumn = createColumn.replaceAll(formatePrex + columnName, comment);
+        }
+
+        for (int index = 0, length = columnIdx.size(); index < length; index++) {
+            String columnName = columnIdx.get(index);
+            StringBuilder columIdxBuilder = priKeyNum.get(columnName);
             String comment = "";
             if (Objects.nonNull(columIdxBuilder)) {
                 comment = columIdxBuilder.reverse().deleteCharAt(0).reverse().insert(0, "(").append(")").toString();
             }
-
             createColumn = createColumn.replaceAll(formatePrex + columnName, comment);
         }
 
@@ -222,9 +236,11 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         content = fullContent.toString();
         createColumnContent = new StringBuilder();
         selectColumnContent = new StringBuilder();
-        idxNum = new HashMap<>();
+        priKeyNum = new HashMap<>();
+        uniqueNum = new HashMap<>();
         columnIdx = new ArrayList<>();
-        keyIdx = 1;
+        priKeyIdx = 1;
+        uniqueIdx = 1;
     }
 
     public String getContent() {

@@ -51,7 +51,9 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .replaceAll("：", ":")
             .replaceAll(";", "；")
             .replaceAll("（", "(")
-            .replaceAll("）", ")");
+            .replaceAll("）", ")")
+            .replaceAll("\r\n","")
+            .replaceAll("\n","");
     }
 
 

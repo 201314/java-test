@@ -105,7 +105,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             case SQLDataType.Constants.DECIMAL:
             case SQLDataType.Constants.BOOLEAN:
                 unionType = SQLDataType.Constants.DECIMAL;
-                if (columnName.contains("amt")) {
+                if (columnName.contains("_amt")||columnName.contains("_amount")) {
+                    columnNameNew = columnName.replaceAll("_amount", "_amt");
                     hiveDataType = "DECIMAL(17,2)";
                 } else {
                     hiveDataType = "DECIMAL(12,8)";

@@ -216,21 +216,17 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .append("STORED AS ORC;");
 
         String createColumn = createContent.toString();
-        boolean existUnique = false;
-        for (int index = 0, length = columnIdx.size(); index < length; index++) {
-            String columnName = columnIdx.get(index);
-            StringBuilder columIdxBuilder = uniqueNum.get(columnName);
-            String comment = "";
-            if (Objects.nonNull(columIdxBuilder)) {
-                comment = columIdxBuilder.reverse().deleteCharAt(0).reverse().insert(0, "(").append(")").toString();
-                existUnique = true;
-            }
-            createColumn = createColumn.replaceAll(formatePrex + columnName, comment);
-        }
 
+        boolean uniqueFlag = uniqueNum.size() > 0 ? Boolean.TRUE : Boolean.FALSE;
         for (int index = 0, length = columnIdx.size(); index < length; index++) {
             String columnName = columnIdx.get(index);
-            StringBuilder columIdxBuilder = priKeyNum.get(columnName);
+            StringBuilder columIdxBuilder = null;
+            // 有唯一索引先用唯一索引
+            if (uniqueFlag == Boolean.TRUE) {
+                columIdxBuilder = uniqueNum.get(columnName);
+            } else {
+                columIdxBuilder = priKeyNum.get(columnName);
+            }
             String comment = "";
             if (Objects.nonNull(columIdxBuilder)) {
                 comment = columIdxBuilder.reverse().deleteCharAt(0).reverse().insert(0, "(").append(")").toString();

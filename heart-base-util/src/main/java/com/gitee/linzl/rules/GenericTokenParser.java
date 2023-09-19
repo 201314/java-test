@@ -1,5 +1,7 @@
 package com.gitee.linzl.rules;
 
+import java.util.Objects;
+
 public class GenericTokenParser {
 
     private final String openToken;
@@ -56,7 +58,10 @@ public class GenericTokenParser {
                     builder.append(src, start, src.length - start);
                     offset = src.length;
                 } else {
-                    builder.append(handler.handleToken(expression.toString()));
+                    Object content = handler.handleToken(expression.toString());
+                    if (Objects.nonNull(content)){
+                        builder.append(content);
+                    }
                     offset = end + closeToken.length();
                 }
             }

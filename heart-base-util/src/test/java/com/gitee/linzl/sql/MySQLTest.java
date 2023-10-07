@@ -11,6 +11,7 @@ import com.alibaba.druid.sql.dialect.mysql.ast.MySqlUnique;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
+import com.alibaba.druid.sql.visitor.SQLTableAliasCollectVisitor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -92,39 +93,44 @@ public class MySQLTest {
     }
     @Test
     public void mysqlToHive() {
-        String sql = "CREATE TABLE `u_bankcard_cert` (\n" +
-            "    `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',\n" +
-            "    `cert_no` varchar(64) NOT NULL DEFAULT '' COMMENT '认证号',\n" +
-            "    `user_no` varchar(64) NOT NULL DEFAULT '' COMMENT '用户号',\n" +
-            "    `card_no_encryptx` varchar(128) NOT NULL DEFAULT '' COMMENT 'card_no 加密字段',\n" +
-            "    `card_no_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT 'card_no md5字段',\n" +
-            "    `card_type` varchar(5) DEFAULT NULL COMMENT '银行卡类型：详见system_dict的card_type',\n" +
-            "    `bank_code` varchar(50) DEFAULT NULL COMMENT '银行编号',\n" +
-            "    `mobile_no_encryptx` varchar(64) NOT NULL DEFAULT '' COMMENT 'mobile_no 加密字段',\n" +
-            "    `mobile_no_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT 'mobile_no md5字段',\n" +
-            "    `cust_name_encryptx` varchar(520) NOT NULL DEFAULT '' COMMENT 'cust_name 加密字段',\n" +
-            "    `cust_name_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT 'cust_name md5字段',\n" +
-            "    `cert_time` datetime NOT NULL COMMENT '认证时间',\n" +
-            "    `cert_state` char(1) NOT NULL COMMENT '认证状态：详见system_dict的cert_state',\n" +
-            "    `cert_msg` varchar(100) DEFAULT NULL COMMENT '绑卡失败信息描述',\n" +
-            "    `business_type` varchar(20) NOT NULL DEFAULT '' COMMENT '业务类型-认证用途 CD授信 DB借款 RP还款 RB 主动绑卡 UB 修改银行卡密码 ',\n" +
-            "    `bind_type` char(1) NOT NULL COMMENT '绑定类型：1：绑定新银行卡，2：重新绑定',\n" +
-            "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',\n" +
-            "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '记录创建者',\n" +
-            "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',\n" +
-            "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '记录更新者',\n" +
-            "    `term` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '期数',\n" +
-            "    `loan_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '借款金额',\n" +
-            "    `loan_amt2` decimal(17, 2) DEFAULT NULL COMMENT '借款金额',\n" +
-            "    `date_loan` date NOT NULL DEFAULT '9999-01-01 00:00:00' COMMENT '动支申请提交日期',\n" +
-            "    `date_cash` datetime DEFAULT NULL COMMENT '放款日期',\n" +
-            "    PRIMARY KEY (`id`),\n" +
-            "    UNIQUE KEY `idx_cert_no` (`cert_no`,`user_no`),\n" +
-            "    UNIQUE KEY `idx_cert_no2` (`mobile_no_md5x`,`user_no`),\n" +
-            "    KEY `idx_user_no` (`user_no`),\n" +
-            "    KEY `idx_mobile_no_md5` (`mobile_no_md5x`),\n" +
-            "    KEY `idx_card_no_md5` (`card_no_md5x`)\n" +
-            ") ENGINE = InnoDB AUTO_INCREMENT = 179438434 DEFAULT CHARSET = utf8 COMMENT = '银行卡认证记录表'";
+        String sql = "CREATE TABLE `u_obas_event_extend` (\n" +
+            "    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',\n" +
+            "    `event_type` varchar(64) NOT NULL DEFAULT '' COMMENT '事件类型',\n" +
+            "    `base_id` bigint(20) DEFAULT NULL COMMENT '基础事件ID用于关联',\n" +
+            "    `request_no` varchar(128) NOT NULL DEFAULT '' COMMENT '流水号',\n" +
+            "    `event_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '事件发生时间',\n" +
+            "    `field_name` varchar(64) NOT NULL DEFAULT '' COMMENT '字段名称',\n" +
+            "    `field_value` varchar(1024) DEFAULT NULL COMMENT '字段值',\n" +
+            "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
+            "    `created_by` varchar(100) DEFAULT 'sys' COMMENT '创建人',\n" +
+            "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
+            "    `updated_by` varchar(100) DEFAULT 'sys' COMMENT '修改人',\n" +
+            "    PRIMARY KEY (`id`, `event_time`),\n" +
+            "    UNIQUE KEY `i_lc_ll_req` (`request_no`),\n" +
+            "    KEY `IDX_EVENT_TIME` (`event_time`)\n" +
+            "    USING\n" +
+            "        BTREE,\n" +
+            "        KEY `IDX_REQUEST_NO` (`request_no`)\n" +
+            "    USING\n" +
+            "        BTREE,\n" +
+            "        KEY `IDX_BASE_ID` (`base_id`)\n" +
+            ") ENGINE = InnoDB AUTO_INCREMENT = 6410625106168528899 DEFAULT CHARSET = utf8 ROW_FORMAT = COMPRESSED KEY_BLOCK_SIZE = 8 COMMENT = '用户事件拓展字段表'\n" +
+            "/*!50100 PARTITION BY RANGE (UNIX_TIMESTAMP(event_time))\n" +
+            " (PARTITION p20230809 VALUES LESS THAN (1691596800) ENGINE = InnoDB,\n" +
+            " PARTITION p20230810 VALUES LESS THAN (1691683200) ENGINE = InnoDB,\n" +
+            " PARTITION p20230811 VALUES LESS THAN (1691769600) ENGINE = InnoDB,\n" +
+            " PARTITION p20230812 VALUES LESS THAN (1691856000) ENGINE = InnoDB,\n" +
+            " PARTITION p20230813 VALUES LESS THAN (1691942400) ENGINE = InnoDB,\n" +
+            " PARTITION p20230814 VALUES LESS THAN (1692028800) ENGINE = InnoDB,\n" +
+            " PARTITION p20230815 VALUES LESS THAN (1692115200) ENGINE = InnoDB,\n" +
+            " PARTITION p20230816 VALUES LESS THAN (1692201600) ENGINE = InnoDB,\n" +
+            " PARTITION p20230817 VALUES LESS THAN (1692288000) ENGINE = InnoDB,\n" +
+            " PARTITION p20230818 VALUES LESS THAN (1692374400) ENGINE = InnoDB,\n" +
+            " PARTITION p20230819 VALUES LESS THAN (1692460800) ENGINE = InnoDB,\n" +
+            " PARTITION p20230820 VALUES LESS THAN (1692547200) ENGINE = InnoDB,\n" +
+            " PARTITION p20230821 VALUES LESS THAN (1692633600) ENGINE = InnoDB,\n" +
+            " PARTITION p20230822 VALUES LESS THAN (1692720000) ENGINE = InnoDB,\n" +
+            " PARTITION p20230823 VALUES LESS THAN (1692806400) ENGINE = InnoDB) */";
 
         MySqlStatementParser parser = new MySqlStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();
@@ -138,12 +144,15 @@ public class MySQLTest {
         File file = new File("D:\\mysql.sql");
         File file2 = new File(file.getParentFile(),file.getName()+".txt");
         String sqlContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
         MySqlStatementParser parser = new MySqlStatementParser(sqlContent);
         List<SQLStatement> stmtList = parser.parseStatementList();
-        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor("pyi");
+        SQLTableAliasCollectVisitor visitor = new SQLTableAliasCollectVisitor();
+
+        //MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor("pyi");
         stmtList.forEach(sqlStatement -> {
             sqlStatement.accept(visitor);
-            System.out.println(visitor.getContent());
+            visitor.getTableSources();
         });
     }
 }

@@ -1,5 +1,6 @@
 package com.gitee.linzl.lang;
 
+import com.gitee.linzl.util.StringUtil;
 import org.junit.Test;
 
 public class StringUtilTest {

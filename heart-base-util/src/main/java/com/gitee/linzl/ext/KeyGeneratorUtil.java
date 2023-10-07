@@ -1,7 +1,7 @@
 package com.gitee.linzl.ext;
 
 import com.gitee.linzl.codec.ConvertUtil;
-import com.gitee.linzl.lang.StringUtil;
+import com.gitee.linzl.util.StringUtil;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

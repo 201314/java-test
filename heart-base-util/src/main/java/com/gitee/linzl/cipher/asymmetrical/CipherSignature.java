@@ -1,6 +1,6 @@
 package com.gitee.linzl.cipher.asymmetrical;
 
-import com.gitee.linzl.lang.StringUtil;
+import com.gitee.linzl.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -130,15 +130,15 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         SQLCharExpr commentExpr = (SQLCharExpr) columnDefinition.getComment();
         String comment = replaceChar(commentExpr == null ? StringUtils.EMPTY : commentExpr.getText());
         createColumnContent.append(" COMMENT '").append(comment);
+
+
         if (unionType == SQLDataType.Constants.DATE) {
             createColumnContent.append("yyyy-MM-dd");
         } else if (unionType == SQLDataType.Constants.TIMESTAMP) {
             createColumnContent.append("yyyy-MM-dd HH:mm:ss");
         }
-
-        createColumnContent.append(formatePrex + columnName).append("'").append(System.lineSeparator());
+        createColumnContent.append(formatePrex + columnName + formatePrex).append("'").append(System.lineSeparator());
         columnIdx.add(columnName);
-
         selectColumnContent.append(",");
         SQLExpr defaultExpr = columnDefinition.getDefaultExpr();
         // 有默认值，则一定是NOT NULL
@@ -231,7 +231,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             if (Objects.nonNull(columIdxBuilder)) {
                 comment = columIdxBuilder.reverse().deleteCharAt(0).reverse().insert(0, "(").append(")").toString();
             }
-            createColumn = createColumn.replaceAll(formatePrex + columnName, comment);
+            createColumn = createColumn.replaceAll(formatePrex + columnName + formatePrex, comment);
         }
 
         StringBuilder selectContent = new StringBuilder();

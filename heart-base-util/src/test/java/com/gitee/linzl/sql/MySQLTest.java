@@ -93,52 +93,28 @@ public class MySQLTest {
     }
     @Test
     public void mysqlToHive() {
-        String sql = "CREATE TABLE `u_obas_event_extend` (\n" +
-            "    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',\n" +
-            "    `event_type` varchar(64) NOT NULL DEFAULT '' COMMENT '事件类型',\n" +
-            "    `base_id` bigint(20) DEFAULT NULL COMMENT '基础事件ID用于关联',\n" +
-            "    `request_no` varchar(128) NOT NULL DEFAULT '' COMMENT '流水号',\n" +
-            "    `event_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '事件发生时间',\n" +
-            "    `field_name` varchar(64) NOT NULL DEFAULT '' COMMENT '字段名称',\n" +
-            "    `field_value` varchar(1024) DEFAULT NULL COMMENT '字段值',\n" +
+        String sql = "CREATE TABLE `product_info` (\n" +
+            "    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键',\n" +
+            "    `adjust_score_protect` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '产品列表保护期调节分数',\n" +
+            "    `adjust_score_protect_effective` datetime DEFAULT NULL COMMENT '保护期开始时间',\n" +
+            "    `adjust_score_protect_expire` datetime DEFAULT NULL COMMENT '保护期开始时间',\n" +
             "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
-            "    `created_by` varchar(100) DEFAULT 'sys' COMMENT '创建人',\n" +
+            "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '创建人',\n" +
             "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
-            "    `updated_by` varchar(100) DEFAULT 'sys' COMMENT '修改人',\n" +
-            "    PRIMARY KEY (`id`, `event_time`),\n" +
-            "    UNIQUE KEY `i_lc_ll_req` (`request_no`),\n" +
-            "    KEY `IDX_EVENT_TIME` (`event_time`)\n" +
-            "    USING\n" +
-            "        BTREE,\n" +
-            "        KEY `IDX_REQUEST_NO` (`request_no`)\n" +
-            "    USING\n" +
-            "        BTREE,\n" +
-            "        KEY `IDX_BASE_ID` (`base_id`)\n" +
-            ") ENGINE = InnoDB AUTO_INCREMENT = 6410625106168528899 DEFAULT CHARSET = utf8 ROW_FORMAT = COMPRESSED KEY_BLOCK_SIZE = 8 COMMENT = '用户事件拓展字段表'\n" +
-            "/*!50100 PARTITION BY RANGE (UNIX_TIMESTAMP(event_time))\n" +
-            " (PARTITION p20230809 VALUES LESS THAN (1691596800) ENGINE = InnoDB,\n" +
-            " PARTITION p20230810 VALUES LESS THAN (1691683200) ENGINE = InnoDB,\n" +
-            " PARTITION p20230811 VALUES LESS THAN (1691769600) ENGINE = InnoDB,\n" +
-            " PARTITION p20230812 VALUES LESS THAN (1691856000) ENGINE = InnoDB,\n" +
-            " PARTITION p20230813 VALUES LESS THAN (1691942400) ENGINE = InnoDB,\n" +
-            " PARTITION p20230814 VALUES LESS THAN (1692028800) ENGINE = InnoDB,\n" +
-            " PARTITION p20230815 VALUES LESS THAN (1692115200) ENGINE = InnoDB,\n" +
-            " PARTITION p20230816 VALUES LESS THAN (1692201600) ENGINE = InnoDB,\n" +
-            " PARTITION p20230817 VALUES LESS THAN (1692288000) ENGINE = InnoDB,\n" +
-            " PARTITION p20230818 VALUES LESS THAN (1692374400) ENGINE = InnoDB,\n" +
-            " PARTITION p20230819 VALUES LESS THAN (1692460800) ENGINE = InnoDB,\n" +
-            " PARTITION p20230820 VALUES LESS THAN (1692547200) ENGINE = InnoDB,\n" +
-            " PARTITION p20230821 VALUES LESS THAN (1692633600) ENGINE = InnoDB,\n" +
-            " PARTITION p20230822 VALUES LESS THAN (1692720000) ENGINE = InnoDB,\n" +
-            " PARTITION p20230823 VALUES LESS THAN (1692806400) ENGINE = InnoDB) */";
+            "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
+            "    PRIMARY KEY (`id`),\n" +
+            "    UNIQUE KEY `uk_product` (`partner_no`, `product_code`, `product_version`)\n" +
+            ") ENGINE = InnoDB AUTO_INCREMENT = 88 DEFAULT CHARSET = utf8 COMMENT = '合作方产品配置表'";
 
         MySqlStatementParser parser = new MySqlStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();
-        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor();
+        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor("pda");
         stmtList.forEach(sqlStatement -> {
             sqlStatement.accept(visitor);
         });
+        System.out.println(visitor.getContent());
     }
+
     @Test
     public void mysqlFileToHive() throws IOException {
         File file = new File("D:\\mysql.sql");
@@ -155,4 +131,81 @@ public class MySQLTest {
             visitor.getTableSources();
         });
     }
+
+    @Test
+    public void mysqlToView(){
+        String sql = "CREATE TABLE `ln_loan` (\n" +
+                "    `id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '物理主键',\n" +
+                "    `loan_req_no` varchar(64) NOT NULL DEFAULT '' COMMENT '放款请求流水号',\n" +
+                "    `loan_no` varchar(64) NOT NULL DEFAULT '' COMMENT '借据号',\n" +
+                "    `busi_loan_no` varchar(20) NOT NULL DEFAULT '' COMMENT '业务借据号',\n" +
+                "    `contract_no` varchar(64) NOT NULL DEFAULT '' COMMENT '合同号',\n" +
+                "    `cust_no` varchar(64) NOT NULL DEFAULT '' COMMENT '客户号',\n" +
+                "    `loan_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '借款金额',\n" +
+                "    `term` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '期数',\n" +
+                "    `rpy_type` varchar(2) NOT NULL DEFAULT '' COMMENT '还款方式:00-等额本金，01-等额本息，02-先息后本',\n" +
+                "    `date_loan` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '资金动用日期',\n" +
+                "    `date_cash` datetime DEFAULT NULL COMMENT '资金到账日期',\n" +
+                "    `date_inst` date DEFAULT NULL COMMENT '起息日',\n" +
+                "    `rp_day` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '还款日',\n" +
+                "    `date_end` date DEFAULT NULL COMMENT '贷款止期',\n" +
+                "    `bank_code` varchar(10) NOT NULL DEFAULT '' COMMENT '银行编号',\n" +
+                "    `card_id` varchar(64) NOT NULL DEFAULT '' COMMENT '银行卡ID',\n" +
+                "    `db_acct` varchar(30) NOT NULL DEFAULT '' COMMENT '放款卡号',\n" +
+                "    `db_acct_encryptx` varchar(64) NOT NULL DEFAULT '' COMMENT '还款卡号密文',\n" +
+                "    `db_acct_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT '还款卡号MD5',\n" +
+                "    `db_acct_name` varchar(100) NOT NULL DEFAULT '' COMMENT '放款账户名称',\n" +
+                "    `db_acct_name_encryptx` varchar(128) NOT NULL DEFAULT '' COMMENT '还款账户名称密文',\n" +
+                "    `db_acct_name_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT '还款账户名称MD5',\n" +
+                "    `loan_source` varchar(20) NOT NULL DEFAULT '' COMMENT '资金动用渠道',\n" +
+                "    `date_settle` date DEFAULT NULL COMMENT '结清日期',\n" +
+                "    `date_bd` date DEFAULT NULL COMMENT '呆账日期',\n" +
+                "    `date_wo` date DEFAULT NULL COMMENT '坏账日期',\n" +
+                "    `date_accrued` date DEFAULT NULL COMMENT '转非应计日期',\n" +
+                "    `date_compensate` date DEFAULT NULL COMMENT '代偿日期',\n" +
+                "    `over_due_days` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '逾期天数',\n" +
+                "    `over_due_status` varchar(10) DEFAULT 'M0' COMMENT '拖欠周期状态码',\n" +
+                "    `loan_bal` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '剩余本金',\n" +
+                "    `free_days` int(11) unsigned DEFAULT '0' COMMENT '免息天数',\n" +
+                "    `date_stat` date DEFAULT NULL COMMENT '核算日期',\n" +
+                "    `status` varchar(2) NOT NULL DEFAULT '' COMMENT '借据状态:AP-待放款,\n" +
+                "RP-还款中,\n" +
+                "OD-逾期中,\n" +
+                "FP-结清,\n" +
+                "BD-呆账,\n" +
+                "WO-坏账',\n" +
+                "    `accrual_type` varchar(5) DEFAULT 'AC' COMMENT '会计类型:AC应计,\n" +
+                "NAC非应计',\n" +
+                "    `compensate_type` varchar(5) DEFAULT 'NCP' COMMENT '代偿类型,\n" +
+                "NCP未代偿,\n" +
+                "ECP提前代偿,\n" +
+                "OCP逾期代偿',\n" +
+                "    `sub_product_ver` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '子产品版本号',\n" +
+                "    `sub_product_code` varchar(64) NOT NULL DEFAULT '' COMMENT '子产品代码',\n" +
+                "    `seq_no` int(11) unsigned NOT NULL DEFAULT '1' COMMENT '借款次数序号',\n" +
+                "    `first_loan` varchar(1) DEFAULT NULL COMMENT '首贷标识:Y-是;N-否',\n" +
+                "    `third_code` varchar(64) NOT NULL DEFAULT '' COMMENT '第三方编码',\n" +
+                "    `offer_req_no` varchar(64) DEFAULT NULL COMMENT '报盘流水号',\n" +
+                "    `pay_order_no` varchar(64) DEFAULT NULL COMMENT '支付订单号',\n" +
+                "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
+                "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '创建人',\n" +
+                "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
+                "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
+                "    PRIMARY KEY (`id`),\n" +
+                "    UNIQUE KEY `i_lc_ll_req` (`loan_req_no`),\n" +
+                "    UNIQUE KEY `i_lc_ll_loan` (`loan_no`),\n" +
+                "    KEY `i_lc_ll_con` (`contract_no`),\n" +
+                "    KEY `i_lc_ll_ct` (`cust_no`),\n" +
+                "    KEY `idx_third_rp_day` (`third_code`, `rp_day`)\n" +
+                ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COMMENT = '借据信息表'";
+
+        MySqlStatementParser parser = new MySqlStatementParser(sql);
+        List<SQLStatement> stmtList = parser.parseStatementList();
+        MySqlToHiveOutputVisitor visitor = new MySqlToHiveOutputVisitor("pda", Boolean.TRUE);
+        stmtList.forEach(sqlStatement -> {
+            sqlStatement.accept(visitor);
+        });
+        System.out.println(visitor.getContent());
+    }
+
 }

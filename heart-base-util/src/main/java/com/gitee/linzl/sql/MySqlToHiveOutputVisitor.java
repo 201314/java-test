@@ -24,34 +24,47 @@ import org.apache.commons.lang3.StringUtils;
  * @date 2023/6/12
  */
 public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
-    private SQLUtils.FormatOption defaultOption = new SQLUtils.FormatOption(VisitorFeature.OutputUCase,
-        VisitorFeature.OutputPrettyFormat);
+    private StringBuilder createColumnContent = null;
 
-    private StringBuilder createColumnContent = new StringBuilder();
+    private StringBuilder selectColumnContent = null;
 
-    private StringBuilder selectColumnContent = new StringBuilder();
-
-    private Map<String, StringBuilder> priKeyNum = new HashMap<>();
+    private Map<String, StringBuilder> priKeyNum = null;
     private Integer priKeyIdx = 1;
 
-    private Map<String, StringBuilder> uniqueNum = new HashMap<>();
+    private Map<String, StringBuilder> uniqueNum = null;
 
     private Integer uniqueIdx = 1;
 
-    private List<String> columnIdx = new ArrayList<>();
+    private List<String> columnIdx = null;
 
-    private String formatePrex = "%";
+    private final String formatePrex = "%";
 
-    private String content = null;
+    private StringBuilder fullContent = null;
     private String tableType = null;
+    private Boolean ifView = false;
+    private static final String SPACE_PAD =" ";
+    private static final String SINGLE_QUOTATION ="'";
+    private static final String COMMA =",";
 
     public MySqlToHiveOutputVisitor() {
-        this.content = null;
+        this("", Boolean.FALSE);
     }
 
     public MySqlToHiveOutputVisitor(String tableType) {
-        this.content = null;
+        this(tableType, Boolean.FALSE);
+    }
+
+    public MySqlToHiveOutputVisitor(String tableType,Boolean ifView) {
         this.tableType = tableType;
+        this.ifView = ifView;
+        this.fullContent = new StringBuilder();
+        this.createColumnContent = new StringBuilder();
+        this.selectColumnContent = new StringBuilder();
+        this.priKeyNum = new HashMap<>();
+        this. uniqueNum = new HashMap<>();
+        this.columnIdx = new ArrayList<>();
+        this.priKeyIdx = 1;
+        this.uniqueIdx = 1;
     }
 
     private String replaceChar(String str) {
@@ -66,85 +79,81 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
     }
 
     public void endVisit(SQLColumnDefinition columnDefinition) {
-        String unionType = null;
+        String unionType = "STRING";
+        String hiveDataType = "STRING";
         String columnName = replaceChar(columnDefinition.getColumnName());
         String columnNameNew = columnName;
-        String dataType = columnDefinition.getDataType().getName();
 
-        String hiveDataType = "STRING";
-        switch (dataType.toUpperCase()) {
-            case SQLDataType.Constants.CHAR:
-            case SQLDataType.Constants.NCHAR:
-            case SQLDataType.Constants.VARCHAR:
-            case SQLDataType.Constants.VARBINARY:
-            case SQLDataType.Constants.TEXT:
-            case SQLDataType.Constants.BYTEA:
-                unionType = "STRING";
-                break;
-            case "DATETIME":
-            case SQLDataType.Constants.TIMESTAMP:
-                unionType = SQLDataType.Constants.TIMESTAMP;
-                if (columnName.endsWith("_time")) {
-                    columnNameNew = "time_" + columnName.replaceAll("_time", "");
-                } else if ((columnName.startsWith("date_") || columnName.endsWith("_date"))
-                    && !StringUtils.equalsAny(columnName, "date_created", "date_updated")) {
-                    columnNameNew = "time_" +
-                        columnName.replaceAll("date_", "")
-                            .replaceAll("_date", "");
-                }
-                break;
-            case SQLDataType.Constants.DATE:
-                unionType = SQLDataType.Constants.DATE;
-                if (columnName.endsWith("_time")) {
-                    columnNameNew = "date_" + columnName.replaceAll("_time", "");
-                } else if (columnName.endsWith("_date")) {
-                    columnNameNew = "date_" + columnName.replaceAll("_date", "");
-                }
-                break;
-            case SQLDataType.Constants.TINYINT:
-            case SQLDataType.Constants.SMALLINT:
-            case SQLDataType.Constants.INT:
-            case SQLDataType.Constants.BIGINT:
-                unionType = SQLDataType.Constants.BIGINT;
-                hiveDataType = SQLDataType.Constants.BIGINT;
-                break;
-            case SQLDataType.Constants.DOUBLE:
-            case SQLDataType.Constants.FLOAT:
-            case SQLDataType.Constants.DOUBLE_PRECISION:
-            case SQLDataType.Constants.REAL:
-            case SQLDataType.Constants.DECIMAL:
-            case SQLDataType.Constants.BOOLEAN:
-                unionType = SQLDataType.Constants.DECIMAL;
-                if (columnName.contains("_amt") || columnName.contains("_amount")) {
-                    columnNameNew = columnName.replaceAll("_amount", "_amt");
-                    hiveDataType = "DECIMAL(17,2)";
-                } else {
-                    hiveDataType = "DECIMAL(12,8)";
-                }
-                break;
+        if (!StringUtils.equalsAnyIgnoreCase(columnName, "id", "date_created", "created_by", "date_updated", "updated_by")) {
+            switch (columnDefinition.getDataType().getName().toUpperCase()) {
+                case "DATETIME":
+                case SQLDataType.Constants.TIMESTAMP:
+                    unionType = SQLDataType.Constants.TIMESTAMP;
+                    if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
+                        columnNameNew = "time_" + columnName.substring(0, columnName.length() - 5);
+                    } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
+                        columnNameNew = "time_" + columnName.substring(5, columnName.length());
+                    } else {
+                        columnNameNew = "time_" + columnName;
+                    }
+                    break;
+                case SQLDataType.Constants.DATE:
+                    unionType = SQLDataType.Constants.DATE;
+                    if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
+                        columnNameNew = "date_" + columnName.substring(0, columnName.length() - 5);
+                    } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
+                        columnNameNew = "date_" + columnName.substring(5, columnName.length());
+                    } else {
+                        columnNameNew = "date_" + columnName;
+                    }
+                    break;
+                case SQLDataType.Constants.TINYINT:
+                case SQLDataType.Constants.SMALLINT:
+                case SQLDataType.Constants.INT:
+                case SQLDataType.Constants.BIGINT:
+                    unionType = SQLDataType.Constants.BIGINT;
+                    hiveDataType = SQLDataType.Constants.BIGINT;
+                    break;
+                case SQLDataType.Constants.DOUBLE:
+                case SQLDataType.Constants.FLOAT:
+                case SQLDataType.Constants.DOUBLE_PRECISION:
+                case SQLDataType.Constants.REAL:
+                case SQLDataType.Constants.DECIMAL:
+                    unionType = SQLDataType.Constants.DECIMAL;
+                    if (columnName.contains("_amt") || columnName.contains("_amount")) {
+                        columnNameNew = columnName.replaceAll("_amount", "_amt");
+                        hiveDataType = "DECIMAL(17,2)";
+                    } else {
+                        hiveDataType = "DECIMAL(12,8)";
+                    }
+                    break;
+            }
         }
 
-        createColumnContent.append(",").append(columnNameNew).append("  ");
-        createColumnContent.append(hiveDataType);
+        createColumnContent.append(COMMA).append(columnNameNew).append(SPACE_PAD);
+        if (Boolean.FALSE.equals(ifView)) {
+            createColumnContent.append(hiveDataType).append(SPACE_PAD);
+        }
 
         SQLCharExpr commentExpr = (SQLCharExpr) columnDefinition.getComment();
         String comment = replaceChar(commentExpr == null ? StringUtils.EMPTY : commentExpr.getText());
-        createColumnContent.append(" COMMENT '").append(comment);
-
+        createColumnContent.append("COMMENT").append(SPACE_PAD).append(SINGLE_QUOTATION).append(comment);
 
         if (unionType == SQLDataType.Constants.DATE) {
             createColumnContent.append("yyyy-MM-dd");
         } else if (unionType == SQLDataType.Constants.TIMESTAMP) {
             createColumnContent.append("yyyy-MM-dd HH:mm:ss");
         }
-        createColumnContent.append(formatePrex + columnName + formatePrex).append("'").append(System.lineSeparator());
+        createColumnContent.append(formatePrex + columnName + formatePrex)
+                .append(COMMA)
+                .append(System.lineSeparator());
         columnIdx.add(columnName);
+
         selectColumnContent.append(",");
-        SQLExpr defaultExpr = columnDefinition.getDefaultExpr();
         // 有默认值，则一定是NOT NULL
         String kuhaoAS = " AS ";
-        if (Objects.nonNull(defaultExpr) && defaultExpr instanceof SQLCharExpr) {
-            SQLCharExpr sqlCharExpr = (SQLCharExpr) defaultExpr;
+        if (Objects.nonNull(columnDefinition.getDefaultExpr()) && columnDefinition.getDefaultExpr() instanceof SQLCharExpr) {
+            SQLCharExpr sqlCharExpr = (SQLCharExpr) columnDefinition.getDefaultExpr();
             // 默认为空值的,才进行判断
             if (StringUtils.isBlank(sqlCharExpr.getText())) {
                 selectColumnContent.append("IF(").append(columnName).append(" = '',NULL,");
@@ -171,7 +180,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
             SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
             uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("业务主键")).append(uniqueIdx).append(",");
+                s -> new StringBuilder("业务主键")).append(uniqueIdx).append(COMMA);
         });
 
         uniqueIdx++;
@@ -182,41 +191,59 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
             SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
             priKeyNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("主键")).append(priKeyIdx).append(",");
+                s -> new StringBuilder("主键")).append(priKeyIdx).append(COMMA);
         });
 
         priKeyIdx++;
     }
 
     public void endVisit(MySqlCreateTableStatement createTable) {
-        String tableName = replaceChar(createTable.getTableName()) + "_" + tableType;
+        String tableName = replaceChar(createTable.getTableName());
+        if(StringUtils.isNotBlank(tableType)){
+            tableName += "_" + tableType;
+        }
+
+        // Create表语句
+        StringBuilder createContent = null;
+        if (Boolean.FALSE.equals(ifView)) {
+            createContent = new StringBuilder("CREATE TABLE IF NOT EXISTS").append(SPACE_PAD);
+        } else {
+            createContent = new StringBuilder("CREATE VIEW IF NOT EXISTS").append(SPACE_PAD);
+        }
+        createContent.append(tableName).append(SPACE_PAD)
+                .append("(").append(SPACE_PAD)
+                .append(createColumnContent.deleteCharAt(0)).append(SPACE_PAD);
+
         String createPartition = "";
         String selectPartition = "";
-        if (StringUtils.equalsAny(tableType, "pdi", "pda")) {
+        if (Boolean.TRUE.equals(ifView) && StringUtils.equalsAny(tableType, "pdi", "pda")) {
+            createContent.append(",pday COMMENT '按日分区'").append(SPACE_PAD);
+            selectPartition = ",pday ";
+        } else if (StringUtils.equalsAny(tableType, "pdi", "pda")) {
             createPartition = "PARTITIONED BY (pday STRING COMMENT '按日分区')";
-            selectPartition = ",'${yesterday_p}' AS pday ";
+            selectPartition = ",'${yesterday_p}' AS pday";
         } else if (StringUtils.equalsAny(tableType, "pmi")) {
             createPartition = "PARTITIONED BY (pmonth STRING COMMENT '按月分区')";
-            selectPartition = ",substr('${last_month_start_p}' ,1,6) AS pmonth ";
+            selectPartition = ",substr('${last_month_start_p}' ,1,6) AS pmonth";
         } else if (StringUtils.equalsAny(tableType, "pyi")) {
             createPartition = "PARTITIONED BY (pyear STRING COMMENT '按年分区')";
-            selectPartition = ",substr('${yesterday_p}' ,1,4) AS pyear ";
+            selectPartition = ",substr('${yesterday_p}' ,1,4) AS pyear";
         }
-        SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
 
-        StringBuilder createContent = new StringBuilder();
-        createContent.append("CREATE TABLE IF NOT EXISTS ").append(tableName).append(" ( ")
-            .append(createColumnContent.deleteCharAt(0))
-            .append(") COMMENT '")
-            .append(replaceChar(sqlCharExpr.getText()))
-            .append("'")
+        SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
+        createContent.append(")").append(SPACE_PAD)
+                .append("COMMENT").append(SPACE_PAD).append(SINGLE_QUOTATION)
+            .append(replaceChar(sqlCharExpr.getText())).append(SINGLE_QUOTATION)
             .append(System.lineSeparator())
             .append(createPartition)
-            .append(System.lineSeparator())
-            .append("STORED AS ORC;");
+            .append(System.lineSeparator());
+        if (Boolean.FALSE.equals(ifView)) {
+            createContent.append("STORED AS ORC;");
+        } else {
+            createContent.append(SPACE_PAD).append("AS").append(SPACE_PAD);
+        }
 
         String createColumn = createContent.toString();
-
         boolean uniqueFlag = uniqueNum.size() > 0 ? Boolean.TRUE : Boolean.FALSE;
         for (int index = 0, length = columnIdx.size(); index < length; index++) {
             String columnName = columnIdx.get(index);
@@ -234,33 +261,23 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             createColumn = createColumn.replaceAll(formatePrex + columnName + formatePrex, comment);
         }
 
+        // insert select 语句
         StringBuilder selectContent = new StringBuilder();
-        selectContent.append("INSERT OVERWRITE TABLE ");
-        selectContent.append(tableName);
-        selectContent.append(" SELECT ")
-            .append(selectColumnContent.deleteCharAt(0))
-            .append(System.lineSeparator())
-            .append(selectPartition)
-            .append(" FROM ")
-            .append(tableName)
-            .append(";");
+        if (Boolean.FALSE.equals(ifView)) {
+            selectContent.append("INSERT OVERWRITE TABLE").append(SPACE_PAD).append(tableName).append(System.lineSeparator());
+        }
 
-        StringBuilder fullContent = new StringBuilder();
-        fullContent.append(SQLUtils.formatHive(createColumn, defaultOption));
+        selectContent.append("SELECT").append(SPACE_PAD)
+            .append(selectColumnContent.deleteCharAt(0)).append(System.lineSeparator())
+            .append(selectPartition).append(System.lineSeparator())
+            .append("FROM").append(SPACE_PAD).append(tableName).append(";");
+
+        fullContent.append(createColumn);
         fullContent.append(System.lineSeparator());
-        fullContent.append(SQLUtils.formatHive(selectContent.toString(), defaultOption));
-
-        content = fullContent.toString();
-        createColumnContent = new StringBuilder();
-        selectColumnContent = new StringBuilder();
-        priKeyNum = new HashMap<>();
-        uniqueNum = new HashMap<>();
-        columnIdx = new ArrayList<>();
-        priKeyIdx = 1;
-        uniqueIdx = 1;
+        fullContent.append(selectContent);
     }
 
     public String getContent() {
-        return content;
+        return SQLUtils.formatHive(fullContent.toString(), new SQLUtils.FormatOption());
     }
 }

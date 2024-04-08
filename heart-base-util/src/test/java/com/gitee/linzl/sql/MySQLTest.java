@@ -23,7 +23,7 @@ import org.junit.Test;
 @Slf4j
 public class MySQLTest {
     @Test
-    public void uniquePk() {
+    public void mysqlToHive() {
         String sql = "CREATE TABLE `ln_loan_extension_record` (\n" +
             "    `id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '物理主键',\n" +
             "    `request_no` varchar(80) NOT NULL DEFAULT '' COMMENT '其他系统请求流水号',\n" +
@@ -73,38 +73,6 @@ public class MySQLTest {
             "    USING\n" +
             "        BTREE\n" +
             ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COMMENT = '借据延期申请及处理表'";
-
-        MySqlStatementParser parser = new MySqlStatementParser(sql);
-        parser.getExprParser();
-
-        List<SQLStatement> stmtList = parser.parseStatementList();
-        // 将AST通过visitor输出
-        StringBuilder out = new StringBuilder();
-        MySqlOutputVisitor visitor = new MySqlOutputVisitor(out);
-        MySqlCreateTableStatement createTable = (MySqlCreateTableStatement) stmtList.get(0);
-        List<SQLTableElement> list = createTable.getTableElementList();
-        list.stream().forEach(sqlTableElement -> {
-            if (sqlTableElement instanceof MySqlUnique) {
-                MySqlUnique mySqlUnique = (MySqlUnique) sqlTableElement;
-                SQLIndexDefinition indexDefinition = mySqlUnique.getIndexDefinition();
-                log.info("唯一索引:" + indexDefinition.getColumns());
-            }
-        });
-    }
-    @Test
-    public void mysqlToHive() {
-        String sql = "CREATE TABLE `product_info` (\n" +
-            "    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键',\n" +
-            "    `adjust_score_protect` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '产品列表保护期调节分数',\n" +
-            "    `adjust_score_protect_effective` datetime DEFAULT NULL COMMENT '保护期开始时间',\n" +
-            "    `adjust_score_protect_expire` datetime DEFAULT NULL COMMENT '保护期开始时间',\n" +
-            "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
-            "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '创建人',\n" +
-            "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
-            "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
-            "    PRIMARY KEY (`id`),\n" +
-            "    UNIQUE KEY `uk_product` (`partner_no`, `product_code`, `product_version`)\n" +
-            ") ENGINE = InnoDB AUTO_INCREMENT = 88 DEFAULT CHARSET = utf8 COMMENT = '合作方产品配置表'";
 
         MySqlStatementParser parser = new MySqlStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();

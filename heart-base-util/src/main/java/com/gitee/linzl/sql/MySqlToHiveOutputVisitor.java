@@ -2,9 +2,12 @@ package com.gitee.linzl.sql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.SQLExpr;
@@ -60,8 +63,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         this.fullContent = new StringBuilder();
         this.createColumnContent = new StringBuilder();
         this.selectColumnContent = new StringBuilder();
-        this.priKeyNum = new HashMap<>();
-        this. uniqueNum = new HashMap<>();
+        this.priKeyNum = new LinkedHashMap<>();
+        this. uniqueNum = new LinkedHashMap<>();
         this.columnIdx = new ArrayList<>();
         this.priKeyIdx = 1;
         this.uniqueIdx = 1;
@@ -137,19 +140,18 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
         SQLCharExpr commentExpr = (SQLCharExpr) columnDefinition.getComment();
         String comment = replaceChar(commentExpr == null ? StringUtils.EMPTY : commentExpr.getText());
-        createColumnContent.append("COMMENT").append(SPACE_PAD).append(SINGLE_QUOTATION).append(comment);
+        createColumnContent.append("COMMENT").append(SPACE_PAD)
+                .append(SINGLE_QUOTATION).append(comment);
 
         if (unionType == SQLDataType.Constants.DATE) {
             createColumnContent.append("yyyy-MM-dd");
         } else if (unionType == SQLDataType.Constants.TIMESTAMP) {
             createColumnContent.append("yyyy-MM-dd HH:mm:ss");
         }
-        createColumnContent.append(formatePrex + columnName + formatePrex)
-                .append(COMMA)
-                .append(System.lineSeparator());
-        columnIdx.add(columnName);
+        createColumnContent.append(formatePrex).append(columnName).append(formatePrex).append(SINGLE_QUOTATION);
+        createColumnContent.append(System.lineSeparator());
 
-        selectColumnContent.append(",");
+        selectColumnContent.append(COMMA);
         // 有默认值，则一定是NOT NULL
         String kuhaoAS = " AS ";
         if (Objects.nonNull(columnDefinition.getDefaultExpr()) && columnDefinition.getDefaultExpr() instanceof SQLCharExpr) {
@@ -173,28 +175,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
         selectColumnContent.append(columnNameNew);
         selectColumnContent.append(System.lineSeparator());
-    }
 
-    public void endVisit(MySqlUnique mySqlUnique) {
-        SQLIndexDefinition idxDefinition = mySqlUnique.getIndexDefinition();
-        idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
-            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("业务主键")).append(uniqueIdx).append(COMMA);
-        });
-
-        uniqueIdx++;
-    }
-
-    public void endVisit(MySqlPrimaryKey primaryKey) {
-        SQLIndexDefinition idxDefinition = primaryKey.getIndexDefinition();
-        idxDefinition.getColumns().stream().forEach(sqlSelectOrderByItem -> {
-            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            priKeyNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
-                s -> new StringBuilder("主键")).append(priKeyIdx).append(COMMA);
-        });
-
-        priKeyIdx++;
+        columnIdx.add(columnName);
     }
 
     public void endVisit(MySqlCreateTableStatement createTable) {
@@ -212,7 +194,10 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         }
         createContent.append(tableName).append(SPACE_PAD)
                 .append("(").append(SPACE_PAD)
-                .append(createColumnContent.deleteCharAt(0)).append(SPACE_PAD);
+                .append(createColumnContent.deleteCharAt(0))
+                .append(",etl_time STRING COMMENT  'etl处理时间(格式:yyyy-MM-dd HH:mm:ss)'")
+                .append(",etl_key STRING COMMENT   'etl处理key(唯一键)'")
+                .append(SPACE_PAD);
 
         String createPartition = "";
         String selectPartition = "";
@@ -232,8 +217,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
         SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
         createContent.append(")").append(SPACE_PAD)
-                .append("COMMENT").append(SPACE_PAD).append(SINGLE_QUOTATION)
-            .append(replaceChar(sqlCharExpr.getText())).append(SINGLE_QUOTATION)
+                .append("COMMENT").append(SPACE_PAD)
+            .append(SINGLE_QUOTATION).append(replaceChar(sqlCharExpr.getText())).append(SINGLE_QUOTATION)
             .append(System.lineSeparator())
             .append(createPartition)
             .append(System.lineSeparator());
@@ -269,12 +254,45 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
         selectContent.append("SELECT").append(SPACE_PAD)
             .append(selectColumnContent.deleteCharAt(0)).append(System.lineSeparator())
-            .append(selectPartition).append(System.lineSeparator())
+            .append(",SUBSTR(CURRENT_TIMESTAMP(),1,19)  AS etl_time");
+
+        if (uniqueFlag){
+            String md5Key =  uniqueNum.keySet().stream().sequential().collect(Collectors.joining(","));
+            selectContent.append(",MD5(CONCAT_WS('|',").append(md5Key).append(")) AS etl_key");
+        } else {
+            String md5Key =  priKeyNum.keySet().stream().sequential().collect(Collectors.joining(","));
+            selectContent.append(",MD5(CONCAT_WS('|',").append("").append(")) AS etl_key");
+        }
+
+        selectContent.append(selectPartition).append(System.lineSeparator())
             .append("FROM").append(SPACE_PAD).append(tableName).append(";");
 
         fullContent.append(createColumn);
         fullContent.append(System.lineSeparator());
         fullContent.append(selectContent);
+    }
+
+    public void endVisit(MySqlUnique mySqlUnique) {
+        SQLIndexDefinition idxDefinition = mySqlUnique.getIndexDefinition();
+        idxDefinition.getColumns().forEach(sqlSelectOrderByItem -> {
+            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
+            System.out.println("identifierExpr.getName():"+identifierExpr.getName());
+            uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+                    s -> new StringBuilder("业务主键")).append(uniqueIdx).append(COMMA);
+        });
+
+        uniqueIdx++;
+    }
+
+    public void endVisit(MySqlPrimaryKey primaryKey) {
+        SQLIndexDefinition idxDefinition = primaryKey.getIndexDefinition();
+        idxDefinition.getColumns().forEach(sqlSelectOrderByItem -> {
+            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
+            priKeyNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+                    s -> new StringBuilder("主键")).append(priKeyIdx).append(COMMA);
+        });
+
+        priKeyIdx++;
     }
 
     public String getContent() {

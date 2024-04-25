@@ -194,25 +194,45 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         }
         createContent.append(tableName).append(SPACE_PAD)
                 .append("(").append(SPACE_PAD)
-                .append(createColumnContent.deleteCharAt(0))
-                .append(",etl_time STRING COMMENT  'etl处理时间(格式:yyyy-MM-dd HH:mm:ss)'")
-                .append(",etl_key STRING COMMENT   'etl处理key(唯一键)'")
-                .append(SPACE_PAD);
+                .append(createColumnContent.deleteCharAt(0));
+        if (ifView){
+            createContent.append(",etl_time COMMENT  'etl处理时间(格式:yyyy-MM-dd HH:mm:ss)'")
+                    .append(SPACE_PAD)
+                    .append(",etl_key COMMENT   'etl处理key(质量唯一键)'")
+                    .append(SPACE_PAD);
+        } else {
+            createContent.append(",etl_time STRING COMMENT  'etl处理时间(格式:yyyy-MM-dd HH:mm:ss)'")
+                    .append(SPACE_PAD)
+                    .append(",etl_key STRING COMMENT   'etl处理key(质量唯一键)'")
+                    .append(SPACE_PAD);
+        }
 
         String createPartition = "";
         String selectPartition = "";
-        if (Boolean.TRUE.equals(ifView) && StringUtils.equalsAny(tableType, "pdi", "pda")) {
-            createContent.append(",pday COMMENT '按日分区'").append(SPACE_PAD);
-            selectPartition = ",pday ";
-        } else if (StringUtils.equalsAny(tableType, "pdi", "pda")) {
-            createPartition = "PARTITIONED BY (pday STRING COMMENT '按日分区')";
-            selectPartition = ",'${yesterday_p}' AS pday";
+        if (StringUtils.equalsAny(tableType, "pdi", "pda")) {
+            if (Boolean.TRUE.equals(ifView)){
+                createContent.append(",pday COMMENT '按日分区'").append(SPACE_PAD);
+                selectPartition = ",pday ";
+            }else {
+                createPartition = "PARTITIONED BY (pday STRING COMMENT '按日分区')";
+                selectPartition = ",'${yesterday_p}' AS pday";
+            }
         } else if (StringUtils.equalsAny(tableType, "pmi")) {
-            createPartition = "PARTITIONED BY (pmonth STRING COMMENT '按月分区')";
-            selectPartition = ",substr('${last_month_start_p}' ,1,6) AS pmonth";
+            if (Boolean.TRUE.equals(ifView)){
+                createContent.append(",pmonth COMMENT '按月分区'").append(SPACE_PAD);
+                selectPartition = ",pmonth ";
+            }else {
+                createPartition = "PARTITIONED BY (pmonth STRING COMMENT '按月分区')";
+                selectPartition = ",substr('${last_month_start_p}' ,1,6) AS pmonth";
+            }
         } else if (StringUtils.equalsAny(tableType, "pyi")) {
-            createPartition = "PARTITIONED BY (pyear STRING COMMENT '按年分区')";
-            selectPartition = ",substr('${yesterday_p}' ,1,4) AS pyear";
+            if (Boolean.TRUE.equals(ifView)){
+                createContent.append(",pyear COMMENT '按年分区'").append(SPACE_PAD);
+                selectPartition = ",pyear ";
+            }else {
+                createPartition = "PARTITIONED BY (pyear STRING COMMENT '按年分区')";
+                selectPartition = ",substr('${yesterday_p}' ,1,4) AS pyear";
+            }
         }
 
         SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
@@ -257,11 +277,17 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
             .append(",SUBSTR(CURRENT_TIMESTAMP(),1,19)  AS etl_time");
 
         if (uniqueFlag){
-            String md5Key =  uniqueNum.keySet().stream().sequential().collect(Collectors.joining(","));
+            Map<String, String> groupedMap = uniqueNum.entrySet().stream().sequential()
+                    .collect(Collectors.groupingBy(entry -> entry.getValue().toString(),
+                            Collectors.mapping(Map.Entry::getKey, Collectors.joining(","))));
+            String md5Key =  groupedMap.values().stream().sequential().findFirst().get();
             selectContent.append(",MD5(CONCAT_WS('|',").append(md5Key).append(")) AS etl_key");
         } else {
-            String md5Key =  priKeyNum.keySet().stream().sequential().collect(Collectors.joining(","));
-            selectContent.append(",MD5(CONCAT_WS('|',").append("").append(")) AS etl_key");
+            Map<String, String> groupedMap = priKeyNum.entrySet().stream().sequential()
+                    .collect(Collectors.groupingBy(entry -> entry.getValue().toString(),
+                            Collectors.mapping(Map.Entry::getKey, Collectors.joining(","))));
+            String md5Key =  groupedMap.values().stream().sequential().findFirst().get();
+            selectContent.append(",MD5(CONCAT_WS('|',").append(md5Key).append(")) AS etl_key");
         }
 
         selectContent.append(selectPartition).append(System.lineSeparator())
@@ -270,13 +296,13 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         fullContent.append(createColumn);
         fullContent.append(System.lineSeparator());
         fullContent.append(selectContent);
+        System.out.println(fullContent);
     }
 
     public void endVisit(MySqlUnique mySqlUnique) {
         SQLIndexDefinition idxDefinition = mySqlUnique.getIndexDefinition();
         idxDefinition.getColumns().forEach(sqlSelectOrderByItem -> {
             SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            System.out.println("identifierExpr.getName():"+identifierExpr.getName());
             uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
                     s -> new StringBuilder("业务主键")).append(uniqueIdx).append(COMMA);
         });

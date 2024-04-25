@@ -160,7 +160,7 @@ public class MySQLTest {
                 "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
                 "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
                 "    PRIMARY KEY (`id`),\n" +
-                "    UNIQUE KEY `i_lc_ll_req` (`loan_req_no`),\n" +
+                "    UNIQUE KEY `i_lc_ll_req` (`loan_req_no`,`busi_loan_no`),\n" +
                 "    UNIQUE KEY `i_lc_ll_loan` (`loan_no`),\n" +
                 "    KEY `i_lc_ll_con` (`contract_no`),\n" +
                 "    KEY `i_lc_ll_ct` (`cust_no`),\n" +

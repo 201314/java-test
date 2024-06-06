@@ -1,6 +1,7 @@
 package com.gitee.linzl.math;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
@@ -40,11 +41,11 @@ public class BigDecimalUtil {
      * @return
      */
     public static BigDecimal add(String first, String second, int scale) {
-        return add(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return add(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal add(Double first, Double second, int scale) {
-        return add(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return add(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     /**
@@ -73,11 +74,11 @@ public class BigDecimalUtil {
      * @return
      */
     public static BigDecimal subtract(String first, String second, int scale) {
-        return subtract(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return subtract(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal subtract(Double first, Double second, int scale) {
-        return subtract(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return subtract(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     /**
@@ -102,11 +103,11 @@ public class BigDecimalUtil {
     }
 
     public static BigDecimal multiply(String first, String second, int scale) {
-        return multiply(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return multiply(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal multiply(Double first, Double second, int scale) {
-        return multiply(first, second).setScale(scale, BigDecimal.ROUND_HALF_UP);
+        return multiply(first, second).setScale(scale, RoundingMode.HALF_UP);
     }
 
     /**
@@ -127,11 +128,15 @@ public class BigDecimalUtil {
     }
 
     public static BigDecimal divide(String first, String second, int scale) {
-        return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
+        BigDecimal bdFirst = new BigDecimal(first);
+        BigDecimal bdSecond = new BigDecimal(second);
+        return bdFirst.divide(bdSecond,scale, BigDecimal.ROUND_CEILING);
     }
 
     public static BigDecimal divide(Double first, Double second, int scale) {
-        return multiply(first, second).setScale(scale, BigDecimal.ROUND_CEILING);
+        BigDecimal bdFirst = BigDecimal.valueOf(first);
+        BigDecimal bdSecond = BigDecimal.valueOf(second);
+        return bdFirst.divide(bdSecond,scale, BigDecimal.ROUND_CEILING);
     }
 
     public static BigDecimal defaultIfNull(BigDecimal first, BigDecimal defaultVal) {

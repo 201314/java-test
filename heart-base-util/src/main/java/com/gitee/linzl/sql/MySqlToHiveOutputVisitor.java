@@ -71,6 +71,9 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
     }
 
     private String replaceChar(String str) {
+        if (StringUtils.isBlank(str)){
+            return StringUtils.EMPTY;
+        }
         return str.trim().replaceAll("`", "")
             .replaceAll(" ", "")
             .replaceAll("：", ":")
@@ -238,7 +241,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         SQLCharExpr sqlCharExpr = (SQLCharExpr) createTable.getComment();
         createContent.append(")").append(SPACE_PAD)
                 .append("COMMENT").append(SPACE_PAD)
-            .append(SINGLE_QUOTATION).append(replaceChar(sqlCharExpr.getText())).append(SINGLE_QUOTATION)
+            .append(SINGLE_QUOTATION).append(replaceChar(Objects.isNull(sqlCharExpr)?
+                        StringUtils.EMPTY:sqlCharExpr.getText())).append(SINGLE_QUOTATION)
             .append(System.lineSeparator())
             .append(createPartition)
             .append(System.lineSeparator());
@@ -296,7 +300,6 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         fullContent.append(createColumn);
         fullContent.append(System.lineSeparator());
         fullContent.append(selectContent);
-        System.out.println(fullContent);
     }
 
     public void endVisit(MySqlUnique mySqlUnique) {

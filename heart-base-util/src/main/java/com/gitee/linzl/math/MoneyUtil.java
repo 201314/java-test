@@ -88,7 +88,7 @@ public class MoneyUtil {
      * @param obj
      * @return
      */
-    public static String percent(Object obj) {
+    public static String percent(Number obj) {
         DecimalFormat format = new DecimalFormat("0.00%");
         return format.format(obj);
     }
@@ -288,5 +288,6 @@ public class MoneyUtil {
         //number = 2356789.9845;
         System.out.println(number + ":" + numberConvertCapital(number));
         System.out.println("1155555:" + abbreviation(1155555d, 6));
+        System.out.println(percent(23));
     }
 }

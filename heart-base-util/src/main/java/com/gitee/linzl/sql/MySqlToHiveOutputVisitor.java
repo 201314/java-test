@@ -90,50 +90,54 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         String columnName = replaceChar(columnDefinition.getColumnName());
         String columnNameNew = columnName;
 
-        if (!StringUtils.equalsAnyIgnoreCase(columnName, "id", "date_created", "created_by", "date_updated", "updated_by")) {
-            switch (columnDefinition.getDataType().getName().toUpperCase()) {
-                case "DATETIME":
-                case SQLDataType.Constants.TIMESTAMP:
-                    unionType = SQLDataType.Constants.TIMESTAMP;
-                    if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
-                        columnNameNew = "time_" + columnName.substring(0, columnName.length() - 5);
-                    } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
-                        columnNameNew = "time_" + columnName.substring(5, columnName.length());
-                    } else {
-                        columnNameNew = "time_" + columnName;
-                    }
+        switch (columnDefinition.getDataType().getName().toUpperCase()) {
+            case "DATETIME":
+            case SQLDataType.Constants.TIMESTAMP:
+                unionType = SQLDataType.Constants.TIMESTAMP;
+                if (StringUtils.equalsAny(columnName, "date_created", "date_updated")) {
                     break;
-                case SQLDataType.Constants.DATE:
-                    unionType = SQLDataType.Constants.DATE;
-                    if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
-                        columnNameNew = "date_" + columnName.substring(0, columnName.length() - 5);
-                    } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
-                        columnNameNew = "date_" + columnName.substring(5, columnName.length());
-                    } else {
-                        columnNameNew = "date_" + columnName;
-                    }
+                }
+                if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
+                    columnNameNew = "time_" + columnName.substring(0, columnName.length() - 5);
+                } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
+                    columnNameNew = "time_" + columnName.substring(5, columnName.length());
+                } else {
+                    columnNameNew = "time_" + columnName;
+                }
+                break;
+            case SQLDataType.Constants.DATE:
+                unionType = SQLDataType.Constants.DATE;
+                if (StringUtils.equalsAny(columnName, "date_created", "date_updated")) {
                     break;
-                case SQLDataType.Constants.TINYINT:
-                case SQLDataType.Constants.SMALLINT:
-                case SQLDataType.Constants.INT:
-                case SQLDataType.Constants.BIGINT:
-                    unionType = SQLDataType.Constants.BIGINT;
-                    hiveDataType = SQLDataType.Constants.BIGINT;
-                    break;
-                case SQLDataType.Constants.DOUBLE:
-                case SQLDataType.Constants.FLOAT:
-                case SQLDataType.Constants.DOUBLE_PRECISION:
-                case SQLDataType.Constants.REAL:
-                case SQLDataType.Constants.DECIMAL:
-                    unionType = SQLDataType.Constants.DECIMAL;
-                    if (columnName.contains("_amt") || columnName.contains("_amount")) {
-                        columnNameNew = columnName.replaceAll("_amount", "_amt");
-                        hiveDataType = "DECIMAL(17,2)";
-                    } else {
-                        hiveDataType = "DECIMAL(12,8)";
-                    }
-                    break;
-            }
+                }
+                if (columnName.endsWith("_time") || columnName.endsWith("_date")) {
+                    columnNameNew = "date_" + columnName.substring(0, columnName.length() - 5);
+                } else if (columnName.startsWith("time_") || columnName.startsWith("date_")) {
+                    columnNameNew = "date_" + columnName.substring(5, columnName.length());
+                } else {
+                    columnNameNew = "date_" + columnName;
+                }
+                break;
+            case SQLDataType.Constants.TINYINT:
+            case SQLDataType.Constants.SMALLINT:
+            case SQLDataType.Constants.INT:
+            case SQLDataType.Constants.BIGINT:
+                unionType = SQLDataType.Constants.BIGINT;
+                hiveDataType = SQLDataType.Constants.BIGINT;
+                break;
+            case SQLDataType.Constants.DOUBLE:
+            case SQLDataType.Constants.FLOAT:
+            case SQLDataType.Constants.DOUBLE_PRECISION:
+            case SQLDataType.Constants.REAL:
+            case SQLDataType.Constants.DECIMAL:
+                unionType = SQLDataType.Constants.DECIMAL;
+                if (columnName.contains("_amt") || columnName.contains("_amount")) {
+                    columnNameNew = columnName.replaceAll("_amount", "_amt");
+                    hiveDataType = "DECIMAL(17,2)";
+                } else {
+                    hiveDataType = "DECIMAL(12,8)";
+                }
+                break;
         }
 
         createColumnContent.append(COMMA).append(columnNameNew).append(SPACE_PAD);

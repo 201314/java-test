@@ -1,13 +1,17 @@
 package com.gitee.linzl.time;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.ocpsoft.prettytime.PrettyTime;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * 日期格式化类
@@ -18,6 +22,8 @@ public class DateFormatUtil {
 	public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 	public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
 	public static final String YYYY_MM_DD = "yyyy-MM-dd";
+	public static final String HH_MM_SS = "HH:mm:ss";
+
 
 	public static String format() {
 		return format(YYYY_MM_DD_HH_MM_SS);
@@ -86,6 +92,14 @@ public class DateFormatUtil {
 	}
 
 	public static String format(LocalDateTime date, String pattern) {
+		return DateTimeFormatter.ofPattern(pattern).format(date);
+	}
+
+	public static String format(LocalTime date) {
+		return format(date, HH_MM_SS);
+	}
+
+	public static String format(LocalTime date, String pattern) {
 		return DateTimeFormatter.ofPattern(pattern).format(date);
 	}
 

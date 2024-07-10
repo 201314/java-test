@@ -1,8 +1,5 @@
 package com.gitee.linzl.lottery;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
-import com.gitee.linzl.sql.MySqlToHiveOutputVisitor;
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -159,32 +159,21 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         createColumnContent.append(System.lineSeparator());
 
         selectColumnContent.append(COMMA);
-        // 有默认值，则一定是NOT NULL
         String kuhaoAS = " AS ";
-        if (Objects.nonNull(columnDefinition.getDefaultExpr()) && columnDefinition.getDefaultExpr() instanceof SQLCharExpr) {
-            SQLCharExpr sqlCharExpr = (SQLCharExpr) columnDefinition.getDefaultExpr();
-            // 默认为空值的,才进行判断
-            if (StringUtils.isBlank(sqlCharExpr.getText())) {
-                selectColumnContent.append("IF(").append(columnName).append(" = '',NULL,");
-                kuhaoAS = ") AS ";
-            }
-        }
-
         if (SQLDataType.Constants.TIMESTAMP.equals(unionType)) {
-            selectColumnContent.append("SUBSTR(").append(columnName).append(",1,19)").append(kuhaoAS);
+            selectColumnContent.append("SUBSTR(").append(columnName).append(",1,19)").append(kuhaoAS).append(columnNameNew);
         } else if (SQLDataType.Constants.DATE.equals(unionType)) {
-            selectColumnContent.append("SUBSTR(").append(columnName).append(",1,10)").append(kuhaoAS);
-        } else if (SQLDataType.Constants.DECIMAL.equals(unionType)) {
-            selectColumnContent.append("COALESCE(").append(columnName).append(",0)").append(kuhaoAS);
-        } else if (StringUtils.equalsAny(kuhaoAS, ") AS ")) {
-            selectColumnContent.append(columnName).append(kuhaoAS);
+            selectColumnContent.append("SUBSTR(").append(columnName).append(",1,10)").append(kuhaoAS).append(columnNameNew);
+        } else if (SQLDataType.Constants.BIGINT.equals(unionType) || SQLDataType.Constants.DECIMAL.equals(unionType)) {
+            selectColumnContent.append("COALESCE(").append(columnName).append(",0)").append(kuhaoAS).append(columnNameNew);
+        } else {
+            selectColumnContent.append("IF(trim(").append(columnName).append(") IN ('','null'),NULL,trim(").append(columnName).append("))").append(kuhaoAS).append(columnNameNew);
         }
 
-        selectColumnContent.append(columnNameNew);
         selectColumnContent.append(System.lineSeparator());
-
         columnIdx.add(columnName);
     }
+
 
     public void endVisit(MySqlCreateTableStatement createTable) {
         String tableName = replaceChar(createTable.getTableName());

@@ -23,55 +23,70 @@ import java.util.List;
 public class MySQLTest {
     @Test
     public void mysqlToHive() {
-        String sql = "CREATE TABLE `ln_loan_extension_record` (\n" +
-            "    `id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '物理主键',\n" +
-            "    `request_no` varchar(80) NOT NULL DEFAULT '' COMMENT '其他系统请求流水号',\n" +
-            "    `applicant` varchar(20) NOT NULL DEFAULT '' COMMENT '申请系统，如客服KF，催收CS',\n" +
-            "    `cust_no` varchar(64) NOT NULL DEFAULT '' COMMENT '客户号',\n" +
-            "    `contract_no` varchar(64) NOT NULL DEFAULT '' COMMENT '合同号',\n" +
-            "    `loan_no` varchar(64) NOT NULL DEFAULT '' COMMENT '借据号',\n" +
-            "    `tr_proc_rp_no` varchar(64) DEFAULT NULL COMMENT '展期关联入账减免流水',\n" +
-            "    `before_loan_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '原始借款本金',\n" +
-            "    `after_loan_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '展期后借款本金',\n" +
-            "    `before_term` int(10) unsigned DEFAULT NULL COMMENT '原始借款期数',\n" +
-            "    `after_term` int(10) unsigned DEFAULT NULL COMMENT '展期后借款期数',\n" +
-            "    `start_term` int(10) unsigned DEFAULT NULL COMMENT '展期当时期数',\n" +
-            "    `apply_date` date DEFAULT NULL COMMENT '展期申请日期，客服申请日期',\n" +
-            "    `valid_date` date DEFAULT NULL COMMENT '展期截止日期，如多少天内可申请展期',\n" +
-            "    `extension_date` datetime DEFAULT NULL COMMENT '展期操作日期，系统延期成功日期',\n" +
-            "    `product_code` varchar(50) DEFAULT NULL COMMENT '产品代码',\n" +
-            "    `status` varchar(2) NOT NULL DEFAULT '' COMMENT '借据展期状态:00初始化,\n" +
-            "02处理中,\n" +
-            "03展期成功,\n" +
-            "04展期失败,\n" +
-            "99系统异常',\n" +
-            "    `before_rpy_type` varchar(2) DEFAULT NULL COMMENT '原始还款方式:00-等额本金，01-等额本息，02-先息后本',\n" +
-            "    `after_rpy_type` varchar(2) DEFAULT NULL COMMENT '展期后还款方式:00-等额本金，01-等额本息，02-先息后本',\n" +
-            "    `before_rpy_date` int(10) unsigned DEFAULT NULL COMMENT '原始还款日',\n" +
-            "    `after_rpy_date` int(10) unsigned DEFAULT NULL COMMENT '展期后还款日',\n" +
-            "    `before_date_end` date DEFAULT NULL COMMENT '原始贷款止期',\n" +
-            "    `after_date_end` date DEFAULT NULL COMMENT '原始贷款止期',\n" +
-            "    `before_loan_status` varchar(2) DEFAULT NULL COMMENT '原始借据状态:RP-正确,\n" +
-            "OD-逾期',\n" +
-            "    `over_due_days` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '展期时候客户级别当前逾期天数',\n" +
-            "    `max_over_days` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '展期时候客户级别最高逾期天数',\n" +
-            "    `over_due_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '展期时候客户级别当前逾期金额',\n" +
-            "    `max_over_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '展期时候客户级别最高逾期金额',\n" +
-            "    `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
-            "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '创建人',\n" +
-            "    `date_updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
-            "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
-            "    PRIMARY KEY (`id`),\n" +
-            "    UNIQUE KEY `uniq_re_ap_loan` (`request_no`, `applicant`, `loan_no`)\n" +
-            "    USING\n" +
-            "        BTREE,\n" +
-            "        KEY `idx_ct` (`cust_no`)\n" +
-            "    USING\n" +
-            "        BTREE,\n" +
-            "        KEY `idx_loan` (`loan_no`)\n" +
-            "    USING\n" +
-            "        BTREE\n" +
-            ") ENGINE = InnoDB DEFAULT CHARSET = utf8";
+        String sql = "CREATE TABLE `ln_loan` (\n" +
+                "    `id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '物理主键',\n" +
+                "    `loan_req_no` varchar(64) NOT NULL DEFAULT '' COMMENT '放款请求流水号',\n" +
+                "    `loan_no` varchar(64) NOT NULL DEFAULT '' COMMENT '借据号',\n" +
+                "    `busi_loan_no` varchar(20) NOT NULL DEFAULT '' COMMENT '业务借据号',\n" +
+                "    `contract_no` varchar(64) NOT NULL DEFAULT '' COMMENT '合同号',\n" +
+                "    `cust_no` varchar(64) NOT NULL DEFAULT '' COMMENT '客户号',\n" +
+                "    `loan_amt` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '借款金额',\n" +
+                "    `term` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '期数',\n" +
+                "    `rpy_type` varchar(2) NOT NULL DEFAULT '' COMMENT '还款方式:00-等额本金，01-等额本息，02-先息后本',\n" +
+                "    `date_loan` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '资金动用日期',\n" +
+                "    `date_cash` datetime DEFAULT NULL COMMENT '资金到账日期',\n" +
+                "    `date_inst` date DEFAULT NULL COMMENT '起息日',\n" +
+                "    `rp_day` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '还款日',\n" +
+                "    `date_end` date DEFAULT NULL COMMENT '贷款止期',\n" +
+                "    `bank_code` varchar(10) NOT NULL DEFAULT '' COMMENT '银行编号',\n" +
+                "    `card_id` varchar(64) NOT NULL DEFAULT '' COMMENT '银行卡ID',\n" +
+                "    `db_acct` varchar(30) NOT NULL DEFAULT '' COMMENT '放款卡号',\n" +
+                "    `db_acct_encryptx` varchar(64) NOT NULL DEFAULT '' COMMENT '还款卡号密文',\n" +
+                "    `db_acct_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT '还款卡号MD5',\n" +
+                "    `db_acct_name` varchar(100) NOT NULL DEFAULT '' COMMENT '放款账户名称',\n" +
+                "    `db_acct_name_encryptx` varchar(128) NOT NULL DEFAULT '' COMMENT '还款账户名称密文',\n" +
+                "    `db_acct_name_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT '还款账户名称MD5',\n" +
+                "    `loan_source` varchar(20) NOT NULL DEFAULT '' COMMENT '资金动用渠道',\n" +
+                "    `date_settle` date DEFAULT NULL COMMENT '结清日期',\n" +
+                "    `date_bd` date DEFAULT NULL COMMENT '呆账日期',\n" +
+                "    `date_wo` date DEFAULT NULL COMMENT '坏账日期',\n" +
+                "    `date_accrued` date DEFAULT NULL COMMENT '转非应计日期',\n" +
+                "    `date_compensate` date DEFAULT NULL COMMENT '代偿日期',\n" +
+                "    `over_due_days` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '逾期天数',\n" +
+                "    `over_due_status` varchar(10) DEFAULT 'M0' COMMENT '拖欠周期状态码',\n" +
+                "    `loan_bal` decimal(17, 2) NOT NULL DEFAULT '0.00' COMMENT '剩余本金',\n" +
+                "    `free_days` int(11) unsigned DEFAULT '0' COMMENT '免息天数',\n" +
+                "    `date_stat` date DEFAULT NULL COMMENT '核算日期',\n" +
+                "    `status` varchar(2) NOT NULL DEFAULT '' COMMENT '借据状态:AP-待放款,\n" +
+                "RP-还款中,\n" +
+                "OD-逾期中,\n" +
+                "FP-结清,\n" +
+                "BD-呆账,\n" +
+                "WO-坏账',\n" +
+                "    `accrual_type` varchar(5) DEFAULT 'AC' COMMENT '会计类型:AC应计,\n" +
+                "NAC非应计',\n" +
+                "    `compensate_type` varchar(5) DEFAULT 'NCP' COMMENT '代偿类型,\n" +
+                "NCP未代偿,\n" +
+                "ECP提前代偿,\n" +
+                "OCP逾期代偿',\n" +
+                "    `sub_product_ver` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '子产品版本号',\n" +
+                "    `sub_product_code` varchar(64) NOT NULL DEFAULT '' COMMENT '子产品代码',\n" +
+                "    `seq_no` int(11) unsigned NOT NULL DEFAULT '1' COMMENT '借款次数序号',\n" +
+                "    `first_loan` varchar(1) DEFAULT NULL COMMENT '首贷标识:Y-是;N-否',\n" +
+                "    `third_code` varchar(64) NOT NULL DEFAULT '' COMMENT '第三方编码',\n" +
+                "    `offer_req_no` varchar(64) DEFAULT NULL COMMENT '报盘流水号',\n" +
+                "    `pay_order_no` varchar(64) DEFAULT NULL COMMENT '支付订单号',\n" +
+                "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
+                "    `created_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '创建人',\n" +
+                "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
+                "    `updated_by` varchar(100) NOT NULL DEFAULT 'sys' COMMENT '修改人',\n" +
+                "    PRIMARY KEY (`id`),\n" +
+                "    UNIQUE KEY `i_lc_ll_req` (`loan_req_no`),\n" +
+                "    UNIQUE KEY `i_lc_ll_loan` (`loan_no`),\n" +
+                "    KEY `i_lc_ll_con` (`contract_no`),\n" +
+                "    KEY `i_lc_ll_ct` (`cust_no`),\n" +
+                "    KEY `idx_third_rp_day` (`third_code`, `rp_day`)\n" +
+                ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COMMENT = '借据信息表'";
 
         MySqlStatementParser parser = new MySqlStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();
@@ -101,49 +116,27 @@ public class MySQLTest {
 
     @Test
     public void mysqlToView(){
-        String sql = "CREATE TABLE `car_owner_loan_appl` (\n" +
-                "    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',\n" +
-                "    `user_no` varchar(32) NOT NULL COMMENT '用户号',\n" +
-                "    `appl_no` varchar(64) NOT NULL COMMENT '申请单号',\n" +
-                "    `out_appl_no` varchar(64) NOT NULL COMMENT '机构单号',\n" +
-                "    `partner_code` varchar(32) NOT NULL COMMENT '机构编号',\n" +
-                "    `product_code` varchar(32) NOT NULL COMMENT '产品编码',\n" +
-                "    `product_name` varchar(32) NOT NULL COMMENT '产品名称',\n" +
-                "    `name_encryptx` varchar(2048) NOT NULL COMMENT '姓名 - 加密',\n" +
-                "    `name_md5x` varchar(32) NOT NULL COMMENT '姓名 - MD5',\n" +
-                "    `phone_encryptx` varchar(2048) NOT NULL COMMENT '手机号 - 加密',\n" +
-                "    `phone_md5x` varchar(32) NOT NULL COMMENT '手机号 - MD5',\n" +
-                "    `plate_no` varchar(8) NOT NULL COMMENT '车牌号',\n" +
-                "    `city_code` varchar(6) NOT NULL COMMENT '城市编码',\n" +
-                "    `city_name` varchar(32) DEFAULT NULL COMMENT '城市名称',\n" +
-                "    `source` varchar(32) NOT NULL DEFAULT 'ONLINE' COMMENT '车主贷订单来源 CarOrderSourceEnum',\n" +
-                "    `recommend_phone_encryptx` varchar(2048) NOT NULL DEFAULT '' COMMENT '推荐人手机号-加密串',\n" +
-                "    `recommend_phone_md5x` varchar(32) NOT NULL DEFAULT '' COMMENT '推荐人手机号-MD5',\n" +
-                "    `purchase_method` varchar(32) NOT NULL DEFAULT '' COMMENT '购车方式 CarPurchaseMethodEnum',\n" +
-                "    `mortgaged_state` char(1) DEFAULT '' COMMENT '抵押状态，Y:抵押中 N:无抵押',\n" +
-                "    `old_car_state` char(1) DEFAULT '' COMMENT '老车龄状态，Y:是老车龄 N:非老车龄',\n" +
-                "    `authorized` char(1) DEFAULT '' COMMENT '协议授权状态，1:已授权 0:未授权',\n" +
-                "    `apply_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',\n" +
-                "    `state` varchar(3) DEFAULT NULL COMMENT '申请状态 APQ：已发送队列 APR：审核中（已发送机构）ARJ：拒绝 APS：申请成功',\n" +
-                "    `sub_state` varchar(32) NOT NULL COMMENT '子状态',\n" +
-                "    `outer_code` varchar(32) DEFAULT NULL COMMENT '机构返回码',\n" +
-                "    `outer_msg` varchar(1024) DEFAULT NULL COMMENT '机构返回描述',\n" +
-                "    `outer_sub_code` varchar(32) NOT NULL COMMENT '机构子返回码',\n" +
-                "    `outer_sub_msg` varchar(1024) NOT NULL COMMENT '机构子返回描述',\n" +
-                "    `loan_amount` decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '放款金额',\n" +
-                "    `loan_num` int(11) NOT NULL DEFAULT '0' COMMENT '融资期限',\n" +
-                "    `rate` decimal(10, 2) NOT NULL DEFAULT '0.00' COMMENT '利率',\n" +
-                "    `outer_ext_result` varchar(1024) NOT NULL DEFAULT '' COMMENT '机构返回的一些额外的信息',\n" +
-                "    `out_state_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '机构状态变更时间（非我方从机构同步结果的时间）',\n" +
-                "    `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n" +
-                "    `created_by` varchar(32) NOT NULL DEFAULT 'sys' COMMENT '创建者',\n" +
-                "    `date_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',\n" +
-                "    `updated_by` varchar(32) NOT NULL DEFAULT 'sys' COMMENT '修改者',\n" +
+        String sql = "CREATE TABLE `abs_loan_assign_condition_sub` (\n" +
+                "    `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键',\n" +
+                "    `special_plan_no` varchar(64) NOT NULL DEFAULT '' COMMENT '专项计划编号',\n" +
+                "    `third_code` varchar(20) NOT NULL DEFAULT '' COMMENT '合作方代码',\n" +
+                "    `date_loan` date DEFAULT NULL COMMENT '借款日期',\n" +
+                "    `valid_comp_end_date` date DEFAULT NULL COMMENT '企业信息核查截止日期',\n" +
+                "    `refuse_loan_source` varchar(255) NOT NULL DEFAULT '' COMMENT '借款渠道',\n" +
+                "    `accept_underly_assets` char(1) NOT NULL DEFAULT 'Y' COMMENT '是否承接兜底资产',\n" +
+                "    `api_channels` varchar(300) NOT NULL DEFAULT '' COMMENT 'api渠道英文逗号隔开',\n" +
+                "    `invalid_date` datetime DEFAULT NULL COMMENT '失效日期',\n" +
+                "    `status` varchar(2) NOT NULL DEFAULT '1' COMMENT '状态 0/1',\n" +
+                "    `remark` varchar(200) DEFAULT NULL COMMENT '备注',\n" +
+                "    `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',\n" +
+                "    `created_by` varchar(32) NOT NULL DEFAULT 'sys' COMMENT '记录创建者',\n" +
+                "    `date_updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录修改时间',\n" +
+                "    `updated_by` varchar(32) NOT NULL DEFAULT 'sys' COMMENT '记录修改者',\n" +
                 "    PRIMARY KEY (`id`),\n" +
-                "    UNIQUE KEY `uni_appl_no` (`appl_no`),\n" +
-                "    KEY `idx_status_date_created` (`state`, `date_created`),\n" +
-                "    KEY `idx_user_product` (`user_no`, `product_code`)\n" +
-                ") ENGINE = InnoDB AUTO_INCREMENT = 1468389 DEFAULT CHARSET = utf8 COMMENT = '车主贷申请表'";
+                "    UNIQUE KEY `uniq_condition_supp` (`special_plan_no`(20), `third_code`)\n" +
+                "    USING\n" +
+                "        BTREE\n" +
+                ") ENGINE = InnoDB AUTO_INCREMENT = 73 DEFAULT CHARSET = utf8 COMMENT = 'ABS入池条件补充表'";
 
         MySqlStatementParser parser = new MySqlStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();

@@ -14,6 +14,7 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLIndexDefinition;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.dialect.mysql.ast.MySqlPrimaryKey;
 import com.alibaba.druid.sql.dialect.mysql.ast.MySqlUnique;
@@ -71,9 +72,6 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
     }
 
     private String replaceChar(String str) {
-        if (StringUtils.isBlank(str)){
-            return StringUtils.EMPTY;
-        }
         return str.trim().replaceAll("`", "")
             .replaceAll(" ", "")
             .replaceAll("：", ":")
@@ -167,7 +165,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         } else if (SQLDataType.Constants.BIGINT.equals(unionType) || SQLDataType.Constants.DECIMAL.equals(unionType)) {
             selectColumnContent.append("COALESCE(").append(columnName).append(",0)").append(kuhaoAS).append(columnNameNew);
         } else {
-            selectColumnContent.append("IF(trim(").append(columnName).append(") IN ('','null'),NULL,trim(").append(columnName).append("))").append(kuhaoAS).append(columnNameNew);
+            selectColumnContent.append("IF(trim(").append(columnName).append(") IN ('','null','NULL'),NULL,trim(").append(columnName).append("))").append(kuhaoAS).append(columnNameNew);
         }
 
         selectColumnContent.append(System.lineSeparator());
@@ -186,7 +184,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         if (Boolean.FALSE.equals(ifView)) {
             createContent = new StringBuilder("CREATE TABLE IF NOT EXISTS").append(SPACE_PAD);
         } else {
-            createContent = new StringBuilder("CREATE VIEW IF NOT EXISTS").append(SPACE_PAD);
+            createContent = new StringBuilder("CREATE OR REPLACE VIEW").append(SPACE_PAD);
         }
         createContent.append(tableName).append(SPACE_PAD)
                 .append("(").append(SPACE_PAD)
@@ -297,9 +295,20 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
     public void endVisit(MySqlUnique mySqlUnique) {
         SQLIndexDefinition idxDefinition = mySqlUnique.getIndexDefinition();
-        idxDefinition.getColumns().forEach(sqlSelectOrderByItem -> {
-            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            uniqueNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+        idxDefinition.getColumns().forEach(item -> {
+            SQLExpr sqlExpr = item.getExpr();
+            String name = null;
+            if(sqlExpr instanceof SQLMethodInvokeExpr){
+                SQLMethodInvokeExpr invokeExpr = (SQLMethodInvokeExpr) sqlExpr;
+                name = invokeExpr.getMethodName();
+            }
+
+            if(sqlExpr instanceof SQLIdentifierExpr){
+                SQLIdentifierExpr invokeExpr = (SQLIdentifierExpr) sqlExpr;
+                name = invokeExpr.getName();
+            }
+
+            uniqueNum.computeIfAbsent(replaceChar(name),
                     s -> new StringBuilder("业务主键")).append(uniqueIdx).append(COMMA);
         });
 
@@ -308,9 +317,20 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
     public void endVisit(MySqlPrimaryKey primaryKey) {
         SQLIndexDefinition idxDefinition = primaryKey.getIndexDefinition();
-        idxDefinition.getColumns().forEach(sqlSelectOrderByItem -> {
-            SQLIdentifierExpr identifierExpr = (SQLIdentifierExpr) sqlSelectOrderByItem.getExpr();
-            priKeyNum.computeIfAbsent(replaceChar(identifierExpr.getName()),
+        idxDefinition.getColumns().forEach(item -> {
+            SQLExpr sqlExpr = item.getExpr();
+            String name = null;
+            if(sqlExpr instanceof SQLMethodInvokeExpr){
+                SQLMethodInvokeExpr invokeExpr = (SQLMethodInvokeExpr) sqlExpr;
+                name = invokeExpr.getMethodName();
+            }
+
+            if(sqlExpr instanceof SQLIdentifierExpr){
+                SQLIdentifierExpr invokeExpr = (SQLIdentifierExpr) sqlExpr;
+                name = invokeExpr.getName();
+            }
+
+            priKeyNum.computeIfAbsent(replaceChar(name),
                     s -> new StringBuilder("主键")).append(priKeyIdx).append(COMMA);
         });
 

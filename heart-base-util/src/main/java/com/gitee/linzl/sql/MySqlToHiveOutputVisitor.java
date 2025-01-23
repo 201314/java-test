@@ -1,7 +1,6 @@
 package com.gitee.linzl.sql;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import com.alibaba.druid.sql.dialect.mysql.ast.MySqlPrimaryKey;
 import com.alibaba.druid.sql.dialect.mysql.ast.MySqlUnique;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
-import com.alibaba.druid.sql.visitor.VisitorFeature;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -65,7 +63,7 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         this.createColumnContent = new StringBuilder();
         this.selectColumnContent = new StringBuilder();
         this.priKeyNum = new LinkedHashMap<>();
-        this. uniqueNum = new LinkedHashMap<>();
+        this.uniqueNum = new LinkedHashMap<>();
         this.columnIdx = new ArrayList<>();
         this.priKeyIdx = 1;
         this.uniqueIdx = 1;
@@ -165,7 +163,10 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
         } else if (SQLDataType.Constants.BIGINT.equals(unionType) || SQLDataType.Constants.DECIMAL.equals(unionType)) {
             selectColumnContent.append("COALESCE(").append(columnName).append(",0)").append(kuhaoAS).append(columnNameNew);
         } else {
-            selectColumnContent.append("IF(trim(").append(columnName).append(") IN ('','null','NULL'),NULL,trim(").append(columnName).append("))").append(kuhaoAS).append(columnNameNew);
+            selectColumnContent.append("IF(trim(").append(columnName).append(") IN ('','null','NULL'),NULL,trim(")
+             .append(columnName).append("))").append(kuhaoAS).append(columnNameNew);
+            //selectColumnContent.append("NULL_BLANK(").append(columnName).append(")").append(kuhaoAS).append
+            // (columnNameNew);
         }
 
         selectColumnContent.append(System.lineSeparator());
@@ -263,6 +264,8 @@ public class MySqlToHiveOutputVisitor extends MySqlASTVisitorAdapter {
 
         // insert select 语句
         StringBuilder selectContent = new StringBuilder();
+        // selectContent.append("-- NULL_BLANK 函数: 替换空字符串、大小写'null'替换为null, 否则返回原字符串并去除前后空格");
+        // selectContent.append(System.lineSeparator());
         if (Boolean.FALSE.equals(ifView)) {
             selectContent.append("INSERT OVERWRITE TABLE").append(SPACE_PAD).append(tableName).append(System.lineSeparator());
         }

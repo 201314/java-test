@@ -51,6 +51,8 @@ import java.util.Objects;
  * <p>
  * Blowfish
  *
+ * Bcrypt 加密，验证
+ *
  * @author linzl
  */
 public class DefaultSymmetricCipher implements ICipher {

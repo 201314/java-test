@@ -5,6 +5,7 @@ import com.gitee.linzl.lambda.constructor.Student;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +69,10 @@ public class MapDemo {
         for (Map.Entry<String, Integer> e : list) {
             System.out.println(e.getKey() + ":" + e.getValue());
         }
+
+        LinkedHashMap<String, Integer> collect = map.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toMap(stringIntegerEntry -> stringIntegerEntry.getKey(), stringIntegerEntry -> stringIntegerEntry.getValue(), (k1, k2) -> k2, LinkedHashMap::new));
+        System.out.println(collect);
+        collect.forEach((s, integer) -> System.out.println(s + ":" + integer));
     }
 
     public static void main(String[] args) {

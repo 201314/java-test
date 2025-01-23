@@ -88,6 +88,11 @@ public class ListDemo {
 
 
     public static void listFlatMap() {
+        List<String> originalList = Arrays.asList("a_b", "c_d_e", "f", "g_h_i_j");
+        List<String> resultList = originalList.stream()
+                .filter(s -> s.contains("_"))
+                .flatMap(s -> Arrays.stream(s.split("_")))
+                .collect(Collectors.toList());
     }
 
 

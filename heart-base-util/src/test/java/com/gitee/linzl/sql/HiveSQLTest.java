@@ -1,5 +1,6 @@
 package com.gitee.linzl.sql;
 
+import com.alibaba.druid.filter.config.ConfigTools;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -15,10 +16,17 @@ import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.alibaba.druid.sql.dialect.hive.parser.HiveStatementParser;
 import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
 import com.alibaba.druid.sql.dialect.hive.visitor.HiveSchemaStatVisitor;
+import com.alibaba.excel.util.DateUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.gitee.linzl.time.DateFormatUtil;
+import com.gitee.linzl.time.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -405,7 +413,7 @@ public class HiveSQLTest {
                 ",\"metadata\":{\"comment\":\"API渠道标识_p0动支(Y-是\n" +
                 ",N-否)\"}}]}'\n" +
                 ", 'transient_lastDdlTime' = '1714948151')";
-        parse(createSql.replaceAll("`",""));
+        parse(createSql.replaceAll("`", ""));
     }
 
     @Test
@@ -449,7 +457,7 @@ public class HiveSQLTest {
                 "    replace(`cis_u_user_decrypt`.`partitions`, '-', '') as `pday`\n" +
                 "from\n" +
                 "    `ods_safe`.`cis_u_user_decrypt`";
-        parse(createViewSql.replaceAll("`",""));
+        parse(createViewSql.replaceAll("`", ""));
     }
 
 
@@ -470,34 +478,23 @@ public class HiveSQLTest {
 
     @Test
     public void drop2() {
-        String sql = "INSERT OVERWRITE TABLE dwd_tmp.test " +
-                " SELECT * FROM (" +
-                " select distinct loan_no,user_name FROM A where id = 1 AND date(time_submit)>'11'" +
-                " UNION ALL " +
-                " select distinct loan_no,user_name FROM A where id = 2 AND time>'22'" +
-                " )b WHERE b.id = 3;";
-        String correctSql = "INSERT OVERWRITE TABLE dwd_tmp.test" +
-                "SELECT  * FROM (\n" +
-                " SELECT  loan_no,user_name FROM A WHERE id = 1 AND date(time_submit) > '11'\n" +
-                " GROUP BY  loan_no,user_name\n" +
-                " UNION ALL\n" +
-                " SELECT  loan_no,user_name FROM A WHERE id = 2 AND time > '22'\n" +
-                " GROUP BY  loan_no,user_name\n" +
-                ") AS b WHERE b.id = 3;";
+        String sql = "insert overwrite table dwd_tmp.clue_tag_info_20250314 \n" +
+                "select a.*\n" +
+                "       ,b\n" +
+                "FROM tb AS a";
         HiveStatementParser parser = new HiveStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();
         HiveRuleCheckVisitor visitor = new HiveRuleCheckVisitor();
-        List<SQLExprTableSource> tableList = new ArrayList<>();
         stmtList.forEach(sqlStatement -> {
             sqlStatement.accept(visitor);
-            tableList.addAll(visitor.getTableList());
         });
     }
 
     @Test
     public void create() {
         String sql =
-                "CREATE TABLE fin_dw.dwd_trade_loan_pda ( \n" +
+                "DROP TABLE IF EXISTS fin_dw.dwd_trade_loan_pda; " +
+                        "CREATE TABLE fin_dw.dwd_trade_loan_pda ( \n" +
                         "     user_no                 string         COMMENT  '用户号' \n" +
                         "    ,cust_no                 string         COMMENT  '' \n" +
                         "    ,term                    INT            COMMENT  '期数' \n" +
@@ -598,7 +595,7 @@ public class HiveSQLTest {
     @Test
     public void create5() {
         String sql = "CREATE TABLE IF NOT EXISTS dwd_tmp.test USING TEXT AS \n"
-                + "SELECT  t.id AS id2\n"
+                + "SELECT  t.id AS id2,id\n"
                 + "FROM (select * FROM (select * FROM dwd_tmp.tmp01_his where 1=1) AS a1  where 2=2) AS a2 where a2.id=1\n";
         HiveStatementParser parser = new HiveStatementParser(sql);
         List<SQLStatement> stmtList = parser.parseStatementList();
@@ -700,6 +697,70 @@ public class HiveSQLTest {
         // cross join / full join
     }
 
+    @Test
+    public void moreSelectJoin() {
+        String sql = "SELECT  loan_no,IF(t0.settle_days IS NOT NULL, t1.settle_term, NULL) AS settle_term,loan_no\n"
+                + "       ,t1.date_settle_days_last\n"
+                + "       ,COUNT(distinct loan_no) AS loan_cnt\n"
+                + "       ,COALESCE(t2.over_due_days_head_3terms_max ,0)\n"
+                + "       ,t3.date_tran_last\n"
+                + "       ,GET_JSON_OBJECT(outputjson, '$.score') AS score\n"
+                + "       ,get_json_object(outputjson, '$.val') AS val\n"
+                + "       ,'${last2Days_p}'                                   AS pday\n"
+                + "       ,t0.source_type   AS source_type\n"
+                + "FROM dwd_tmp.tmp00_his AS t0\n"
+                + "LEFT JOIN dwd_tmp.tmp01_his AS t1\n"
+                + "ON t0.loan_no = t1.loan_no\n"
+                + "LEFT JOIN dwd_tmp.tmp02_his AS t2\n"
+                + "ON t0.loan_no = t2.loan_no AND 1=1\n"
+                + "LEFT JOIN dwd_tmp.tmp03_his AS t3\n"
+                + "ON t2.loan_no = t3.loan_no\n"
+                + "LEFT JOIN dwd_tmp.tmp04_his AS t4\n"
+                + "ON t2.loan_no = t4.loan_no\n"
+                + "LEFT JOIN dwd_tmp.tmp05_his AS t5\n"
+                + "ON t2.loan_no = t5.loan_no\n"
+                + "LEFT JOIN dwd_tmp.tmp06_his\n"
+                + "ON t2.loan_no = loan_no";
+        HiveStatementParser parser = new HiveStatementParser(sql);
+        List<SQLStatement> stmtList = parser.parseStatementList();
+        HiveRuleCheckVisitor visitor = new HiveRuleCheckVisitor();
+        List<SQLExprTableSource> tableList = new ArrayList<>();
+        stmtList.forEach(sqlStatement -> {
+            sqlStatement.accept(visitor);
+            tableList.addAll(visitor.getTableList());
+        });
+    }
+
+    @Test
+    public void oneSelect() {
+        String sql = "SELECT  t.id AS id2,id,id AS id2,t.id\n"
+                + "FROM  dwd_tmp.tmp01_his AS t where 1=1";
+        HiveStatementParser parser = new HiveStatementParser(sql);
+        List<SQLStatement> stmtList = parser.parseStatementList();
+        HiveRuleCheckVisitor visitor = new HiveRuleCheckVisitor();
+        List<SQLExprTableSource> tableList = new ArrayList<>();
+        stmtList.forEach(sqlStatement -> {
+            sqlStatement.accept(visitor);
+            tableList.addAll(visitor.getTableList());
+        });
+    }
+
+    @Test
+    public void unionSelect() {
+        String sql = "\n" +
+                "  select *,id AS id2 from A_tb\n" +
+                "  UNION\n" +
+                "  select *,id AS id2 from B_tb\n" +
+                "  ";
+        HiveStatementParser parser = new HiveStatementParser(sql);
+        List<SQLStatement> stmtList = parser.parseStatementList();
+        HiveRuleCheckVisitor visitor = new HiveRuleCheckVisitor();
+        List<SQLExprTableSource> tableList = new ArrayList<>();
+        stmtList.forEach(sqlStatement -> {
+            sqlStatement.accept(visitor);
+            tableList.addAll(visitor.getTableList());
+        });
+    }
     // 嵌套式子查询join
     // WITH{
     //  ****
@@ -762,5 +823,15 @@ public class HiveSQLTest {
                 }*/
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJIKPetpntNzLVlBMQcwXx24Vel8ja7bf/u7PZhkPeI4c9lD6BNDJJP7IQ+0bRS6NvQzAxP2UBsEr0qlZ6sIfi0CAwEAAQ==";
+        String password="ZMrdrWUc+U7/PSDNJRprcuaI4NgWKjnlXqJ8vegAegI697/TUNzPdIt4DF8keRqy4s2kaX10QhSczRJHJOnO5A==";
+        String rawPwd = ConfigTools.decrypt(publicKey,password);
+        System.out.println(rawPwd);
+
+        String times ="12:12:14";
+        System.out.println(DateFormatUtil.format(DateUtils.parseDate(times),DateFormatUtil.HH_MM_SS));
     }
 }

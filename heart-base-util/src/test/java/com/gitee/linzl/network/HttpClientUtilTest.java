@@ -1,5 +1,15 @@
 package com.gitee.linzl.network;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.junit.Test;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,10 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.junit.Test;
 
 /**
  * @author linzl
@@ -26,24 +32,25 @@ public class HttpClientUtilTest {
     }
 
     @Test
+    public void getLgl() {
+        String url = "http://purplerattle.w3.luyouxia.net/data";
+        String json = HttpClientUtil.getInstance().httpGet(url + "?st=as0");
+        System.out.println("第一次==》" + json);
+        json = HttpClientUtil.getInstance().httpGet(url + "?st=as1");
+        System.out.println("第二次==》" + json);
+        json = HttpClientUtil.getInstance().httpGet(url + "?st=as2");
+        System.out.println("第三次==》" + json);
+        json = HttpClientUtil.getInstance().httpGet(url + "?st=as3");
+        System.out.println("第四次==》" + json);
+        json = HttpClientUtil.getInstance().httpGet(url + "?st=as4");
+        System.out.println("第五次==》" + json);
+    }
+
+    @Test
     public void postJson() {
         String url = "http://localhost:8080/hello";
         String json = "{\"authCode\":\"1Ictlh5dRc40kSZo8t+YQlzik3MOQSQ+bsBq4Ztad+w=\",\"deviceNo\":\"10021001\",\"merchantMac\":\"13450284C79AF1EDEB0A07AFC57C4E17D1E6B1629F098E710241B29E6EC94AB851CD151CFD9F5A039820AD5A07E51C299879371035ECE42B885450EE71DB72C1\",\"orderAmt\":1,\"orderNo\":\"df228f7504b64c2aa251c5dce991ef5d00000\",\"requestTime\":\"190109160329\",\"vehTypeCode\":\"3\",\"vehplateColorCode\":\"2\",\"vehplateNo\":\"绮�A00002\",\"version\":\"2.0\"}";
         String resultJson = HttpClientUtil.getInstance().postJson(url, json);
-        System.out.println(resultJson);
-    }
-
-    @Test
-    public void postToWecenter() {
-        // 用户注册信息post到圈子
-        String url = "https://quanzi.utea20.com/api/createOrUpdateUser.php";
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        list.add(new BasicNameValuePair("account", "testAccount"));
-        list.add(new BasicNameValuePair("uuid", "110110"));
-        list.add(new BasicNameValuePair("nickname", "测试"));
-        list.add(new BasicNameValuePair("mobile", "110"));
-        list.add(new BasicNameValuePair("email", "99@qq.com"));
-        String resultJson = HttpClientUtil.getInstance().postForm(url, list);
         System.out.println(resultJson);
     }
 
@@ -70,18 +77,17 @@ public class HttpClientUtilTest {
     }
 
     @Test
-    public void getLgl() {
-        String url = "http://purplerattle.w3.luyouxia.net/data";
-        String json = HttpClientUtil.getInstance().httpGet(url + "?st=as0");
-        System.out.println("第一次==》" + json);
-        json = HttpClientUtil.getInstance().httpGet(url + "?st=as1");
-        System.out.println("第二次==》" + json);
-        json = HttpClientUtil.getInstance().httpGet(url + "?st=as2");
-        System.out.println("第三次==》" + json);
-        json = HttpClientUtil.getInstance().httpGet(url + "?st=as3");
-        System.out.println("第四次==》" + json);
-        json = HttpClientUtil.getInstance().httpGet(url + "?st=as4");
-        System.out.println("第五次==》" + json);
+    public void postToWecenter() {
+        // 用户注册信息post到圈子
+        String url = "https://quanzi.utea20.com/api/createOrUpdateUser.php";
+        List<NameValuePair> list = new ArrayList<NameValuePair>();
+        list.add(new BasicNameValuePair("account", "testAccount"));
+        list.add(new BasicNameValuePair("uuid", "110110"));
+        list.add(new BasicNameValuePair("nickname", "测试"));
+        list.add(new BasicNameValuePair("mobile", "110"));
+        list.add(new BasicNameValuePair("email", "99@qq.com"));
+        String resultJson = HttpClientUtil.getInstance().postForm(url, list);
+        System.out.println(resultJson);
     }
 
     @Test

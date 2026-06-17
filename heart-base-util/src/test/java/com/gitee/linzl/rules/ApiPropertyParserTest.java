@@ -1,11 +1,8 @@
 package com.gitee.linzl.rules;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
-public class ApiParamUtilTest {
+public class ApiPropertyParserTest {
     String content = "{\n" +
         "\t\"callbackBody\": {\n" +
         "\t\t\"自定义返回key1\": \"${requestData.loginTime}\",\n" +
